@@ -209,8 +209,8 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="w-full py-20 px-10 bg-gray-800 md:px-20 flex-col md:flex-row justify-between gap-8"></div>
-      </div>
+        <div className="w-screen h-50 flex items-center justify-center bg-[url('/background.svg')] bg-cover bg-center"></div>
+        </div>
     </>
   );
 };
