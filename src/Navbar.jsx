@@ -58,7 +58,7 @@ const Navbar = () => {
 
       {/* Mobile Dropdown Menu */}
       {menuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-md">
+        <div className="md:hidden absolute top-full left-0 w-full bg-neutral-600 shadow-md">
           <ul className="flex flex-col items-center space-y-4 p-4">
             <li><Link to="/shop" className="hover:text-red-500 transition">Shop</Link></li>
             <li><Link to="/orders" className="hover:text-red-500 transition">Orders</Link></li>

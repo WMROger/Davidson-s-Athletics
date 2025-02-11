@@ -6,6 +6,8 @@ import Orders from './Pages/Orders'
 import Home from './Pages/Home'
 import Cart from './Pages/Cart'
 import Services from './Pages/Services'
+import Login from './Pages/Login'
+import Register from './Pages/Register'
 
 function App() {
 
@@ -18,6 +20,8 @@ function App() {
       <Route path="/orders" element={<Orders />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/services" element={<Services />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
     </Routes>
   </div>
   )
