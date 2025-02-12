@@ -1,16 +1,49 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
 const Home = () => {
   return (
     <>
       <div className="bg-white">
-        {/*Hero Section*/}
-        <div className="h-auto w-full">
-          <img
-            className="w-full h-auto object-cover"
-            src="/Home Assets/Hero.svg"
-            alt="Hero"
-          />
+        {/* Hero Section with Carousel */}
+        <div className="h-auto w-screen">
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay]}
+            spaceBetween={0}
+            slidesPerView={1}
+            navigation
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 3000 }}
+            loop={true}
+            className="w-screen h-auto"
+          >
+            <SwiperSlide>
+              <img
+                className="w-screen h-auto object-cover"
+                src="/Home Assets/Hero.svg"
+                alt="Hero"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <img
+                className="w-screen h-auto object-cover"
+                src="/Home Assets/Hero1.svg"
+                alt="Hero 1"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <img
+                className="w-screen h-auto object-cover"
+                src="/Home Assets/Hero2.svg"
+                alt="Hero 2"
+              />
+            </SwiperSlide>
+          </Swiper>
         </div>
 
         {/*Parent Container*/}
@@ -209,8 +242,8 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="w-screen h-50 flex items-center justify-center bg-[url('/background.svg')] bg-cover bg-center"></div>
-        </div>
+        <div className="w-full py-20 px-10 bg-gray-800 md:px-20 flex-col md:flex-row justify-between gap-8"></div>
+      </div>
     </>
   );
 };

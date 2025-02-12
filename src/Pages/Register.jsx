@@ -11,7 +11,7 @@ export default function Register() {
 
   return (
     <div className="h-screen flex items-center justify-center bg-[url('/background.svg')] bg-cover bg-center">
-      <div className="bg-neutral-800 p-15 rounded-3xl shadow-lg w-116">
+      <div className="bg-neutral-800 p-15 border-1 border-white rounded-2xl shadow-lg w-[450px] mt-22 pb-16">
         <div className="flex justify-center mb-6">
           <img
             src="/Logo.svg"
@@ -47,7 +47,7 @@ export default function Register() {
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                className="w-41 inline-block p-2 border border-gray-300 text-white rounded-lg focus:ring focus:ring-blue-300"
+                className="w-39 inline-block p-2 border border-white text-white rounded-lg focus:ring focus:ring-blue-300"
                 required
               />
             </div>
@@ -55,7 +55,7 @@ export default function Register() {
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                className="w-41 inline-block p-2 border border-gray-300 text-white rounded-lg focus:ring focus:ring-blue-300"
+                className="w-39 inline-block p-2 border border-gray-300 text-white rounded-lg focus:ring focus:ring-blue-300"
                 required
               />
             </div>
