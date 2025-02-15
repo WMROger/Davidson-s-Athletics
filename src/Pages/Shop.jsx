@@ -9,10 +9,10 @@ const Shop = () => {
         {/* Hero Section */}
         <section 
           className="hero bg-cover bg-center h-64 flex items-center justify-center text-white rounded-lg shadow-lg"
-          style={{ backgroundImage: "url('/path-to-hero-image.jpg')" }}
+          style={{ backgroundImage: "url('Home Assets/ Hero1.svg')" }}
         >
 
-          <h2 className="text-4xl font-bold bg-black bg-opacity-50 p-4 rounded-lg">
+          <h2 className="text-4xl font-bold bg-orange bg-opacity-50 p-4 rounded-lg">
             Welcome to Davidson Athletics Shop
           </h2>
         </section>
