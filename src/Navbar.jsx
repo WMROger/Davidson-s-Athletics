@@ -12,7 +12,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-transparent text-white px-7 py-4 z-50 backdrop-filter backdrop-blur-3xl">
+    // text for nav bar is black
+    <nav className="fixed top-0 left-0 w-full bg-transparent text-black px-7 py-4 z-50 backdrop-filter backdrop-blur-3xl">
       <div className="container mx-auto flex justify-between items-center">
 
         {/* Logo */}
@@ -34,7 +35,8 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           {/* Search Bar */}
           <div className="relative hidden md:block">
-            <Search className="absolute right-5 top-1/2 transform -translate-y-1/2 text-white" size={24} />
+            {/* Search Button Black Icon */}
+            <Search className="absolute right-5 top-1/2 transform -translate-y-1/2 text-black" size={24} /> 
             <input
               type="text"
               value={searchQuery}
