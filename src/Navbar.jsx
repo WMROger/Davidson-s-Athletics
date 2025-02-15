@@ -1,25 +1,33 @@
+// src/components/Navbar.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Search } from "lucide-react"; // npm install lucide-react
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate(); // Added hook to navigate programmatically
 
   // Toggle mobile menu
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
+  // Handle shirt click and navigate to customize page with state
+  const handleShirtClick = (image, color) => {
+    navigate("/customizeshirt", { state: { selectedImage: image, selectedColor: color } });
+  };
+
   return (
-    // text for nav bar is black
     <nav className="fixed top-0 left-0 w-full bg-transparent text-black px-7 py-4 z-50 backdrop-filter backdrop-blur-3xl">
       <div className="container mx-auto flex justify-between items-center">
-
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 text-2xl font-bold">
           <img className="h-20 w-auto" src="/Logo.svg" alt="Logo" />
-        <span className="text-3xl leading-none">  <p>Davidson</p> <p className="text-orange-300">Athletics</p> </span>
+          <span className="text-3xl leading-none">
+            <p>Davidson</p>
+            <p className="text-orange-300">Athletics</p>
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -36,7 +44,7 @@ const Navbar = () => {
           {/* Search Bar */}
           <div className="relative hidden md:block">
             {/* Search Button Black Icon */}
-            <Search className="absolute right-5 top-1/2 transform -translate-y-1/2 text-black" size={24} /> 
+            <Search className="absolute right-5 top-1/2 transform -translate-y-1/2 text-black" size={24} />
             <input
               type="text"
               value={searchQuery}
@@ -44,8 +52,6 @@ const Navbar = () => {
               placeholder="Search..."
               className="pl-5 pr-4 p-2 border border-gray-300 rounded-full text-white focus:outline-none w-64"
             />
-
-          
           </div>
           <Link to="/login" className="hover:text-red-500 transition">Login</Link>
           <Link to="/register" className="hover:text-red-500 transition">Register</Link>

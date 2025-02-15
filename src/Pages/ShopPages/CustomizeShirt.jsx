@@ -1,29 +1,47 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const CustomizeShirt = () => {
+  const location = useLocation();
+  const { state } = location;
+  const selectedImage = state?.selectedImage;
+  const selectedColor = state?.selectedColor;
+
   const colors = ["black", "green", "red", "blue", "purple", "yellow"];
   const sizes = ["Small", "Medium", "Large", "XL", "XXL"];
+  const [currentColor, setCurrentColor] = useState(selectedColor || "black");
+  const [shirtImage, setShirtImage] = useState(selectedImage || "/images/default-shirt.jpg");
+
+  useEffect(() => {
+    // Ensure the image updates correctly when the color changes
+    setShirtImage(`/Home Assets/home_img_longSleeve-${currentColor}.svg`);
+  }, [currentColor]);
 
   return (
-    <div className="container mx-auto p-6">
-      {/* Main Shirt Customization Section */}
-      <div className="flex gap-10">
-        {/* Shirt Image */}
+    <div className="w-full">
+      {/* Black Background Section */}
+      <div className="w-full mt-25 h-32 bg-black"></div>
+
+      {/* Shirt Customization Section */}
+      <div className="container mx-auto p-6 flex gap-10">
+        {/* Left Side: Static Shirt Preview */}
         <div className="w-1/2">
           <img
-            src="/path-to-shirt-image.jpg"
-            alt="Long Sleeve Jersey"
+            src="/images/default-shirt.jpg"
+            alt="Long Sleeve Shirt"
             className="w-full rounded-lg shadow-lg"
           />
         </div>
 
-        {/* Customization Options */}
+        {/* Right Side: Dynamic Shirt Image from Shop */}
         <div className="w-1/2">
-          <h2 className="text-2xl font-bold">Long Sleeve Jersey</h2>
-          <p className="text-gray-500 mt-2">
-            High-quality long sleeve jersey. The perfect fit for your needs.
-          </p>
+          <h2 className="text-2xl font-bold">Long Sleeve Shirt</h2>
           <p className="text-xl font-semibold mt-2">PHP 450.00</p>
+          <img
+            src={shirtImage}
+            alt="Selected Shirt"
+            className="w-full h-80 rounded-lg shadow-lg mt-4"
+          />
 
           {/* Size Selection */}
           <div className="mt-4">
@@ -42,31 +60,14 @@ const CustomizeShirt = () => {
               {colors.map((color) => (
                 <span
                   key={color}
-                  className="w-6 h-6 rounded-full border border-gray-400 cursor-pointer"
+                  className={`w-8 h-8 rounded-full border cursor-pointer ${
+                    currentColor === color ? "border-4 border-gray-700" : ""
+                  }`}
                   style={{ backgroundColor: color }}
+                  onClick={() => setCurrentColor(color)}
                 ></span>
               ))}
             </div>
-          </div>
-
-          {/* Quantity Selection */}
-          <div className="mt-4">
-            <label className="block text-lg font-medium">Quantity:</label>
-            <input
-              type="number"
-              min="1"
-              defaultValue="1"
-              className="border rounded-lg p-2 w-1/4"
-            />
-          </div>
-
-          {/* Printing Option */}
-          <div className="mt-4">
-            <label className="block text-lg font-medium">Printing Option:</label>
-            <select className="border rounded-lg p-2 w-3/4">
-              <option>Standard Print</option>
-              <option>Backside Print</option>
-            </select>
           </div>
 
           {/* Add to Cart Button */}
@@ -76,32 +77,21 @@ const CustomizeShirt = () => {
         </div>
       </div>
 
-      {/* Divider */}
-      <hr className="my-10" />
-
-      {/* Recommended Products */}
-      <h2 className="text-2xl font-bold text-center">You Might Also Like</h2>
-      <div className="grid grid-cols-4 gap-6 mt-6">
-        {[...Array(8)].map((_, index) => (
-          <div key={index} className="border p-4 shadow-lg rounded-lg">
-            <img
-              src="/path-to-shirt-image.jpg"
-              alt="Similar Shirt"
-              className="w-full h-48 object-cover rounded-lg"
-            />
-            <h3 className="text-sm font-semibold mt-2">Long Sleeve Shirt</h3>
-            <p className="text-gray-700">PHP 450.00</p>
-            <div className="flex gap-1 mt-2">
-              {colors.map((color) => (
-                <span
-                  key={color}
-                  className="w-4 h-4 rounded-full border border-gray-400"
-                  style={{ backgroundColor: color }}
-                ></span>
-              ))}
+      {/* More Like This Section */}
+      <div className="container mx-auto mt-12">
+        <h2 className="text-2xl font-bold mb-4">More Like This</h2>
+        <div className="grid grid-cols-4 gap-6">
+          {colors.map((color) => (
+            <div key={color} className="border p-4 shadow-lg rounded-lg cursor-pointer">
+              <img
+                src={`/Home Assets/home_img_longSleeve-${color}.svg`}
+                alt={`${color} Shirt`}
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <p className="text-center text-lg font-semibold mt-2 capitalize">{color} Shirt</p>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
