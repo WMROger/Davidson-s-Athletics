@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, googleProvider, facebookProvider } from "../Database/firebase"; // Import providers
 import { useFacebookSDK } from "../Database/useFacebookSDK"; // Adjust the path to where the hook is located
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+import { getFirestore, collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function Login() {
   useFacebookSDK(); // Load the Facebook SDK on component mount
@@ -19,27 +19,51 @@ export default function Login() {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log("Logged in:", userCredential.user);
-        // Add user data to Firestore
         const user = userCredential.user;
-        setDoc(doc(db, "users", user.uid), {
-          email: user.email,
-          displayName: user.displayName || "Unnamed User",
-          photoURL: user.photoURL || "default.jpg",
-          lastLogin: new Date(),
-          role: "user",
-        })
-          .then(() => {
-            console.log("User data saved to Firestore");
-            navigate("/admin");
-          })
-          .catch((error) => {
-            console.error("Error saving user data:", error.message);
-          });
+
+        // Add user data to Firestore (if not already there)
+        const userRef = doc(db, "users", user.uid);
+        getDoc(userRef).then((docSnap) => {
+          if (!docSnap.exists()) {
+            setDoc(userRef, {
+              email: user.email,
+              displayName: user.displayName || "Unnamed User",
+              photoURL: user.photoURL || "default.jpg",
+              lastLogin: new Date(),
+              role: "user",
+            })
+              .then(() => {
+                console.log("User data saved to Firestore");
+                // After saving the data, check the user's role
+                navigateBasedOnRole(user.uid);
+              })
+              .catch((error) => {
+                console.error("Error saving user data:", error.message);
+              });
+          } else {
+            // If the user already exists, just check the role
+            navigateBasedOnRole(user.uid);
+          }
+        });
       })
       .catch((error) => {
         console.error("Login error:", error.message);
         alert("Invalid credentials or account does not exist");
       });
+  };
+
+  const navigateBasedOnRole = (userId) => {
+    const userRef = doc(db, "users", userId);
+    getDoc(userRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        const role = docSnap.data().role;
+        if (role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/home");
+        }
+      }
+    });
   };
 
   // Google Login
@@ -48,21 +72,29 @@ export default function Login() {
       .then((result) => {
         console.log("Google Login Success:", result.user);
         const user = result.user;
+
         // Add user data to Firestore
-        setDoc(doc(db, "users", user.uid), {
-          email: user.email,
-          displayName: user.displayName || "Unnamed User",
-          photoURL: user.photoURL || "default.jpg",
-          lastLogin: new Date(),
-          role: "user",
-        })
-          .then(() => {
-            console.log("User data saved to Firestore");
-            navigate("/admin");
-          })
-          .catch((error) => {
-            console.error("Error saving user data:", error.message);
-          });
+        const userRef = doc(db, "users", user.uid);
+        getDoc(userRef).then((docSnap) => {
+          if (!docSnap.exists()) {
+            setDoc(userRef, {
+              email: user.email,
+              displayName: user.displayName || "Unnamed User",
+              photoURL: user.photoURL || "default.jpg",
+              lastLogin: new Date(),
+              role: "user",
+            })
+              .then(() => {
+                console.log("User data saved to Firestore");
+                navigateBasedOnRole(user.uid);
+              })
+              .catch((error) => {
+                console.error("Error saving user data:", error.message);
+              });
+          } else {
+            navigateBasedOnRole(user.uid);
+          }
+        });
       })
       .catch((error) => {
         console.error("Google Login Error:", error.message);
@@ -75,21 +107,29 @@ export default function Login() {
       .then((result) => {
         console.log("Facebook Login Success:", result.user);
         const user = result.user;
+
         // Add user data to Firestore
-        setDoc(doc(db, "users", user.uid), {
-          email: user.email,
-          displayName: user.displayName || "Unnamed User",
-          photoURL: user.photoURL || "default.jpg",
-          lastLogin: new Date(),
-          role: "user",
-        })
-          .then(() => {
-            console.log("User data saved to Firestore");
-            navigate("/admin");
-          })
-          .catch((error) => {
-            console.error("Error saving user data:", error.message);
-          });
+        const userRef = doc(db, "users", user.uid);
+        getDoc(userRef).then((docSnap) => {
+          if (!docSnap.exists()) {
+            setDoc(userRef, {
+              email: user.email,
+              displayName: user.displayName || "Unnamed User",
+              photoURL: user.photoURL || "default.jpg",
+              lastLogin: new Date(),
+              role: "user",
+            })
+              .then(() => {
+                console.log("User data saved to Firestore");
+                navigateBasedOnRole(user.uid);
+              })
+              .catch((error) => {
+                console.error("Error saving user data:", error.message);
+              });
+          } else {
+            navigateBasedOnRole(user.uid);
+          }
+        });
       })
       .catch((error) => {
         console.error("Facebook Login Error:", error.message);

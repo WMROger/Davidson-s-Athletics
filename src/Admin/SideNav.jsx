@@ -1,12 +1,60 @@
-import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Menu, X, Search, LayoutDashboard, ShoppingCart } from "lucide-react";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../Database/firebase"; // Adjust paths accordingly
 
 const AdminLayout = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // To handle the loading state
+  const navigate = useNavigate();
 
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login"); // Redirect to login after logging out
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userRef = doc(db, "users", user.uid); // Adjust path based on where you store roles
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          const userRole = docSnap.data().role; // Assuming role is stored in Firestore
+          if (userRole === "admin") {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+            navigate("/home"); // Redirect non-admin users to home page
+          }
+        }
+      } else {
+        setIsAdmin(false); // If not logged in, set to false
+        navigate("/login"); // Redirect to login page if not logged in
+      }
+      setIsLoading(false); // Set loading to false after the check
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
+  }, [navigate]);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // You can display a loading indicator while checking the authentication status
+  }
+
+  if (!isAdmin) {
+    return null; // This is to prevent rendering the layout if the user is not an admin
+  }
 
   return (
     <div className="flex h-screen">
@@ -57,7 +105,11 @@ const AdminLayout = () => {
                 }
               >
                 <LayoutDashboard size={20} className="flex-shrink-0" />
-                <span className={`ml-3 transition-all duration-300 ease-out ${isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"}`}>
+                <span
+                  className={`ml-3 transition-all duration-300 ease-out ${
+                    isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                  }`}
+                >
                   Dashboard
                 </span>
               </NavLink>
@@ -72,13 +124,31 @@ const AdminLayout = () => {
                 }
               >
                 <ShoppingCart size={20} className="flex-shrink-0" />
-                <span className={`ml-3 transition-all duration-300 ease-out ${isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"}`}>
+                <span
+                  className={`ml-3 transition-all duration-300 ease-out ${
+                    isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                  }`}
+                >
                   Orders
                 </span>
               </NavLink>
             </li>
           </ul>
         </nav>
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          className={`flex items-center p-3 rounded-lg mt-20 transition-all duration-300 ease-out hover:bg-gray-800`}
+        >
+          <span
+            className={`ml-8 transition-all duration-300 ease-out ${
+              isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+            }`}
+          >
+            Logout
+          </span>
+        </button>
       </aside>
 
       {/* Main Content */}
