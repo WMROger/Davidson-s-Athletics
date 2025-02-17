@@ -31,10 +31,9 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <ul className="hidden md:flex space-x-8 text-xl">
+        <ul className="hidden md:flex space-x-23 text-xl">
           <li><Link to="/" className="hover:text-red-500 transition">Home</Link></li>
           <li><Link to="/shop" className="hover:text-red-500 transition">Shop</Link></li>
-          <li><Link to="/orders" className="hover:text-red-500 transition">Orders</Link></li>
           <li><Link to="/cart" className="hover:text-red-500 transition">Cart</Link></li>
           <li><Link to="/services" className="hover:text-red-500 transition">Services</Link></li>
         </ul>

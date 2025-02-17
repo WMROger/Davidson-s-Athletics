@@ -3,7 +3,6 @@ import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Navbar from "./Navbar";
 import Shop from "./Pages/Shop";
-import Orders from "./Pages/Orders";
 import Home from "./Pages/Home";
 import Cart from "./Pages/Cart";
 import Services from "./Pages/Services";
@@ -12,7 +11,7 @@ import Register from "./Pages/Register";
 import SideNav from "./Admin/SideNav";
 import Dashboard from "./Admin/Dashboard";
 import ManageOrders from "./Admin/ManageOrders";
-import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt";  // Import the CustomizeShirt component
+import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt"; // Import the CustomizeShirt component
 
 function App() {
   return (
@@ -46,15 +45,7 @@ function App() {
             </>
           }
         />
-        <Route
-          path="/orders"
-          element={
-            <>
-              <Navbar />
-              <Orders />
-            </>
-          }
-        />
+
         <Route
           path="/cart"
           element={
