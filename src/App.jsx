@@ -1,4 +1,3 @@
-// src/App.jsx
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Navbar from "./Navbar";
@@ -11,9 +10,12 @@ import Register from "./Pages/Register";
 import SideNav from "./Admin/SideNav";
 import Dashboard from "./Admin/Dashboard";
 import ManageOrders from "./Admin/ManageOrders";
+import Assets from "./Admin/Assets";
+import Design from "./Admin/AdminDesign";
 import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt"; // Import the CustomizeShirt component
 
 function App() {
+
   return (
     <div className="overflow-x-hidden">
       <Routes>
@@ -87,6 +89,8 @@ function App() {
         <Route path="/admin" element={<SideNav />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="manage-orders" element={<ManageOrders />} />
+          <Route path="design" element={<Design />} />
+          <Route path="assets" element={<Assets/>} />
         </Route>
 
         {/* Add the Customize Shirt Route */}
