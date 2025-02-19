@@ -10,12 +10,13 @@ import Register from "./Pages/Register";
 import SideNav from "./Admin/SideNav";
 import Dashboard from "./Admin/Dashboard";
 import ManageOrders from "./Admin/ManageOrders";
-import Assets from "./Admin/Assets";
 import Design from "./Admin/AdminDesign";
-import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt"; // Import the CustomizeShirt component
+import Assets from "./Admin/Assets";
+import NewShirt from "./Admin/NewShirt"; // Import NewShirt component
+import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt";
+import RequestForm from "./Pages/ShopPages/RequestForm"; // Import RequestForm component
 
 function App() {
-
   return (
     <div className="overflow-x-hidden">
       <Routes>
@@ -47,7 +48,6 @@ function App() {
             </>
           }
         />
-
         <Route
           path="/cart"
           element={
@@ -90,7 +90,8 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="manage-orders" element={<ManageOrders />} />
           <Route path="design" element={<Design />} />
-          <Route path="assets" element={<Assets/>} />
+          <Route path="assets" element={<Assets />} />
+          <Route path="NewShirt" element={<NewShirt />} />
         </Route>
 
         {/* Add the Customize Shirt Route */}
@@ -100,6 +101,17 @@ function App() {
             <>
               <Navbar />
               <CustomizeShirt />
+            </>
+          }
+        />
+
+        {/* Add the Request Form Route */}
+        <Route
+          path="/requestform"
+          element={
+            <>
+              <Navbar />
+              <RequestForm />
             </>
           }
         />

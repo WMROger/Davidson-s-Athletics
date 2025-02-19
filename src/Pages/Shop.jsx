@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { db } from "../Database/firebase"; // Ensure correct path
+import { collection, getDocs } from "firebase/firestore";
 
 const colors = ["black", "green", "red", "blue", "purple", "yellow", "orange"];
 
@@ -7,16 +9,25 @@ const Shop = () => {
   const navigate = useNavigate();
   const [showDesignOptions, setShowDesignOptions] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [products, setProducts] = useState([]);
 
-  const [products, setProducts] = useState(
-    [...Array(12)].map((_, index) => ({
-      id: index,
-      name: "Long Sleeve Shirt",
-      price: 450,
-      color: "black",
-      image: `/Home Assets/home_img_longSleeve.svg`,
-    }))
-  );
+  useEffect(() => {
+    const fetchShirts = async () => {
+      try {
+        const shirtsCollection = collection(db, "shirts");
+        const snapshot = await getDocs(shirtsCollection);
+        const shirtsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProducts(shirtsData);
+      } catch (error) {
+        console.error("Error fetching shirts:", error);
+      }
+    };
+
+    fetchShirts();
+  }, []);
 
   const handleImageClick = (product) => {
     navigate(`/customizeshirt`, {
@@ -27,9 +38,7 @@ const Shop = () => {
   const handleColorChange = (index, color) => {
     const updatedProducts = [...products];
     updatedProducts[index].color = color;
-    updatedProducts[
-      index
-    ].image = `/Home Assets/home_img_longSleeve-${color}.svg`;
+    updatedProducts[index].image = `/Home Assets/home_img_longSleeve-${color}.svg`;
     setProducts(updatedProducts);
   };
 
@@ -90,19 +99,14 @@ const Shop = () => {
           <div className="mt-4">
             <label className="block mb-2 font-medium">Size</label>
             <div className="flex flex-col gap-2">
-              {[
-                "Small",
-                "Medium",
-                "Large",
-                "Extra Large",
-                "XX Large",
-                "XXX Large",
-              ].map((size) => (
-                <label key={size} className="flex items-center gap-2">
-                  <input type="checkbox" className="form-checkbox" />
-                  {size}
-                </label>
-              ))}
+              {["Small", "Medium", "Large", "Extra Large", "XX Large", "XXX Large"].map(
+                (size) => (
+                  <label key={size} className="flex items-center gap-2">
+                    <input type="checkbox" className="form-checkbox" />
+                    {size}
+                  </label>
+                )
+              )}
             </div>
           </div>
         </aside>
@@ -118,15 +122,12 @@ const Shop = () => {
               Request Design {">"}
             </button>
 
-            {/* Show Design Options When Button is Clicked */}
             {showDesignOptions && (
               <div className="flex px-10 space-x-13">
                 {["Jerseys", "Uniforms", "T-shirts"].map((designType) => (
                   <button
                     key={designType}
-                    onClick={() =>
-                      handleDesignSelection(designType.toLowerCase())
-                    }
+                    onClick={() => handleDesignSelection(designType.toLowerCase())}
                     className="border px-20 py-1 rounded-md hover:bg-gray-200"
                   >
                     {designType}
@@ -146,7 +147,6 @@ const Shop = () => {
                 >
                   <p className="text-gray-500">Select or drop a file</p>
                 </div>
-                {/* Hidden File Input */}
                 <input
                   type="file"
                   id="fileUpload"
@@ -162,11 +162,8 @@ const Shop = () => {
                   Upload
                 </button>
 
-                {/* Display Selected File Name */}
                 {selectedFile && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    Selected: {selectedFile}
-                  </p>
+                  <p className="text-xs text-gray-500 mt-2">Selected: {selectedFile}</p>
                 )}
 
                 <p className="text-xs text-gray-500 mt-2">
@@ -179,7 +176,7 @@ const Shop = () => {
               <div key={product.id} className="border p-4 shadow-lg rounded-lg">
                 <img
                   src={product.image}
-                  alt="Long Sleeve Shirt"
+                  alt={product.name}
                   className="w-full h-48 object-cover rounded-lg cursor-pointer"
                   onClick={() => handleImageClick(product)}
                 />

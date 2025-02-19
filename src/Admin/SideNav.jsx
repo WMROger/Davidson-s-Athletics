@@ -169,7 +169,24 @@ const AdminLayout = () => {
                 </span>
               </NavLink>
             </li>
-
+            {/* New Shirt Uploads */}
+            <li>
+              <NavLink
+                to="/admin/NewShirt"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg transition-all duration-300 ease-out ${
+                    isActive ? "bg-gray-700" : "hover:bg-gray-800"
+                  }`
+                }
+              >
+                <img 
+                 src="/IcSideNav/pendingAssets.svg"
+                 className="size-6"/>
+                <span className={`ml-3 transition-all duration-300 ease-out ${isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"}`}>
+                  New Shirt
+                </span>
+              </NavLink>
+            </li>
             <li>
               <NavLink
                 to="/admin/notification"
