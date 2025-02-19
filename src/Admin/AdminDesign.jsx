@@ -19,7 +19,7 @@ const initialDesigns = [
   },
 ];
 
-export default function AdminDesign() {
+export default function Admin() {
   const [designs, setDesigns] = useState(initialDesigns);
   const [openMenuId, setOpenMenuId] = useState(null);
 
