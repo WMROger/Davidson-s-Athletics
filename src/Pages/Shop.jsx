@@ -38,7 +38,9 @@ const Shop = () => {
   const handleColorChange = (index, color) => {
     const updatedProducts = [...products];
     updatedProducts[index].color = color;
-    updatedProducts[index].image = `/Home Assets/home_img_longSleeve-${color}.svg`;
+    updatedProducts[
+      index
+    ].image = `/Home Assets/home_img_longSleeve-${color}.svg`;
     setProducts(updatedProducts);
   };
 
@@ -99,14 +101,19 @@ const Shop = () => {
           <div className="mt-4">
             <label className="block mb-2 font-medium">Size</label>
             <div className="flex flex-col gap-2">
-              {["Small", "Medium", "Large", "Extra Large", "XX Large", "XXX Large"].map(
-                (size) => (
-                  <label key={size} className="flex items-center gap-2">
-                    <input type="checkbox" className="form-checkbox" />
-                    {size}
-                  </label>
-                )
-              )}
+              {[
+                "Small",
+                "Medium",
+                "Large",
+                "Extra Large",
+                "XX Large",
+                "XXX Large",
+              ].map((size) => (
+                <label key={size} className="flex items-center gap-2">
+                  <input type="checkbox" className="form-checkbox" />
+                  {size}
+                </label>
+              ))}
             </div>
           </div>
         </aside>
@@ -127,7 +134,9 @@ const Shop = () => {
                 {["Jerseys", "Uniforms", "T-shirts"].map((designType) => (
                   <button
                     key={designType}
-                    onClick={() => handleDesignSelection(designType.toLowerCase())}
+                    onClick={() =>
+                      handleDesignSelection(designType.toLowerCase())
+                    }
                     className="border px-20 py-1 rounded-md hover:bg-gray-200"
                   >
                     {designType}
@@ -163,7 +172,9 @@ const Shop = () => {
                 </button>
 
                 {selectedFile && (
-                  <p className="text-xs text-gray-500 mt-2">Selected: {selectedFile}</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Selected: {selectedFile}
+                  </p>
                 )}
 
                 <p className="text-xs text-gray-500 mt-2">

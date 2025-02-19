@@ -103,7 +103,7 @@ const RequestForm = () => {
           >
             <option value="">Select Product Type</option>
             <option value="Jersey">Jersey</option>
-            <option value="Uniform">Uniform</option>
+            <option value="Polo">Polo</option>
             <option value="Sleeveless">Sleeveless</option>
             <option value="T-shirts">T-shirts</option>
           </select>
@@ -112,24 +112,40 @@ const RequestForm = () => {
       )}
 
       {/* Step 3: Design Details */}
-      {step === 2 && (
-        <div className="space-y-3">
+      {step === 2 && formData.productType && ["Jersey", "Polo", "T-shirts", "Sleeveless"].includes(formData.productType) && (
+        <div>
+          <label>Cut Type</label>
+          <select className="border p-2 rounded w-full">
+            {formData.productType === "Jersey" && (
+              <>
+                <option value="Normal Cut">Normal Cut</option>
+                <option value="Amboy Cut">Amboy Cut</option>
+                <option value="NBA Cut">NBA Cut</option>
+                <option value="V Neck">V Neck</option>
+                <option value="Round Neck">Round Neck</option>
+              </>
+            )}
+            {formData.productType === "Polo" && (
+              <>
+                <option value="Zipper">Zipper</option>
+                <option value="Button">Button</option>
+                <option value="Chinese Collar">Chinese Collar</option>
+              </>
+            )}
+            {formData.productType === "T-shirts" && (
+              <>
+                <option value="Round Neck">Round Neck</option>
+                <option value="V Neck">V Neck</option>
+              </>
+            )}
 
-        <select className="border p-2 rounded w-full">
-            <option value="">Select Sport Type</option>
-            <option value="Basketball">Basketball</option>
-            <option value="Soccer">Soccer</option>
-            <option value="Soccer">Volletball</option>
-            <option value="Other">Other</option>
-         </select>
-
-         <select className="border p-2 rounded w-full">
-            <option value="Normal Cut">Normal Cut</option>
-            <option value="Amboy Cut">Amboy Cut</option>
-            <option value="Nba Cut">Nba Cut</option>
-            <option value="V Neck">V Neck</option>
-            <option value="Round Neck">Round Neck</option>
-         </select>
+            {formData.productType === "Sleeveless" && (
+              <>
+                <option value="">N/A</option>
+              </>
+            )}
+          </select>
+        
 
          <label>Primary Color</label>
           <input type="text" className="border p-2 w-full h-10 rounded" />
@@ -159,7 +175,7 @@ const RequestForm = () => {
                 setFormData({ ...formData, designDetails: { ...formData.designDetails, hasName: e.target.checked } })
               }
             />
-            <span>Name on Jersey</span>
+            <span>Add Name</span>
           </label>
 
           {Array.from({ length: formData.designDetails.quantity }).map((_, i) => (
@@ -167,7 +183,7 @@ const RequestForm = () => {
               {formData.designDetails.hasName && (
                 <input
                   type="text"
-                  placeholder={`Surname for Jersey ${i + 1}`}
+                  placeholder={`Add Names ${i + 1}`}
                   className="border p-2 w-1/2 rounded"
                 />
               )}
