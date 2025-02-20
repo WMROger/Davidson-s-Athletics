@@ -96,7 +96,7 @@ function App() {
 
         {/* Add the Customize Shirt Route */}
         <Route
-          path="/customizeshirt"
+          path="/ShopPages/CustomizeShirt"
           element={
             <>
               <Navbar />
@@ -107,7 +107,7 @@ function App() {
 
         {/* Add the Request Form Route */}
         <Route
-          path="/requestform"
+          path="/ShopPages/RequestForm"
           element={
             <>
               <Navbar />

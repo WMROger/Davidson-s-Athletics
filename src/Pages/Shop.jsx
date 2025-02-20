@@ -30,7 +30,7 @@ const Shop = () => {
   }, []);
 
   const handleImageClick = (product) => {
-    navigate(`/customizeshirt`, {
+    navigate(`/ShopPages/CustomizeShirt`, {
       state: { selectedImage: product.image, selectedColor: product.color },
     });
   };
@@ -49,7 +49,7 @@ const Shop = () => {
   };
 
   const handleDesignSelection = (designType) => {
-    navigate(`/requestdesign/${designType}`);
+    navigate(`/ShopPages/RequestForm`);
     setShowDesignOptions(false);
   };
 
