@@ -1,139 +1,63 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider, facebookProvider } from "../Database/firebase"; // Import providers
-import { useFacebookSDK } from "../Database/useFacebookSDK"; // Adjust the path to where the hook is located
-import { getFirestore, collection, doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, googleProvider, facebookProvider } from "../Database/firebase";
+import { useFacebookSDK } from "../Database/useFacebookSDK";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function Login() {
-  useFacebookSDK(); // Load the Facebook SDK on component mount
+  useFacebookSDK(); // Load Facebook SDK
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const db = getFirestore();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log("Logged in:", userCredential.user);
-        const user = userCredential.user;
-
-        // Add user data to Firestore (if not already there)
-        const userRef = doc(db, "users", user.uid);
-        getDoc(userRef).then((docSnap) => {
-          if (!docSnap.exists()) {
-            setDoc(userRef, {
-              email: user.email,
-              displayName: user.displayName || "Unnamed User",
-              photoURL: user.photoURL || "default.jpg",
-              lastLogin: new Date(),
-              role: "user",
-            })
-              .then(() => {
-                console.log("User data saved to Firestore");
-                // After saving the data, check the user's role
-                navigateBasedOnRole(user.uid);
-              })
-              .catch((error) => {
-                console.error("Error saving user data:", error.message);
-              });
-          } else {
-            // If the user already exists, just check the role
-            navigateBasedOnRole(user.uid);
-          }
-        });
-      })
-      .catch((error) => {
-        console.error("Login error:", error.message);
-        alert("Invalid credentials or account does not exist");
-      });
-  };
-
-  const navigateBasedOnRole = (userId) => {
-    const userRef = doc(db, "users", userId);
-    getDoc(userRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        const role = docSnap.data().role;
-        if (role === "admin") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/home");
-        }
+  // Handles user login (email/password, Google, Facebook)
+  const handleLogin = async (authMethod) => {
+    try {
+      let userCredential;
+      if (authMethod === "email") {
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
+      } else if (authMethod === "google") {
+        userCredential = await signInWithPopup(auth, googleProvider);
+      } else if (authMethod === "facebook") {
+        userCredential = await signInWithPopup(auth, facebookProvider);
       }
-    });
+
+      const user = userCredential.user;
+      console.log(`${authMethod} login successful:`, user);
+
+      // Check if user exists in Firestore
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+
+      if (!docSnap.exists()) {
+        // Save user to Firestore
+        await setDoc(userRef, {
+          email: user.email,
+          displayName: user.displayName || "Unnamed User",
+          photoURL: user.photoURL || "default.jpg",
+          lastLogin: new Date(),
+          role: "user",
+        });
+        console.log("User data saved to Firestore");
+      }
+
+      navigateBasedOnRole(user.uid);
+    } catch (error) {
+      console.error(`${authMethod} login error:`, error.message);
+      alert("Login failed. Please check your credentials or try another method.");
+    }
   };
 
-  // Google Login
-  const handleGoogleLogin = () => {
-    signInWithPopup(auth, googleProvider)
-      .then((result) => {
-        console.log("Google Login Success:", result.user);
-        const user = result.user;
-
-        // Add user data to Firestore
-        const userRef = doc(db, "users", user.uid);
-        getDoc(userRef).then((docSnap) => {
-          if (!docSnap.exists()) {
-            setDoc(userRef, {
-              email: user.email,
-              displayName: user.displayName || "Unnamed User",
-              photoURL: user.photoURL || "default.jpg",
-              lastLogin: new Date(),
-              role: "user",
-            })
-              .then(() => {
-                console.log("User data saved to Firestore");
-                navigateBasedOnRole(user.uid);
-              })
-              .catch((error) => {
-                console.error("Error saving user data:", error.message);
-              });
-          } else {
-            navigateBasedOnRole(user.uid);
-          }
-        });
-      })
-      .catch((error) => {
-        console.error("Google Login Error:", error.message);
-      });
-  };
-
-  // Facebook Login
-  const handleFacebookLogin = () => {
-    signInWithPopup(auth, facebookProvider)
-      .then((result) => {
-        console.log("Facebook Login Success:", result.user);
-        const user = result.user;
-
-        // Add user data to Firestore
-        const userRef = doc(db, "users", user.uid);
-        getDoc(userRef).then((docSnap) => {
-          if (!docSnap.exists()) {
-            setDoc(userRef, {
-              email: user.email,
-              displayName: user.displayName || "Unnamed User",
-              photoURL: user.photoURL || "default.jpg",
-              lastLogin: new Date(),
-              role: "user",
-            })
-              .then(() => {
-                console.log("User data saved to Firestore");
-                navigateBasedOnRole(user.uid);
-              })
-              .catch((error) => {
-                console.error("Error saving user data:", error.message);
-              });
-          } else {
-            navigateBasedOnRole(user.uid);
-          }
-        });
-      })
-      .catch((error) => {
-        console.error("Facebook Login Error:", error.message);
-      });
+  // Navigate based on user role
+  const navigateBasedOnRole = async (userId) => {
+    const userRef = doc(db, "users", userId);
+    const docSnap = await getDoc(userRef);
+    if (docSnap.exists()) {
+      navigate(docSnap.data().role === "admin" ? "/admin/dashboard" : "/home");
+    }
   };
 
   return (
@@ -143,11 +67,9 @@ export default function Login() {
         <h2 className="text-2xl font-bold text-center mb-6 mt-6 text-neutral-300">
           Sign In
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); handleLogin("email"); }} className="space-y-4">
           <div>
-            <label className="block text-neutral-400 text-sm font-medium">
-              Email
-            </label>
+            <label className="block text-neutral-400 text-sm font-medium">Email</label>
             <input
               type="email"
               value={email}
@@ -157,9 +79,7 @@ export default function Login() {
             />
           </div>
           <div>
-            <label className="block text-neutral-400 text-sm font-medium">
-              Password
-            </label>
+            <label className="block text-neutral-400 text-sm font-medium">Password</label>
             <input
               type="password"
               value={password}
@@ -168,10 +88,7 @@ export default function Login() {
               required
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-stone-300 text-black p-2 rounded-lg hover:bg-blue-700 transition"
-          >
+          <button type="submit" className="w-full bg-stone-300 text-black p-2 rounded-lg hover:bg-blue-700 transition">
             Login
           </button>
 
@@ -184,13 +101,13 @@ export default function Login() {
             <div className="flex gap-4">
               <div
                 className="bg-blue-600 cursor-pointer rounded-xl w-35 p-3 flex items-center justify-center h-12"
-                onClick={handleFacebookLogin}
+                onClick={() => handleLogin("facebook")}
               >
                 <img src="/fb.svg" alt="Facebook" className="w-8 h-8" />
               </div>
               <div
                 className="bg-white cursor-pointer rounded-xl w-35 p-3 flex items-center justify-center h-12"
-                onClick={handleGoogleLogin}
+                onClick={() => handleLogin("google")}
               >
                 <img src="/google.svg" alt="Google" className="w-6 h-6" />
               </div>
@@ -198,10 +115,7 @@ export default function Login() {
           </div>
 
           <div className="flex items-center justify-center space-x-4">
-            <Link
-              to="/register"
-              className="text-sm text-red-400 underline items-center"
-            >
+            <Link to="/register" className="text-sm text-red-400 underline items-center">
               Create Account
             </Link>
           </div>
