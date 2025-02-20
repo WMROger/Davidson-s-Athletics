@@ -50,7 +50,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <ul className="hidden md:flex space-x-6 text-xl">
+        <ul className="hidden md:flex space-x-24 text-xl">
           <li><Link to="/" className="hover:text-red-500 transition">Home</Link></li>
           <li><Link to="/shop" className="hover:text-red-500 transition">Shop</Link></li>
           {user && (
