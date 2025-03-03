@@ -1,99 +1,131 @@
 import React, { useState } from "react";
-import { PlusCircle, MinusCircle, Trash2, Image as ImageIcon, Type } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([
     {
       id: 1,
-      size: "M",
-      color: "white",
+      name: "Long Sleeve Jersey",
+      variation: "XL",
       quantity: 1,
-      customizations: {
-        text: "Custom Text",
-        textColor: "#000000",
-        textPosition: "center",
-        uploadedImage: null,
-      },
-      basePrice: 350,
+      basePrice: 550,
+      imageUrl: "SampleShirt.svg",
+      selected: false,
+    },
+    {
+      id: 2,
+      name: "Long Sleeve Jersey",
+      variation: "XL",
+      quantity: 1,
+      basePrice: 550,
+      imageUrl: "SampleShirt.svg",
+      selected: false,
     },
   ]);
 
+  // Toggle Checkbox Selection
+  const toggleSelectItem = (index) => {
+    setCartItems((prevCart) =>
+      prevCart.map((item, i) => (i === index ? { ...item, selected: !item.selected } : item))
+    );
+  };
+
+  // Update Quantity
   const updateQuantity = (index, change) => {
-    const newCart = [...cartItems];
-    const newQuantity = newCart[index].quantity + change;
-    if (newQuantity > 0 && newQuantity <= 10) {
-      newCart[index].quantity = newQuantity;
-      setCartItems(newCart);
-    }
+    setCartItems((prevCart) =>
+      prevCart.map((item, i) =>
+        i === index
+          ? { ...item, quantity: Math.min(10, Math.max(1, item.quantity + change)) }
+          : item
+      )
+    );
   };
 
-  const updateCustomization = (index, field, value) => {
-    const newCart = [...cartItems];
-    newCart[index].customizations[field] = value;
-    setCartItems(newCart);
-  };
-
+  // Remove Item from Cart
   const removeItem = (index) => {
-    setCartItems(cartItems.filter((_, i) => i !== index));
-  };
-
-  const calculateTotal = () => {
-    return cartItems.reduce((sum, item) => sum + item.basePrice * item.quantity, 0);
+    setCartItems((prevCart) => prevCart.filter((_, i) => i !== index));
   };
 
   return (
     <>
-    <div className="bg-black w-full h-10">
-    </div>
-    
-    <div className="max-w-4xl mx-auto my-30 p-4">
-    
+      {/* Top Bar Placeholder */}
+      <div className="w-full h-20 bg-black mt-30"></div>
 
-      <h2 className="text-xl font-bold mb-4">Your Cart</h2>
-      {cartItems.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">Your cart is empty</div>
-      ) : (
-        cartItems.map((item, index) => (
-          <div key={item.id} className="flex flex-col md:flex-row gap-6 p-4 border rounded-lg">
-            <div className="w-40 h-48 bg-gray-100 rounded-lg flex items-center justify-center relative">
-              <div className="w-32 h-40" style={{ backgroundColor: item.color }}>
-                <p className="absolute" style={{ color: item.customizations.textColor, textAlign: item.customizations.textPosition }}>
-                  {item.customizations.text}
-                </p>
-              </div>
+      {/* Cart Container */}
+      <div className="max-w-4xl mx-auto my-10 p-4">
+        {/* Header */}
+        <div className="bg-gray-800 text-white grid grid-cols-5 py-4 px-5 rounded-md text-center font-medium">
+          <div className="flex items-center gap-2 justify-start col-span-2">
+            <input type="checkbox" className="w-5 h-5" />
+            <span>Product</span>
+          </div>
+          <span>Price</span>
+          <span>Amount</span>
+          <span>Action</span>
+        </div>
+
+        {/* Cart Items */}
+        {cartItems.map((item, index) => (
+          <div
+            key={item.id}
+            className={`border rounded-md p-4 mt-4 bg-gray-100 ${
+              item.selected ? "border-blue-500" : "border-gray-300"
+            }`}
+          >
+            {/* Product Row (Outer Box - Restored) */}
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="checkbox"
+                checked={item.selected}
+                onChange={() => toggleSelectItem(index)}
+                className="w-5 h-5"
+              />
+              <span className="font-medium">{item.name}</span>
             </div>
-            <div className="flex-1 space-y-4">
-              <div className="flex justify-between">
-                <h3 className="font-medium">Custom T-Shirt</h3>
-                <button onClick={() => removeItem(index)} className="text-red-500">
-                  <Trash2 className="w-5 h-5 hover:bg-red-300 rounded-6" />
+
+            {/* Inner Box - Wrapped Inside the Outer Box */}
+            <div className="border rounded-md p-4 bg-white">
+              <div className="grid grid-cols-5 items-center text-center">
+                {/* Product Section */}
+                <div className="col-span-2 flex items-center gap-4">
+                  <img src={item.imageUrl} alt="Product" className="w-20 h-20 object-fit rounded-md" />
+                  <div>
+                    <h3 className="font-medium">Custom Long Sleeve Jersey</h3>
+                    <p className="text-gray-500 text-sm">Variation: {item.variation}</p>
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div className="font-medium text-lg">₱{(item.basePrice * item.quantity).toFixed(2)}</div>
+
+                {/* Quantity Selector - Properly Aligned */}
+                <div className="flex justify-center">
+                  <div className="flex items-center border rounded-md w-24 justify-between">
+                    <button
+                      onClick={() => updateQuantity(index, -1)}
+                      className="px-2 py-1 border-r hover:bg-gray-200"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="w-8 text-center">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(index, 1)}
+                      className="px-2 py-1 border-l hover:bg-gray-200"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Remove Button */}
+                <button onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700">
+                  Cancel
                 </button>
               </div>
-              <div className="flex gap-4">
-                <button onClick={() => updateQuantity(index, -1)}><MinusCircle className="w-5 h-5" /></button>
-                <span>{item.quantity}</span>
-                <button onClick={() => updateQuantity(index, 1)}><PlusCircle className="w-5 h-5" /></button>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Type className="w-4 h-4" />
-                  <input type="text" value={item.customizations.text} onChange={(e) => updateCustomization(index, "text", e.target.value)} className="border rounded px-2 py-1 text-sm" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4" />
-                  <input type="color" value={item.customizations.textColor} onChange={(e) => updateCustomization(index, "textColor", e.target.value)} className="w-8 h-8" />
-                </div>
-              </div>
             </div>
-            <div className="text-right font-medium">₱{(item.basePrice * item.quantity).toFixed(2)}</div>
           </div>
-        ))
-      )}
-      <div className="border-t pt-4 flex justify-end font-medium">
-        <span className="mr-2">Total:</span>
-        <span>₱{calculateTotal().toFixed(2)}</span>
+        ))}
       </div>
-    </div>
     </>
   );
 };
