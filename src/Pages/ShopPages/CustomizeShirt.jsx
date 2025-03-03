@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const CustomizeShirt = () => {
   const location = useLocation();
@@ -11,11 +12,20 @@ const CustomizeShirt = () => {
   const sizes = ["Small", "Medium", "Large", "XL", "XXL"];
   const [currentColor, setCurrentColor] = useState(selectedColor || "black");
   const [shirtImage, setShirtImage] = useState(selectedImage || "/images/default-shirt.jpg");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Ensure the image updates correctly when the color changes
     setShirtImage(`/Home Assets/home_img_longSleeve-${currentColor}.svg`);
   }, [currentColor]);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="w-full">
@@ -70,10 +80,12 @@ const CustomizeShirt = () => {
             </div>
           </div>
 
-          {/* Add to Cart Button */}
-          <button className="mt-6 bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-800 transition">
-            Add to Cart
-          </button>
+          {/* Add to Cart Button (Hidden if not logged in) */}
+          {user && (
+            <button className="mt-6 bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-800 transition">
+              Add to Cart
+            </button>
+          )}
         </div>
       </div>
 
