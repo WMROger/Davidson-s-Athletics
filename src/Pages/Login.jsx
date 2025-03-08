@@ -72,6 +72,7 @@ export default function Login() {
             <label className="block text-neutral-400 text-sm font-medium">Email</label>
             <input
               type="email"
+              placeholder="user@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 block w-full p-2 border border-gray-300 text-white rounded-lg focus:ring focus:ring-blue-300"

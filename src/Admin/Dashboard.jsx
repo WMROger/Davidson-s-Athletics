@@ -1,13 +1,25 @@
 import React, { useState } from "react";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import Card from "../DashboardCards/Card";
 import CardContent from "../DashboardCards/CardContent";
 
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
 const ordersData = [
-  { id: 1, product: "Jersey", type: "Sleeveless", price: "$50", status: "Pending" },
-  { id: 2, product: "Hoodie", type: "Long Sleeves", price: "$75", status: "Processing" },
-  { id: 3, product: "T-Shirt", type: "Short Sleeves", price: "$30", status: "Shipped" },
-  { id: 4, product: "Cap", type: "Accessory", price: "$20", status: "Completed" },
-  { id: 5, product: "Tracksuit", type: "Uniform", price: "$90", status: "Cancelled" },
+  { id: 1, product: "Jersey", type: "Sleeveless", price: "₱350", status: "Pending" },
+  { id: 2, product: "Hoodie", type: "Long Sleeves", price: "₱450", status: "Processing" },
+  { id: 3, product: "T-Shirt", type: "Short Sleeves", price: "₱350", status: "Shipped" },
+  { id: 4, product: "Tracksuit", type: "Uniform", price: "₱400", status: "Cancelled" },
 ];
 
 const statusColors = {
@@ -26,6 +38,46 @@ const Dashboard = () => {
       ? ordersData
       : ordersData.filter((order) => order.status === statusFilter);
 
+  // Sample data for Bar Chart (Monthly Sales)
+  const salesData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [
+      {
+        label: "Monthly Sales (₱)",
+        data: [5000, 8000, 7500, 9000, 12000, 11000, 9500, 10000, 8500, 13000, 14000, 15000],
+        backgroundColor: "#FF9800",
+        borderRadius: 10,
+        barThickness: 30, // Adjusted for better visibility
+      },
+    ],
+  };
+
+  // Chart.js Options
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        grid: {
+          display: false, // Removes vertical grid lines
+        },
+      },
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: "rgba(200, 200, 200, 0.2)", // Light horizontal grid lines
+        },
+      },
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context) => `₱${context.raw.toLocaleString()}`, // Format currency
+        },
+      },
+    },
+  };
+
   return (
     <div className="p-6 space-y-6">
       <h2 className="text-3xl font-bold">Overview</h2>
@@ -37,22 +89,23 @@ const Dashboard = () => {
             <Card className="bg-[url('/background.svg')] bg-cover bg-center text-white">
               <CardContent>
                 <h2 className="text-2xl font-semibold mb-4">Annual Sales</h2>
-                <p className="text-5xl font-bold">$500,000</p>
+                <p className="text-5xl font-bold">₱500,000</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent>
                 <h2 className="text-2xl font-semibold mb-4">Monthly Sales</h2>
-                <p className="text-5xl font-bold">$40,000</p>
+                <p className="text-5xl font-bold">₱40,000</p>
               </CardContent>
             </Card>
           </div>
 
+          {/* Bar Chart */}
           <Card>
             <CardContent>
-              <h2 className="text-xl font-semibold">Sales This Year</h2>
-              <div className="h-64 bg-gray-200 flex items-center justify-center">
-                <p>Bar Chart Placeholder</p>
+              <h2 className="text-5xl font-semibold">Sales This Year</h2>
+              <div className="h-72">
+                <Bar data={salesData} options={chartOptions} />
               </div>
             </CardContent>
           </Card>
@@ -64,9 +117,9 @@ const Dashboard = () => {
             <CardContent>
               <h2 className="text-xl font-semibold">Top-Selling Categories</h2>
               <ul className="mt-4 space-y-2">
-                <li>Sleeveless - $15,000</li>
-                <li>Short Sleeves - $12,500</li>
-                <li>Uniforms - $10,000</li>
+                <li>Sleeveless - ₱15,000</li>
+                <li>Short Sleeves - ₱12,500</li>
+                <li>Uniforms - ₱10,000</li>
               </ul>
             </CardContent>
           </Card>
@@ -92,20 +145,20 @@ const Dashboard = () => {
                 <table className="w-full border-collapse border border-gray-300 text-left">
                   <thead>
                     <tr className="bg-gray-100">
-                      <th className="p-2 border">Product</th>
-                      <th className="p-2 border">Type</th>
-                      <th className="p-2 border">Price</th>
-                      <th className="p-2 border">Status</th>
+                      <th className="p-3 border">Product</th>
+                      <th className="p-3 border">Type</th>
+                      <th className="p-3 border">Price</th>
+                      <th className="p-3 border">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredOrders.length > 0 ? (
-                      filteredOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-gray-100">
-                          <td className="p-2 border">{order.product}</td>
-                          <td className="p-2 border">{order.type}</td>
-                          <td className="p-2 border">{order.price}</td>
-                          <td className="p-2 border">
+                      filteredOrders.map((order, index) => (
+                        <tr key={order.id} className={`${index % 2 === 0 ? "bg-gray-50" : ""}`}>
+                          <td className="p-3 border">{order.product}</td>
+                          <td className="p-3 border">{order.type}</td>
+                          <td className="p-3 border">{order.price}</td>
+                          <td className="p-3 border">
                             <span
                               className={`px-3 py-1 text-white text-sm rounded-full ${statusColors[order.status]}`}
                             >

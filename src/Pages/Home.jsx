@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
@@ -6,7 +6,36 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
+const faqs = [
+  {
+    question: "What material are the personalized T-shirts made of?",
+    answer:
+      "We offer cotton, blend, and polyester options. Our soft-touch custom tees are made of 100% ringspun cotton, which is more breathable and feels softer. We also have personalized T-shirts made from performance fabric, which is moisture-wicking for maximum comfort.",
+  },
+  {
+    question: "What sizes are the T-shirts available in?",
+    answer:
+      "Adults’ T-shirts from VistaPrint are available in XXS – 5XL. We also offer kids’ sizes. To find the exact length and width of each size, check our size charts tab on the T-shirt page of your choice.",
+  },
+  {
+    question: "Can I print my artwork or design onto the T-shirts?",
+    answer:
+      "Yes, of course. To make your own T-shirt, you can upload your design to the front of your tee and add custom elements like text. For some of our personalized T-shirts, reverse side printing is also available.",
+  },
+  {
+    question: "Is there a minimum order quantity for custom T-shirts?",
+    answer:
+      "There is no minimum order quantity for T-shirts printed with direct-to-garment or heat transfer printing options. For screenprint T-shirts, the minimum order quantity is 6.",
+  },
+];
+
 const Home = () => {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
     <>
       <div className="bg-white">
@@ -22,49 +51,25 @@ const Home = () => {
             loop={true}
             className="w-screen h-auto"
           >
-            <SwiperSlide>
-              <img
-                className="w-screen h-auto object-cover"
-                src="/Home Assets/Hero.svg"
-                alt="Hero"
-              />
-            </SwiperSlide>
-            <SwiperSlide>
-              <img
-                className="w-screen h-auto object-cover"
-                src="/Home Assets/Hero1.svg"
-                alt="Hero 1"
-              />
-            </SwiperSlide>
-            <SwiperSlide>
-              <img
-                className="w-screen h-auto object-cover"
-                src="/Home Assets/Hero2.svg"
-                alt="Hero 2"
-              />
-            </SwiperSlide>
+            {["Hero", "Hero1", "Hero2"].map((img, index) => (
+              <SwiperSlide key={index}>
+                <img
+                  className="w-screen h-auto object-cover"
+                  src={`/Home Assets/${img}.svg`}
+                  alt={`Hero ${index}`}
+                />
+              </SwiperSlide>
+            ))}
           </Swiper>
         </div>
 
-        {/*Parent Container*/}
-        <div className="w-full py-30 px-10 md:px-20 bg-orange-100 flex flex-col md:flex-row justify-between gap-8">
-          {/* Text Section */}
-          <div className="md:w-1/2 md:text-left text-center ml-28 pr-15 mt-7">
-            <h1
-              className="text-4xl font-semibold text-gray-800 "
-              style={{ fontFamily: "Inter, sans-serif" }}
-            >
-              Custom T-Shirts
-            </h1>
-
-            <p
-              className="text-2xl/8 mt-3 "
-              style={{ fontFamily: "Inter, sans-serif" }}
-            >
-              Make custom T-shirts that they will be pleased to wear-all at
-              prices that fit every budget.
+        {/* Custom T-Shirts Section */}
+        <div className="w-full py-20 px-10 md:px-47 bg-orange-100 flex flex-col md:flex-row items-center gap-8">
+          <div className="md:w-1/2 text-center md:text-left">
+            <h1 className="text-4xl font-semibold text-gray-800">Custom T-Shirts</h1>
+            <p className="text-2xl mt-3">
+              Make custom T-shirts that they will be pleased to wear—all at prices that fit every budget.
             </p>
-
             <Link
               to="/shop"
               className="bg-black text-white text-xl hover:bg-orange-300 hover:text-black transition duration-300 rounded-xl px-8 py-4 mt-3 inline-block"
@@ -72,11 +77,10 @@ const Home = () => {
               See all products
             </Link>
           </div>
-          {/* Image */}
-          <div className="md:w-1/2 flex justify-center ">
+          <div className="md:w-1/2 flex justify-center">
             <img
               src="/Home Assets/home_picture1.svg"
-              className="w-full max-w-md md:max-w-lg lg:max-w-xl h-auto  drop-shadow-xl"
+              className="w-full max-w-md md:max-w-lg lg:max-w-xl h-auto drop-shadow-xl"
               alt="Custom T-Shirts"
             />
           </div>
@@ -102,7 +106,7 @@ const Home = () => {
             </p>
 
             {/* Apparel Category Container*/}
-            <div className="md:w-full flex justify-between items-center gap-x-100">
+            <div className="md:w-full flex justify-between items-center gap-x-75">
               <div className="text-center flex-1 mt-10">
                 <img
                   src="/Home Assets/home_img_shortSleeve.svg"
@@ -134,115 +138,50 @@ const Home = () => {
             </div>
           </div>
         </div>
-        {/*Parent Container*/}
-        <div className="w-full py-30 px-10 md:px-20 bg-gray-800 flex flex-col md:flex-row justify-between gap-8">
-          {/* Image */}
-          <div className="md:w-1/2 flex mr-5 justify-center ">
+
+
+        {/* Team Design Section */}
+        <div className="w-full py-20 px-10 md:px-20 bg-gray-800 flex flex-col md:flex-row items-center gap-8">
+          <div className="md:w-1/2 flex justify-center">
             <img
               src="/Home Assets/home_picture1.svg"
-              className="w-full max-w-md md:max-w-lg lg:max-w-xl h-auto  drop-shadow-xl"
+              className="w-full max-w-md md:max-w-lg lg:max-w-xl h-auto drop-shadow-xl"
               alt="Custom T-Shirts"
             />
           </div>
-          {/* Text Section */}
-          <div className="md:w-1/2 md:text-left text-center ml-2 mr-80 pr-1 mt-7">
-            <h1
-              className="text-4xl font-semibold text-gray-200 "
-              style={{ fontFamily: "Inter, sans-serif" }}
-            >
+          <div className="md:w-1/2 text-center md:text-left">
+            <h1 className="text-4xl font-semibold text-gray-200">
               Designing tees for your team just got easier.
             </h1>
-
-            <p
-              className="text-2xl/8 mt-3 text-gray-200 "
-              style={{ fontFamily: "Inter, sans-serif" }}
-            >
-              Create a look for the entire team without the need to start your
-              design from scratch. Easy, simple, fast.
+            <p className="text-2xl mt-3 text-gray-200">
+              Create a look for the entire team without the need to start your design from scratch. Easy, simple, fast.
             </p>
-
-            <button
-              type="button"
-              className="bg-orange-100 text-black text-xl hover:bg-orange-300 hover:text-black transition duration-300  rounded-xl px-8 py-4 mt-3"
-            >
-              Get Started{" "}
+            <button className="bg-orange-100 text-black text-xl hover:bg-orange-300 transition duration-300 rounded-xl px-8 py-4 mt-3">
+              Get Started
             </button>
           </div>
         </div>
-        <div className="w-full py-20 px-10 bg-orange-100 md:px-20 flex flex-col md:flex-row justify-between gap-8">
-          {/* Text Section */}
-          <div className="md:w-5/7 md:text-left text-center mx-auto mt-7">
-            <h1
-              className="text-4xl font-semibold text-gray-800"
-              style={{ fontFamily: "Inter, sans-serif" }}
-            >
-              Frequently Asked Questions
-            </h1>
 
-            {/* FAQ Item 1 */}
-            <div className="mt-10">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                What material are the personalized T-shirts made of?
-              </h2>
-              <p className="text-lg mt-2">
-                We offer cotton, blend, and polyester options. Our soft-touch
-                custom tees are made of 100% ringspun cotton, which is more
-                breathable and feels softer. We also have personalized T-shirts
-                made from performance fabric, which is moisture-wicking for
-                maximum comfort.
-              </p>
+        {/* FAQ Section */}
+        <div className="w-full py-20 px-10 bg-white md:px-46">
+          <div className="md:w-5/7 text-center md:text-left">
+            <h1 className="text-4xl font-semibold text-gray-800">Frequently Asked Questions</h1>
+            <div className="mt-10 space-y-4">
+              {faqs.map((faq, index) => (
+                <div key={index} className=" border-gray-300 rounded-lg">
+                  <button
+                    className="w-full text-left p-4 flex hover:bg-gray-50 justify-between items-center"
+                    onClick={() => toggleFAQ(index)}
+                  >
+                    <span className="text-xl font-semibold text-gray-800">{faq.question}</span>
+                    <span className="text-xl">{openIndex === index ? "−" : "+"}</span>
+                  </button>
+                  {openIndex === index && <div className="p-4 text-lg text-black border-b border-gray-700f">{faq.answer}</div>}
+                </div>
+              ))}
             </div>
-
-            {/* Divider */}
-            <hr className="my-6 border-gray-400" />
-            {/* FAQ Item 2 */}
-            <div className="mt-10">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                What sizes are the T-shirts available in?
-              </h2>
-              <p className="text-lg mt-2">
-                Adults’ T-shirts from VistaPrint are available in XXS – 5XL. We
-                also offer kids’ sizes. To find the exact length and width of
-                each size, check our size charts tab on the T-shirt page of your
-                choice.
-              </p>
-            </div>
-
-            {/* Divider */}
-            <hr className="my-6 border-gray-400" />
-            {/* FAQ Item 3 */}
-            <div className="mt-10">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Can I print my, artwork or design onto the T-shirts?
-              </h2>
-              <p className="text-lg mt-2">
-                Yes, of course. To make your own T-shirt, you can upload your
-                design to the front of your tee and add custom elements like
-                text. For some of our personalized T-shirts, reverse side
-                printing is also available.
-              </p>
-            </div>
-
-            {/* Divider */}
-            <hr className="my-6 border-gray-400" />
-            {/* FAQ Item 4 */}
-            <div className="mt-10">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Is there a minumum order quantity for custom T-shit?
-              </h2>
-              <p className="text-lg mt-2">
-                There is no minimum order quantity for T-shirts printed with
-                direct-to-garment or heat transfer printing options. For
-                screenprint T-shirts, the minimum order quantity is 6.
-              </p>
-            </div>
-
-            {/* Divider */}
-            <hr className="my-6 border-gray-400" />
           </div>
         </div>
-
-        <div className="w-full py-20 px-10 bg-gray-800 md:px-20 flex-col md:flex-row justify-between gap-8"></div>
       </div>
     </>
   );

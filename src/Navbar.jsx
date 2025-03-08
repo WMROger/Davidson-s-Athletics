@@ -100,7 +100,7 @@ const Navbar = () => {
           )}
           <li>
             <Link to="/services" className="hover:text-red-500 transition">
-              Services
+              About Us
             </Link>
           </li>
         </ul>
