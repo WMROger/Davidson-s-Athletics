@@ -10,6 +10,13 @@ const RequestForm = () => {
     location.state?.uploadedImages || []
   );
   const [imagePreviews, setImagePreviews] = useState([]); // To store image preview URLs
+  const getCutTypeOptions = () => {
+    return [
+      { value: "v-neck", label: "V-Neck" },
+      { value: "crew-neck", label: "Crew Neck" },
+      { value: "scoop-neck", label: "Scoop Neck" },
+    ];
+  };
   const [formData, setFormData] = useState({
     customerInfo: {
       fullName: "",
@@ -29,6 +36,7 @@ const RequestForm = () => {
       names: Array(1).fill(""),
       sizes: Array(1).fill(""),
     },
+    
   });
 
   // Track focused input fields
@@ -118,51 +126,56 @@ const RequestForm = () => {
   };
 
   const handleSubmit = async () => {
-    if (uploadedImages.length === 0) {
-      alert("Please upload at least one image before submitting.");
-      return;
-    }
-
     try {
-      // Upload images to your server only on submit
       const uploadedUrls = [];
-
+  
+      // Upload each image to the server
       for (const image of uploadedImages) {
         const formData = new FormData();
-        formData.append("file", image);
-
+        formData.append('file', image);
+  
         const response = await fetch(
-          "https://davidsonsathletics.scarlet2.io/api/upload_request_design.php",
+          'https://davidsonathletics.scarlet2.io/api/upload_request_design.php',
           {
-            method: "POST",
+            method: 'POST',
             body: formData,
           }
         );
-
+  
+        // Check if the upload was successful
         if (!response.ok) {
-          throw new Error("Failed to upload image.");
+          throw new Error('Failed to upload image.');
         }
-
+  
         const data = await response.json();
-        uploadedUrls.push(data.imageUrl); // Store the image URL after upload
+        if (data.imageUrl) {
+          uploadedUrls.push(data.imageUrl); // Add the uploaded image URL to the list
+        } else {
+          throw new Error('Error uploading image: ' + data.error);
+        }
       }
-
-      // Store request in Firestore with all uploaded images
-      await addDoc(collection(db, "requests"), {
-        customerInfo: formData.customerInfo,
-        productType: formData.productType,
-        designDetails: formData.designDetails,
-        imageUrls: uploadedUrls, // Store the uploaded image URLs
+  
+      // Check for undefined values in formData before sending to Firestore
+      const requestData = {
+        customerInfo: formData.customerInfo || '',
+        productType: formData.productType || '',
+        designDetails: formData.designDetails || '',
+        imageUrls: uploadedUrls.length > 0 ? uploadedUrls : [], // Ensure imageUrls is always an array
         timestamp: new Date(),
-      });
-
-      alert("Request submitted successfully!");
+      };
+  
+      // Add the request data to Firestore
+      await addDoc(collection(db, 'requests'), requestData);
+  
+      alert('Request submitted successfully!');
     } catch (error) {
-      console.error("Error submitting request:", error);
-      alert("Failed to submit request.");
+      console.error('Error submitting request:', error);
+      alert('Failed to submit request.');
     }
   };
-
+  
+  
+  
   const productTypeOptions = [
     { value: "Jersey", label: "Jersey" },
     { value: "Polo", label: "Polo" },
@@ -298,6 +311,7 @@ const RequestForm = () => {
             <p className="text-sm">Upload team logo</p>
           </label>
 
+          {/* Show uploaded image previews */}
           {/* Show uploaded image previews */}
           {imagePreviews.length > 0 && (
             <div className="mt-4">
