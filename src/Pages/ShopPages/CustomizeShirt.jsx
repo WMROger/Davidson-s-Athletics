@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const CustomizeShirt = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { state } = location;
   const selectedImage = state?.selectedImage;
   const selectedColor = state?.selectedColor;
@@ -11,8 +12,21 @@ const CustomizeShirt = () => {
   const colors = ["black", "green", "red", "blue", "purple", "yellow"];
   const sizes = ["Small", "Medium", "Large", "XL", "XXL"];
   const [currentColor, setCurrentColor] = useState(selectedColor || "black");
+  const [selectedSize, setSelectedSize] = useState("Large");
   const [shirtImage, setShirtImage] = useState(selectedImage || "/images/default-shirt.jpg");
   const [user, setUser] = useState(null);
+
+  // Function to handle navigation to OrderConfirmation
+  const handleProceed = () => {
+    navigate("/ShopPages/OrderConfirmation", {
+      state: {
+        selectedColor: currentColor,
+        selectedSize: selectedSize,
+        price: 450.00,
+        shirtImage: shirtImage
+      }
+    });
+  };
 
   useEffect(() => {
     setShirtImage(`/Home Assets/home_img_longSleeve-${currentColor}.svg`);
@@ -37,7 +51,7 @@ const CustomizeShirt = () => {
         {/* Left Side: Static Shirt Preview */}
         <div className="w-1/2">
           <img
-            src="/images/default-shirt.jpg"
+            src="/Home Assets/home_img_longSleeve.svg"
             alt="Long Sleeve Shirt"
             className="w-full rounded-lg shadow-lg"
           />
@@ -56,7 +70,11 @@ const CustomizeShirt = () => {
           {/* Size Selection */}
           <div className="mt-4">
             <label className="block text-lg font-medium">Size:</label>
-            <select className="border rounded-lg p-2 w-1/2">
+            <select 
+              className="border rounded-lg p-2 w-1/2"
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+            >
               {sizes.map((size) => (
                 <option key={size}>{size}</option>
               ))}
@@ -84,6 +102,14 @@ const CustomizeShirt = () => {
           {user && (
             <button className="mt-6 bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-800 transition">
               Add to Cart
+            </button>
+          )}
+          {user && (
+            <button 
+              className="mt-6 ml-10 bg-black text-white py-3 px-8 rounded-lg hover:bg-gray-800 transition"
+              onClick={handleProceed}
+            >
+              Proceed
             </button>
           )}
         </div>

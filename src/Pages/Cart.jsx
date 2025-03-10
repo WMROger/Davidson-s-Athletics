@@ -49,13 +49,13 @@ const Cart = () => {
   return (
     <>
       {/* Top Bar Placeholder */}
-      <div className="w-full h-20 bg-black mt-30"></div>
+      <div className="w-full h-24 bg-black mt-30"></div>
 
       {/* Cart Container */}
-      <div className="max-w-4xl mx-auto my-10 p-4">
+      <div className="w-7xl mx-auto my-5 p-8">
         {/* Header */}
-        <div className="bg-gray-800 text-white grid grid-cols-5 py-4 px-5 rounded-md text-center font-medium">
-          <div className="flex items-center gap-2 justify-start col-span-2">
+        <div className="bg-gray-800 text-white grid grid-cols-5 py-5 px-5 rounded-md text-center text-xl">
+          <div className="flex items-center gap-2 justify-start col-span-2 text-xl">
             <input type="checkbox" className="w-5 h-5" />
             <span>Product</span>
           </div>
@@ -88,15 +88,15 @@ const Cart = () => {
               <div className="grid grid-cols-5 items-center text-center">
                 {/* Product Section */}
                 <div className="col-span-2 flex items-center gap-4">
-                  <img src={item.imageUrl} alt="Product" className="w-20 h-20 object-fit rounded-md" />
+                  <img src={item.imageUrl} alt="Product" className="w-28 h-28 object-fit rounded-md bg-gray-100" />
                   <div>
-                    <h3 className="font-medium">Custom Long Sleeve Jersey</h3>
-                    <p className="text-gray-500 text-sm">Variation: {item.variation}</p>
+                    <h3 className="text-xl text-left">Custom Long Sleeve Jersey</h3>
                   </div>
+                  <p className="text-gray-500 text-left text-xl">Variations: {item.variation}</p>
                 </div>
 
                 {/* Price */}
-                <div className="font-medium text-lg">₱{(item.basePrice * item.quantity).toFixed(2)}</div>
+                <div className="font-medium text-xl">₱{(item.basePrice * item.quantity).toFixed(2)}</div>
 
                 {/* Quantity Selector - Properly Aligned */}
                 <div className="flex justify-center">

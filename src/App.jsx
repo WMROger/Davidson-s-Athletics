@@ -15,6 +15,7 @@ import Assets from "./Admin/Assets";
 import NewShirt from "./Admin/NewShirt"; // Import NewShirt component
 import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt";
 import RequestForm from "./Pages/ShopPages/RequestForm"; // Import RequestForm component
+import OrderConfirmation from './Pages/ShopPages/OrderConfirmation';
 
 function App() {
   return (
@@ -105,6 +106,18 @@ function App() {
           }
         />
 
+        <Route
+          path="/ShopPages/OrderConfirmation"
+          element={
+            <>
+              <Navbar />
+              <OrderConfirmation />
+            </>
+          }
+        />
+        
+
+
         {/* Add the Request Form Route */}
         <Route
           path="/ShopPages/RequestForm"
@@ -113,6 +126,7 @@ function App() {
               <Navbar />
               <RequestForm />
             </>
+            
           }
         />
       </Routes>
