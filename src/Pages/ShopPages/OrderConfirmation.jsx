@@ -7,9 +7,9 @@ const OrderConfirmation = () => {
       <div className="w-full h-24 bg-black "></div>
       
       {/* Main content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Progress steps */}
-        <div className="flex justify-center items-center gap-4 mb-16">
+        <div className="flex justify-end items-center gap-4 mb-16">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
             <span className="ml-2 font-medium">Review</span>
@@ -25,7 +25,7 @@ const OrderConfirmation = () => {
         
         {/* Order confirmation header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold mb-2">Order Confirmation</h1>
+          <h1 className="text-4xl font-bold mb-2">Order Confirmation</h1>
           <p className="text-gray-600">Always double check before confirming for less hassle.</p>
         </div>
         
@@ -34,7 +34,7 @@ const OrderConfirmation = () => {
           {/* Product image */}
           <div className="md:w-1/2 bg-gray-100 rounded-lg p-4 flex items-center justify-center">
             <img
-              src="/api/placeholder/400/400"
+              src="/Home Assets/home_img_longSleeve-black.svg"
               alt="Long Sleeve Jersey"
               className="max-w-full h-auto"
             />
