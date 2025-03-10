@@ -1,22 +1,33 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { db } from "../../Database/firebase"; // Ensure correct path
+import { collection, addDoc } from "firebase/firestore";
 
 const RequestForm = () => {
   const location = useLocation();
   const selectedProduct = location.state?.selectedProduct || "";
-
+  const [uploadedImages, setUploadedImages] = useState(
+    location.state?.uploadedImages || []
+  );
+  const [imagePreviews, setImagePreviews] = useState([]); // To store image preview URLs
   const [formData, setFormData] = useState({
-    customerInfo: { fullName: "", email: "", phone: "", teamName: "", logo: null },
+    customerInfo: {
+      fullName: "",
+      email: "",
+      phone: "",
+      teamName: "",
+      logo: null,
+    },
     productType: selectedProduct,
-    designDetails: { 
-      primaryColor: "", 
-      secondaryColor: "", 
-      pattern: "", 
-      quantity: 1, 
-      specialInstructions: "", 
-      hasName: false, 
-      names: Array(1).fill(""), 
-      sizes: Array(1).fill("") 
+    designDetails: {
+      primaryColor: "",
+      secondaryColor: "",
+      pattern: "",
+      quantity: 1,
+      specialInstructions: "",
+      hasName: false,
+      names: Array(1).fill(""),
+      sizes: Array(1).fill(""),
     },
   });
 
@@ -24,16 +35,16 @@ const RequestForm = () => {
   const [focusedFields, setFocusedFields] = useState({});
 
   const handleFocus = (fieldId) => {
-    setFocusedFields(prev => ({
+    setFocusedFields((prev) => ({
       ...prev,
-      [fieldId]: true
+      [fieldId]: true,
     }));
   };
 
   const handleBlur = (fieldId, value) => {
-    setFocusedFields(prev => ({
+    setFocusedFields((prev) => ({
       ...prev,
-      [fieldId]: value ? true : false
+      [fieldId]: value ? true : false,
     }));
   };
 
@@ -45,11 +56,34 @@ const RequestForm = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      customerInfo: { ...prev.customerInfo, logo: e.target.files[0] },
-    }));
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    const previewUrls = [];
+    const uploadedFiles = [];
+
+    // Create an array of promises to handle async reading of all files
+    const filePromises = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          previewUrls.push(reader.result); // Push the preview URL
+          uploadedFiles.push(file); // Store the file itself
+          resolve(); // Resolve the promise once the file is read
+        };
+        reader.onerror = reject; // Reject the promise if there's an error
+        reader.readAsDataURL(file);
+      });
+    });
+
+    // After all files are read, update the state
+    Promise.all(filePromises)
+      .then(() => {
+        setImagePreviews((prev) => [...prev, ...previewUrls]); // Update preview state
+        setUploadedImages((prevImages) => [...prevImages, ...uploadedFiles]); // Update uploaded files state
+      })
+      .catch((error) => {
+        console.error("Error reading files:", error);
+      });
   };
 
   const handleQuantityChange = (e) => {
@@ -83,38 +117,72 @@ const RequestForm = () => {
     }));
   };
 
-  // Get cut type options based on product type
-  const getCutTypeOptions = () => {
-    if (formData.productType === "Jersey") {
-      return [
-        { value: "Normal Cut", label: "Normal Cut" },
-        { value: "Amboy Cut", label: "Amboy Cut" },
-        { value: "NBA Cut", label: "NBA Cut" },
-        { value: "V Neck", label: "V Neck" },
-        { value: "Round Neck", label: "Round Neck" }
-      ];
+  const handleSubmit = async () => {
+    if (uploadedImages.length === 0) {
+      alert("Please upload at least one image before submitting.");
+      return;
     }
-    return [];
+
+    try {
+      // Upload images to your server only on submit
+      const uploadedUrls = [];
+
+      for (const image of uploadedImages) {
+        const formData = new FormData();
+        formData.append("file", image);
+
+        const response = await fetch(
+          "https://davidsonsathletics.scarlet2.io/api/upload_request_design.php",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to upload image.");
+        }
+
+        const data = await response.json();
+        uploadedUrls.push(data.imageUrl); // Store the image URL after upload
+      }
+
+      // Store request in Firestore with all uploaded images
+      await addDoc(collection(db, "requests"), {
+        customerInfo: formData.customerInfo,
+        productType: formData.productType,
+        designDetails: formData.designDetails,
+        imageUrls: uploadedUrls, // Store the uploaded image URLs
+        timestamp: new Date(),
+      });
+
+      alert("Request submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting request:", error);
+      alert("Failed to submit request.");
+    }
   };
 
   const productTypeOptions = [
     { value: "Jersey", label: "Jersey" },
     { value: "Polo", label: "Polo" },
     { value: "Sleeveless", label: "Sleeveless" },
-    { value: "T-shirts", label: "T-shirts" }
+    { value: "T-shirts", label: "T-shirts" },
   ];
 
   const sizeOptions = [
     { value: "S", label: "Small" },
     { value: "M", label: "Medium" },
     { value: "L", label: "Large" },
-    { value: "XL", label: "X-Large" }
+    { value: "XL", label: "X-Large" },
   ];
 
   return (
     <div className="max-w-4xl mx-auto my-30 p-8 bg-white shadow-md rounded-lg">
       <h2 className="text-5xl font-bold text-start">Request Design</h2>
-      <p className="text-start text-gray-500 mb-6">Fill out the information below</p>
+      <p className="text-start text-gray-500 mb-6">
+        Fill out the information below
+      </p>
 
       {/* Flexbox Layout */}
       <div className="flex flex-col md:flex-row justify-between">
@@ -192,7 +260,7 @@ const RequestForm = () => {
                 Phone Number
               </label>
             </div>
-            
+
             {/* Team Name Field */}
             <div className="w-full sm:w-1/2 relative mb-4">
               <input
@@ -220,10 +288,32 @@ const RequestForm = () => {
 
           {/* File Upload */}
           <label className="border-dashed border-2 border-gray-400 rounded-lg p-6 flex flex-col items-center text-gray-500 cursor-pointer mt-4">
-            <input type="file" onChange={handleFileChange} className="hidden" />
+            <input
+              type="file"
+              multiple
+              onChange={handleFileChange}
+              className="hidden"
+            />
             <span className="text-2xl">📤</span>
             <p className="text-sm">Upload team logo</p>
           </label>
+
+          {/* Show uploaded image previews */}
+          {imagePreviews.length > 0 && (
+            <div className="mt-4">
+              <p className="text-gray-600">Uploaded Image Previews:</p>
+              <div className="flex flex-wrap gap-2">
+                {imagePreviews.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image} // Display the preview image
+                    alt={`Uploaded Design ${index + 1}`}
+                    className="w-32 h-auto border rounded-lg shadow-md"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Middle Divider - Only visible on larger screens */}
@@ -236,14 +326,18 @@ const RequestForm = () => {
             <select
               id="productType"
               value={formData.productType}
-              onChange={(e) => setFormData({ ...formData, productType: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, productType: e.target.value })
+              }
               onFocus={() => handleFocus("productType")}
               onBlur={(e) => handleBlur("productType", e.target.value)}
               className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
             >
               <option value=""></option>
-              {productTypeOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {productTypeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
             <label
@@ -257,8 +351,19 @@ const RequestForm = () => {
               Product Type
             </label>
             <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              <svg
+                className="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                ></path>
               </svg>
             </div>
           </div>
@@ -269,14 +374,18 @@ const RequestForm = () => {
               <select
                 id="cutType"
                 value={formData.designDetails.cutType || ""}
-                onChange={(e) => handleInputChange(e, "cutType", "designDetails")}
+                onChange={(e) =>
+                  handleInputChange(e, "cutType", "designDetails")
+                }
                 onFocus={() => handleFocus("cutType")}
                 onBlur={(e) => handleBlur("cutType", e.target.value)}
                 className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
               >
                 <option value=""></option>
-                {getCutTypeOptions().map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
+                {getCutTypeOptions().map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
                 ))}
               </select>
               <label
@@ -290,20 +399,33 @@ const RequestForm = () => {
                 Cut Type
               </label>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                <svg
+                  className="w-4 h-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
                 </svg>
               </div>
             </div>
           )}
-          
+
           {/* Primary Color Field */}
           <div className="relative mb-4">
             <input
               id="primaryColor"
               type="text"
               value={formData.designDetails.primaryColor}
-              onChange={(e) => handleInputChange(e, "primaryColor", "designDetails")}
+              onChange={(e) =>
+                handleInputChange(e, "primaryColor", "designDetails")
+              }
               onFocus={() => handleFocus("primaryColor")}
               onBlur={(e) => handleBlur("primaryColor", e.target.value)}
               className="border p-2 rounded w-full z-10 relative bg-transparent"
@@ -312,7 +434,8 @@ const RequestForm = () => {
             <label
               htmlFor="primaryColor"
               className={`absolute transition-all duration-200 pointer-events-none ${
-                focusedFields["primaryColor"] || formData.designDetails.primaryColor
+                focusedFields["primaryColor"] ||
+                formData.designDetails.primaryColor
                   ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
                   : "text-gray-500 top-2 left-2 z-0"
               }`}
@@ -327,7 +450,9 @@ const RequestForm = () => {
               id="secondaryColor"
               type="text"
               value={formData.designDetails.secondaryColor}
-              onChange={(e) => handleInputChange(e, "secondaryColor", "designDetails")}
+              onChange={(e) =>
+                handleInputChange(e, "secondaryColor", "designDetails")
+              }
               onFocus={() => handleFocus("secondaryColor")}
               onBlur={(e) => handleBlur("secondaryColor", e.target.value)}
               className="border p-2 rounded w-full z-10 relative bg-transparent"
@@ -336,7 +461,8 @@ const RequestForm = () => {
             <label
               htmlFor="secondaryColor"
               className={`absolute transition-all duration-200 pointer-events-none ${
-                focusedFields["secondaryColor"] || formData.designDetails.secondaryColor
+                focusedFields["secondaryColor"] ||
+                formData.designDetails.secondaryColor
                   ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
                   : "text-gray-500 top-2 left-2 z-0"
               }`}
@@ -402,7 +528,10 @@ const RequestForm = () => {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  designDetails: { ...formData.designDetails, hasName: e.target.checked },
+                  designDetails: {
+                    ...formData.designDetails,
+                    hasName: e.target.checked,
+                  },
                 })
               }
               className="w-4 h-4"
@@ -411,68 +540,87 @@ const RequestForm = () => {
           </label>
 
           {/* Name & Size Fields */}
-          {Array.from({ length: formData.designDetails.quantity }).map((_, i) => (
-            <div key={i} className="flex space-x-2 mb-2">
-              {formData.designDetails.hasName && (
+          {Array.from({ length: formData.designDetails.quantity }).map(
+            (_, i) => (
+              <div key={i} className="flex space-x-2 mb-2">
+                {formData.designDetails.hasName && (
+                  <div className="relative w-1/2">
+                    <input
+                      type="text"
+                      value={formData.designDetails.names[i]}
+                      onChange={(e) => handleNameChange(i, e.target.value)}
+                      onFocus={() => handleFocus(`name-${i}`)}
+                      onBlur={(e) => handleBlur(`name-${i}`, e.target.value)}
+                      className="border p-2 rounded w-full z-10 relative bg-transparent"
+                      placeholder=" "
+                    />
+                    <label
+                      className={`absolute transition-all duration-200 pointer-events-none ${
+                        focusedFields[`name-${i}`] ||
+                        formData.designDetails.names[i]
+                          ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                          : "text-gray-500 top-2 left-2 z-0"
+                      }`}
+                    >
+                      Name {i + 1}
+                    </label>
+                  </div>
+                )}
+
                 <div className="relative w-1/2">
-                  <input
-                    type="text"
-                    value={formData.designDetails.names[i]}
-                    onChange={(e) => handleNameChange(i, e.target.value)}
-                    onFocus={() => handleFocus(`name-${i}`)}
-                    onBlur={(e) => handleBlur(`name-${i}`, e.target.value)}
-                    className="border p-2 rounded w-full z-10 relative bg-transparent"
-                    placeholder=" "
-                  />
+                  <select
+                    value={formData.designDetails.sizes[i]}
+                    onChange={(e) => handleSizeChange(i, e.target.value)}
+                    onFocus={() => handleFocus(`size-${i}`)}
+                    onBlur={(e) => handleBlur(`size-${i}`, e.target.value)}
+                    className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
+                  >
+                    <option value=""></option>
+                    {sizeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                   <label
                     className={`absolute transition-all duration-200 pointer-events-none ${
-                      focusedFields[`name-${i}`] || formData.designDetails.names[i]
+                      focusedFields[`size-${i}`] ||
+                      formData.designDetails.sizes[i]
                         ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
                         : "text-gray-500 top-2 left-2 z-0"
                     }`}
                   >
-                    Name {i + 1}
+                    Size {i + 1}
                   </label>
-                </div>
-              )}
-              
-              <div className="relative w-1/2">
-                <select
-                  value={formData.designDetails.sizes[i]}
-                  onChange={(e) => handleSizeChange(i, e.target.value)}
-                  onFocus={() => handleFocus(`size-${i}`)}
-                  onBlur={(e) => handleBlur(`size-${i}`, e.target.value)}
-                  className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
-                >
-                  <option value=""></option>
-                  {sizeOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-                <label
-                  className={`absolute transition-all duration-200 pointer-events-none ${
-                    focusedFields[`size-${i}`] || formData.designDetails.sizes[i]
-                      ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
-                      : "text-gray-500 top-2 left-2 z-0"
-                  }`}
-                >
-                  Size {i + 1}
-                </label>
-                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
 
           {/* Special Instructions Field */}
           <div className="relative mb-4">
             <textarea
               id="specialInstructions"
               value={formData.designDetails.specialInstructions}
-              onChange={(e) => handleInputChange(e, "specialInstructions", "designDetails")}
+              onChange={(e) =>
+                handleInputChange(e, "specialInstructions", "designDetails")
+              }
               onFocus={() => handleFocus("specialInstructions")}
               onBlur={(e) => handleBlur("specialInstructions", e.target.value)}
               className="border p-2 rounded w-full h-24 z-10 relative bg-transparent"
@@ -481,7 +629,8 @@ const RequestForm = () => {
             <label
               htmlFor="specialInstructions"
               className={`absolute transition-all duration-200 pointer-events-none ${
-                focusedFields["specialInstructions"] || formData.designDetails.specialInstructions
+                focusedFields["specialInstructions"] ||
+                formData.designDetails.specialInstructions
                   ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
                   : "text-gray-500 top-2 left-2 z-0"
               }`}
@@ -493,8 +642,15 @@ const RequestForm = () => {
       </div>
 
       <div className="flex justify-center space-x-6 mt-6">
-        <button className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">Submit</button>
-        <button className="border border-black px-6 py-2 rounded-md hover:bg-gray-100 transition-colors">Cancel</button>
+        <button
+          onClick={handleSubmit}
+          className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors"
+        >
+          Submit
+        </button>
+        <button className="border border-black px-6 py-2 rounded-md hover:bg-gray-100 transition-colors">
+          Cancel
+        </button>
       </div>
     </div>
   );
