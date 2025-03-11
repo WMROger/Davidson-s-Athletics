@@ -80,30 +80,6 @@ const OrdersManagement = () => {
     { id: '#102349', customer: 'Ari Necesario', type: 'Pickup', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
     { id: '#102350', customer: 'Ari Necesario', type: 'Delivery', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
     { id: '#102351', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
-    { id: '#102344', customer: 'Ari Necesario', type: 'Delivery', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 19', dateValue: '2025-02-19' },
-    { id: '#102345', customer: 'Ari Necesario', type: 'Pickup', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 19', dateValue: '2025-02-19' },
-    { id: '#102346', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 20', dateValue: '2025-02-20' },
-    { id: '#102347', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 20', dateValue: '2025-02-20' },
-    { id: '#102348', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
-    { id: '#102349', customer: 'Ari Necesario', type: 'Pickup', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
-    { id: '#102350', customer: 'Ari Necesario', type: 'Delivery', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
-    { id: '#102351', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
-    { id: '#102344', customer: 'Ari Necesario', type: 'Delivery', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 19', dateValue: '2025-02-19' },
-    { id: '#102345', customer: 'Ari Necesario', type: 'Pickup', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 19', dateValue: '2025-02-19' },
-    { id: '#102346', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 20', dateValue: '2025-02-20' },
-    { id: '#102347', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 20', dateValue: '2025-02-20' },
-    { id: '#102348', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
-    { id: '#102349', customer: 'Ari Necesario', type: 'Pickup', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
-    { id: '#102350', customer: 'Ari Necesario', type: 'Delivery', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
-    { id: '#102351', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
-    { id: '#102344', customer: 'Ari Necesario', type: 'Delivery', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 19', dateValue: '2025-02-19' },
-    { id: '#102345', customer: 'Ari Necesario', type: 'Pickup', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 19', dateValue: '2025-02-19' },
-    { id: '#102346', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 20', dateValue: '2025-02-20' },
-    { id: '#102347', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 20', dateValue: '2025-02-20' },
-    { id: '#102348', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
-    { id: '#102349', customer: 'Ari Necesario', type: 'Pickup', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
-    { id: '#102350', customer: 'Ari Necesario', type: 'Delivery', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
-    { id: '#102351', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
   ];
 
   // Get unique dates for the date filter
@@ -555,11 +531,11 @@ const OrdersManagement = () => {
           <div className="text-sm text-gray-600">
             Showing page {currentPage} of {totalPages || 1}
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1">
             <button 
               onClick={prevPage}
               disabled={currentPage === 1}
-              className={`rounded-full px-3 py-3 flex items-center ${currentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
+              className={`rounded-full px-3 py-2 flex items-center ${currentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
               aria-label="Previous page"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -573,7 +549,7 @@ const OrdersManagement = () => {
                 <button 
                   key={`page-${page}`}
                   onClick={() => goToPage(page)}
-                  className={`rounded-full w-10 h-10  flex items-center justify-center ${
+                  className={`rounded-full w-8 h-8 flex items-center justify-center ${
                     currentPage === page 
                       ? 'bg-black text-white' 
                       : 'bg-gray-200 hover:bg-gray-300 text-gray-600'
@@ -589,7 +565,7 @@ const OrdersManagement = () => {
             <button
               onClick={nextPage}
               disabled={currentPage === totalPages || totalPages === 0}
-              className={`rounded-full px-3 py-3 flex items-center ${currentPage === totalPages || totalPages === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
+              className={`rounded-full px-3 py-2 flex items-center ${currentPage === totalPages || totalPages === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
               aria-label="Next page"
             >
               <ChevronRight className="w-4 h-4" />
