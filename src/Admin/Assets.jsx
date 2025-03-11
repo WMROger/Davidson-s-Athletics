@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { MoreHorizontal, Plus } from "lucide-react"; // Use horizontal meatballs icon and plus icon
 import { db } from "../Database/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import Select from 'react-select';
 
 const initialAssets = [
   {
@@ -23,6 +24,13 @@ const initialAssets = [
   },
 ];
 
+const sizeOptions = [
+  { value: 'S', label: 'S' },
+  { value: 'M', label: 'M' },
+  { value: 'L', label: 'L' },
+  { value: 'XL', label: 'XL' },
+];
+
 export default function Assets() {
   const [assets, setAssets] = useState(initialAssets);
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -34,6 +42,8 @@ export default function Assets() {
   const [color, setColor] = useState("");
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(""); // Store uploaded image URL
+  const [sizes, setSizes] = useState([]);
+  const [stock, setStock] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -103,7 +113,7 @@ export default function Assets() {
   // Upload form data to Firestore
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !price || !color || !imageUrl) {
+    if (!name || !price || !color || !imageUrl || sizes.length === 0 || !stock) {
       alert("Please fill all fields and upload an image.");
       return;
     }
@@ -114,6 +124,8 @@ export default function Assets() {
       price: parseFloat(price),
       color,
       image: imageUrl,
+      sizes,
+      stock: parseInt(stock),
       date: new Date(),
       status: "Uploaded",
     };
@@ -125,6 +137,8 @@ export default function Assets() {
     setColor("");
     setImage(null);
     setImageUrl("");
+    setSizes([]);
+    setStock("");
     setLoading(false);
   };
 
@@ -221,10 +235,52 @@ export default function Assets() {
       </div>
 
       {showAddProductPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <h2 className="text-2xl font-semibold mb-4">Add New Product</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex flex-col items-center">
+                <div className="border-dashed border-2 border-gray-300 rounded-lg p-6 mb-4 w-full flex justify-center items-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="upload-image"
+                  />
+                  <label htmlFor="upload-image" className="cursor-pointer">
+                    {imageUrl ? (
+                      <img src={imageUrl} alt="Uploaded" className="w-32 h-32 object-cover border rounded" />
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-12 w-12 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M3 15a4 4 0 004 4h10a4 4 0 004-4M7 10l5-5m0 0l5 5m-5-5v12"
+                          />
+                        </svg>
+                        <span className="text-gray-400">Upload Image</span>
+                      </div>
+                    )}
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white px-4 py-2 rounded mb-4"
+                  onClick={handleUploadImage}
+                  disabled={uploading}
+                >
+                  {uploading ? "Uploading..." : "Upload Image"}
+                </button>
+              </div>
               <input
                 type="text"
                 placeholder="Shirt Name"
@@ -246,43 +302,31 @@ export default function Assets() {
                 onChange={(e) => setColor(e.target.value)}
                 className="p-2 border rounded w-full"
               />
-
-              {/* File Input */}
-              <input type="file" accept="image/*" onChange={handleFileChange} />
-
-              {/* Upload Image Button */}
-              <button
-                type="button"
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-                onClick={handleUploadImage}
-                disabled={uploading}
-              >
-                {uploading ? "Uploading..." : "Upload Image"}
-              </button>
-
-              {/* Image Preview */}
-              {imageUrl && (
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">Uploaded Image Preview:</p>
-                  <img
-                    src={imageUrl}
-                    alt="Uploaded"
-                    className="w-32 h-32 object-cover border rounded mt-2"
-                  />
-                </div>
-              )}
-
-              {/* Submit Form Button */}
+              <Select
+                isMulti
+                options={sizeOptions}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                placeholder="Select Sizes"
+                onChange={(selectedOptions) => setSizes(selectedOptions.map(option => option.value))}
+              />
+              <input
+                type="number"
+                placeholder="Stock Quantity"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="p-2 border rounded w-full"
+              />
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded"
+                className="bg-blue-500 text-white px-4 py-2 rounded w-full"
                 disabled={loading}
               >
-                {loading ? "Adding..." : "Add Shirt"}
+                {loading ? "Adding..." : "Add Product"}
               </button>
               <button
                 type="button"
-                className="ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="mt-2 px-4 py-2 bg-red-500 text-white rounded w-full hover:bg-red-600"
                 onClick={() => setShowAddProductPopup(false)}
               >
                 Cancel
@@ -298,9 +342,10 @@ export default function Assets() {
             <h2 className="text-2xl font-semibold mb-4">Product Details</h2>
             <img src={selectedProduct.image} alt="Product" className="w-full h-auto mb-4" />
             <p><strong>Product Name:</strong> {selectedProduct.name}</p>
-            <p><strong>Available Sizes:</strong> S, M, L, XL</p>
+            <p><strong>Available Sizes:</strong> {selectedProduct.sizes.join(", ")}</p>
             <p><strong>Color:</strong> {selectedProduct.color}</p>
             <p><strong>Price:</strong> P{selectedProduct.price}</p>
+            <p><strong>Stock:</strong> {selectedProduct.stock}</p>
             <button
               className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               onClick={() => setSelectedProduct(null)}
