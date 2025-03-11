@@ -12,6 +12,7 @@ export default function AdminDesign() {
   const [currentPendingPage, setCurrentPendingPage] = useState(1);
   const [currentHistoryPage, setCurrentHistoryPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState("All");
+  const [selectedAsset, setSelectedAsset] = useState(null); // State to manage selected asset for modal
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -77,7 +78,7 @@ export default function AdminDesign() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-left text-gray-600 border-b">
-              <th className="p-2 pl-6">Name & Date</th>
+              <th className="p-2 ">Name & Date</th>
               <th className="p-2 ">Status</th>
               <th className="p-2 ">File</th>
               <th className="p-2 "></th>
@@ -110,9 +111,8 @@ export default function AdminDesign() {
                 </td>
                 <td className="p-2">
                   <a
-                    href={asset.imageUrls[0]}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="#"
+                    onClick={() => setSelectedAsset(asset)} // Open modal with selected asset
                     className="text-blue-500 hover:underline"
                   >
                     View File
@@ -232,9 +232,8 @@ export default function AdminDesign() {
                 </td>
                 <td className="p-2">
                   <a
-                    href={asset.imageUrls[0]}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="#"
+                    onClick={() => setSelectedAsset(asset)} // Open modal with selected asset
                     className="text-blue-500 hover:underline"
                   >
                     View File
@@ -287,6 +286,41 @@ export default function AdminDesign() {
           </button>
         </div>
       </div>
+
+      {selectedAsset && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2"> {/* Adjusted width to 1/2 */}
+            <h2 className="text-2xl font-semibold mb-4">Asset Details</h2>
+            <div className="flex">
+              <img src={selectedAsset.imageUrls[0]} alt="Asset" className="w-1/2 h-auto mr-4" />
+              <div className="w-1/2">
+                <p><strong>Order:</strong> #{(currentPendingPage - 1) * ITEMS_PER_PAGE + assets.indexOf(selectedAsset) + 1}</p>
+                <p><strong>Name:</strong> {selectedAsset.customerInfo.fullName}</p>
+                <p><strong>Email:</strong> {selectedAsset.customerInfo.email}</p>
+                <p><strong>Phone:</strong> {selectedAsset.customerInfo.phone}</p>
+                <p><strong>Team Name:</strong> {selectedAsset.customerInfo.teamName}</p>
+                <p><strong>Date:</strong> {format(selectedAsset.timestamp.toDate(), "MMM dd, yyyy")}</p>
+                <p><strong>Status:</strong> {selectedAsset.status}</p>
+                <p><strong>Product Type:</strong> {selectedAsset.productType}</p>
+                <p><strong>Cut Type:</strong> {selectedAsset.designDetails.cutType}</p>
+                <p><strong>Pattern:</strong> {selectedAsset.designDetails.pattern}</p>
+                <p><strong>Primary Color:</strong> {selectedAsset.designDetails.primaryColor}</p>
+                <p><strong>Secondary Color:</strong> {selectedAsset.designDetails.secondaryColor}</p>
+                <p><strong>Quantity:</strong> {selectedAsset.designDetails.quantity}</p>
+                <p><strong>Sizes:</strong> {selectedAsset.designDetails.sizes.join(", ")}</p>
+                <p><strong>Special Instructions:</strong> {selectedAsset.designDetails.specialInstructions}</p>
+                <p><strong>Names:</strong> {selectedAsset.designDetails.names.join(", ")}</p>
+              </div>
+            </div>
+            <button
+              className="mt-4 ml-205 px-6 py-2 bg-red-500 cursor-pointer text-white rounded hover:bg-red-600"
+              onClick={() => setSelectedAsset(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
