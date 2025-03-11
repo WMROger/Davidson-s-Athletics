@@ -1,32 +1,27 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { MoreHorizontal, Plus } from "lucide-react"; // Use horizontal meatballs icon and plus icon
-
-const initialAssets = [
-  {
-    id: 1,
-    name: "John Doe",
-    date: new Date(),
-    status: "Awaiting Approval",
-    file: "design1.pdf",
-  },
-  {
-    id: 2,
-    name: "Jane Smith Jane Smith Awesomeness Gray",
-    date: new Date(),
-    status: "Awaiting Approval",
-    file: "logo.png",
-  },
-];
+import { db } from "../Database/firebase"; // Adjust the import path if necessary
+import { collection, getDocs } from "firebase/firestore";
 
 const ITEMS_PER_PAGE = 5;
 
 export default function AdminDesign() {
-  const [assets, setAssets] = useState(initialAssets);
+  const [assets, setAssets] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [currentPendingPage, setCurrentPendingPage] = useState(1);
   const [currentHistoryPage, setCurrentHistoryPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState("All");
+
+  useEffect(() => {
+    const fetchAssets = async () => {
+      const querySnapshot = await getDocs(collection(db, "requests"));
+      const assetsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setAssets(assetsData);
+    };
+
+    fetchAssets();
+  }, []);
 
   const updateStatus = (id, newStatus) => {
     setAssets((prev) =>
@@ -40,7 +35,6 @@ export default function AdminDesign() {
     setAssets((prev) => prev.filter((asset) => asset.id !== id));
   };
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest(".menu-container")) {
@@ -70,7 +64,6 @@ export default function AdminDesign() {
           <span className="text-gray-600 font-normal ml-6">({pendingAssets.length})</span>
         </h2>
 
-        {/* Upload File Button moved to the right */}
         <button className="px-6 py-2 bg-[#222A2D] text-white rounded hover:bg-[#FFBF61] hover:text-black flex items-center">
           <Plus className="w-5 h-5 mr-2" /> New Upload
         </button>
@@ -89,15 +82,12 @@ export default function AdminDesign() {
           <tbody>
             {paginatedPendingAssets.map((asset) => (
               <tr key={asset.id} className="text-left border-b">
-                {/* Name & Date */}
                 <td className="p-2 pl-6">
-                  <p className="font-semibold">{asset.name}</p>
+                  <p className="font-semibold">{asset.customerInfo.fullName}</p>
                   <p className="text-sm text-gray-500">
-                    {format(asset.date, "MMM dd, yyyy")}
+                    {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
                   </p>
                 </td>
-
-                {/* Status */}
                 <td className="p-2">
                   <span
                     className={`px-3 py-1 rounded text-sm font-medium ${
@@ -111,11 +101,9 @@ export default function AdminDesign() {
                     {asset.status}
                   </span>
                 </td>
-
-                {/* File */}
                 <td className="p-2">
                   <a
-                    href={`/uploads/${asset.file}`}
+                    href={asset.imageUrls[0]}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -123,8 +111,6 @@ export default function AdminDesign() {
                     View File
                   </a>
                 </td>
-
-                {/* Actions */}
                 <td className="p-2 flex items-center justify-center relative">
                   <button
                     className="px-4 py-2 text-green-600 rounded hover:bg-green-300 mr-2"
@@ -140,7 +126,6 @@ export default function AdminDesign() {
                   </button>
                 </td>
                 <td>
-                  {/* Meatballs Menu */}
                   <div className="relative menu-container">
                     <button
                       className="p-2 rounded-full hover:bg-gray-200"
@@ -151,8 +136,6 @@ export default function AdminDesign() {
                     >
                       <MoreHorizontal className="w-7 h-7 text-gray-600" />
                     </button>
-
-                    {/* Menu */}
                     {openMenuId === asset.id && (
                       <div className="absolute -top-12 left-0 flex bg-white border rounded-lg shadow-lg z-50">
                         <button
@@ -218,15 +201,12 @@ export default function AdminDesign() {
           <tbody>
             {paginatedHistoryAssets.map((asset) => (
               <tr key={asset.id} className="text-left border-b">
-                {/* Name & Date */}
                 <td className="p-2 pl-6">
-                  <p className="font-semibold">{asset.name}</p>
+                  <p className="font-semibold">{asset.customerInfo.fullName}</p>
                   <p className="text-sm text-gray-500">
-                    {format(asset.date, "MMM dd, yyyy")}
+                    {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
                   </p>
                 </td>
-
-                {/* Status */}
                 <td className="p-2">
                   <span
                     className={`px-3 py-1 rounded text-sm font-medium ${
@@ -240,11 +220,9 @@ export default function AdminDesign() {
                     {asset.status}
                   </span>
                 </td>
-
-                {/* File */}
                 <td className="p-2">
                   <a
-                    href={`/uploads/${asset.file}`}
+                    href={asset.imageUrls[0]}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -252,8 +230,6 @@ export default function AdminDesign() {
                     View File
                   </a>
                 </td>
-
-                {/* Actions */}
                 <td className="p-2 flex items-center justify-center relative">
                   <div className="relative menu-container">
                     <button
@@ -265,8 +241,6 @@ export default function AdminDesign() {
                     >
                       <MoreHorizontal className="w-7 h-7 text-gray-600" />
                     </button>
-
-                    {/* Menu */}
                     {openMenuId === asset.id && (
                       <div className="absolute -top-12 left-0 flex bg-white border rounded-lg shadow-lg z-50">
                         <button

@@ -60,7 +60,7 @@ const Shop = () => {
     setSelectedFile(imageUrls);
   
     navigate("/ShopPages/RequestForm", {
-      state: { uploadedImages: imageUrls },
+      state: { uploadedImages: files, imagePreviews: imageUrls },
     });
   };
   
