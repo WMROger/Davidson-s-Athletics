@@ -26,7 +26,7 @@ const CustomizeShirt = () => {
         shirtImage: shirtImage
       }
     });
-  };
+  };  
 
   useEffect(() => {
     setShirtImage(`/Home Assets/home_img_longSleeve-${currentColor}.svg`);
