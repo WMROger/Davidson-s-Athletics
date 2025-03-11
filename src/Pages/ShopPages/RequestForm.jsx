@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { db } from "../../Database/firebase"; // Ensure correct path
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, runTransaction, doc } from "firebase/firestore"; // Import necessary Firestore functions
+import { v4 as uuidv4 } from 'uuid'; // Import the uuid library
 
 const RequestForm = () => {
   const location = useLocation();
@@ -156,8 +157,26 @@ const RequestForm = () => {
         }
       }
 
+      // Run a transaction to get the current order number and increment it
+      const newOrderNumber = await runTransaction(db, async (transaction) => {
+        const orderCounterRef = doc(db, "counters", "orderCounter");
+        const orderCounterDoc = await transaction.get(orderCounterRef);
+
+        if (!orderCounterDoc.exists()) {
+          throw new Error("Order counter document does not exist!");
+        }
+
+        const currentOrderNumber = orderCounterDoc.data().currentOrderNumber;
+        const newOrderNumber = currentOrderNumber + 1;
+
+        transaction.update(orderCounterRef, { currentOrderNumber: newOrderNumber });
+
+        return newOrderNumber;
+      });
+
       // Check for undefined values in formData before sending to Firestore
       const requestData = {
+        id: newOrderNumber, // Use the new order number as the unique ID
         customerInfo: formData.customerInfo || "",
         productType: formData.productType || "",
         designDetails: formData.designDetails || "",

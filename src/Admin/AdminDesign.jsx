@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { MoreHorizontal, Plus } from "lucide-react"; // Use horizontal meatballs icon and plus icon
 import { db } from "../Database/firebase"; // Adjust the import path if necessary
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -23,7 +23,9 @@ export default function AdminDesign() {
     fetchAssets();
   }, []);
 
-  const updateStatus = (id, newStatus) => {
+  const updateStatus = async (id, newStatus) => {
+    const assetDoc = doc(db, "requests", id);
+    await updateDoc(assetDoc, { status: newStatus });
     setAssets((prev) =>
       prev.map((asset) =>
         asset.id === id ? { ...asset, status: newStatus } : asset
@@ -31,7 +33,9 @@ export default function AdminDesign() {
     );
   };
 
-  const deleteAsset = (id) => {
+  const deleteAsset = async (id) => {
+    const assetDoc = doc(db, "requests", id);
+    await deleteDoc(assetDoc);
     setAssets((prev) => prev.filter((asset) => asset.id !== id));
   };
 
@@ -73,20 +77,23 @@ export default function AdminDesign() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-left text-gray-600 border-b">
-              <th className="p-2 pl-6 ">Name & Date</th>
+              <th className="p-2 pl-6">Name & Date</th>
               <th className="p-2 ">Status</th>
               <th className="p-2 ">File</th>
               <th className="p-2 "></th>
             </tr>
           </thead>
           <tbody>
-            {paginatedPendingAssets.map((asset) => (
+            {paginatedPendingAssets.map((asset, index) => (
               <tr key={asset.id} className="text-left border-b">
                 <td className="p-2 pl-6">
-                  <p className="font-semibold">{asset.customerInfo.fullName}</p>
-                  <p className="text-sm text-gray-500">
-                    {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
-                  </p>
+                  <div className="flex flex-col">
+                    <p className="font-semibold">Order #{(currentPendingPage - 1) * ITEMS_PER_PAGE + index + 1}</p> {/* Display the readable order number */}
+                    <p className="font-semibold mt-1">{asset.customerInfo.fullName}</p> {/* Add margin-top to create a small gap */}
+                    <p className="text-sm text-gray-500">
+                      {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
+                    </p>
+                  </div>
                 </td>
                 <td className="p-2">
                   <span
@@ -199,13 +206,16 @@ export default function AdminDesign() {
             </tr>
           </thead>
           <tbody>
-            {paginatedHistoryAssets.map((asset) => (
+            {paginatedHistoryAssets.map((asset, index) => (
               <tr key={asset.id} className="text-left border-b">
                 <td className="p-2 pl-6">
-                  <p className="font-semibold">{asset.customerInfo.fullName}</p>
-                  <p className="text-sm text-gray-500">
-                    {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
-                  </p>
+                  <div className="flex flex-col">
+                    <p className="font-semibold">Order #{(currentHistoryPage - 1) * ITEMS_PER_PAGE + index + 1}</p> {/* Display the readable order number */}
+                    <p className="font-semibold mt-1">{asset.customerInfo.fullName}</p> {/* Add margin-top to create a small gap */}
+                    <p className="text-sm text-gray-500">
+                      {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
+                    </p>
+                  </div>
                 </td>
                 <td className="p-2">
                   <span
