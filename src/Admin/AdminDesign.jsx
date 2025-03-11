@@ -78,7 +78,7 @@ export default function AdminDesign() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-left text-gray-600 border-b">
-              <th className="p-2 ">Name & Date</th>
+              <th className="p-2 pl-6">Name & Date</th>
               <th className="p-2 ">Status</th>
               <th className="p-2 ">File</th>
               <th className="p-2 "></th>
