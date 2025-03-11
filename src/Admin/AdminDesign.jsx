@@ -45,8 +45,8 @@ export default function AdminDesign() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const pendingAssets = assets.filter(asset => asset.status === "Awaiting Approval");
-  const historyAssets = assets.filter(asset => asset.status !== "Awaiting Approval" && (filterStatus === "All" || asset.status === filterStatus));
+  const pendingAssets = assets.filter(asset => asset.status === "Pending Approval");
+  const historyAssets = assets.filter(asset => asset.status !== "Pending Approval" && (filterStatus === "All" || asset.status === filterStatus));
 
   const pendingPageCount = Math.ceil(pendingAssets.length / ITEMS_PER_PAGE);
   const historyPageCount = Math.ceil(historyAssets.length / ITEMS_PER_PAGE);
