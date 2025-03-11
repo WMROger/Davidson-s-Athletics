@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { MoreHorizontal, Plus } from "lucide-react"; // Use horizontal meatballs icon and plus icon
-import { db, storage } from "../Database/firebase";
+import { db } from "../Database/firebase";
 import { collection, addDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const initialAssets = [
   {
@@ -141,7 +140,7 @@ export default function Assets() {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="relative p-6">
       <h1 className="text-6xl font-bold mb-8">Assets</h1>
 
       <div className="flex justify-between items-center mb-6">
