@@ -69,9 +69,7 @@ export default function AdminDesign() {
           <span className="text-gray-600 font-normal ml-6">({pendingAssets.length})</span>
         </h2>
 
-        <button className="px-6 py-2 bg-[#222A2D] text-white rounded hover:bg-[#FFBF61] hover:text-black flex items-center">
-          <Plus className="w-5 h-5 mr-2" /> New Upload
-        </button>
+        
       </div>
 
       <div className="overflow-hidden border rounded-2xl mb-12">

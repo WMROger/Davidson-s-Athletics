@@ -40,6 +40,7 @@ export default function Assets() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [color, setColor] = useState("");
+  const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(""); // Store uploaded image URL
   const [sizes, setSizes] = useState([]);
@@ -74,12 +75,16 @@ export default function Assets() {
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
-      setImageUrl(""); // Reset previous URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageUrl(reader.result);
+      };
+      reader.readAsDataURL(e.target.files[0]);
     }
   };
 
   // Upload image to Firebase Storage
-  const handleUploadImage = async () => {
+  const uploadImage = async () => {
     if (!image) {
       alert("Please select an image first.");
       return;
@@ -99,30 +104,39 @@ export default function Assets() {
       if (data.success) {
         setImageUrl(data.url);
         alert("Image uploaded successfully!");
+        return data.url;
       } else {
         throw new Error(data.error);
       }
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Image upload failed.");
+      return null;
+    } finally {
+      setUploading(false);
     }
-
-    setUploading(false);
   };
 
   // Upload form data to Firestore
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !price || !color || !imageUrl || sizes.length === 0 || !stock) {
+    if (!name || !price || !color || !image || sizes.length === 0 || !stock || !description) {
       alert("Please fill all fields and upload an image.");
       return;
     }
 
     setLoading(true);
+    const imageUrl = await uploadImage();
+    if (!imageUrl) {
+      setLoading(false);
+      return;
+    }
+
     const newProduct = {
       name,
       price: parseFloat(price),
       color,
+      description,
       image: imageUrl,
       sizes,
       stock: parseInt(stock),
@@ -135,6 +149,7 @@ export default function Assets() {
     setName("");
     setPrice("");
     setColor("");
+    setDescription("");
     setImage(null);
     setImageUrl("");
     setSizes([]);
@@ -272,14 +287,6 @@ export default function Assets() {
                     )}
                   </label>
                 </div>
-                <button
-                  type="button"
-                  className="bg-gray-500 text-white px-4 py-2 rounded mb-4"
-                  onClick={handleUploadImage}
-                  disabled={uploading}
-                >
-                  {uploading ? "Uploading..." : "Upload Image"}
-                </button>
               </div>
               <input
                 type="text"
@@ -300,6 +307,12 @@ export default function Assets() {
                 placeholder="Color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
+                className="p-2 border rounded w-full"
+              />
+              <textarea
+                placeholder="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 className="p-2 border rounded w-full"
               />
               <Select
@@ -344,6 +357,7 @@ export default function Assets() {
             <p><strong>Product Name:</strong> {selectedProduct.name}</p>
             <p><strong>Available Sizes:</strong> {selectedProduct.sizes.join(", ")}</p>
             <p><strong>Color:</strong> {selectedProduct.color}</p>
+            <p><strong>Description:</strong> {selectedProduct.description}</p>
             <p><strong>Price:</strong> P{selectedProduct.price}</p>
             <p><strong>Stock:</strong> {selectedProduct.stock}</p>
             <button
