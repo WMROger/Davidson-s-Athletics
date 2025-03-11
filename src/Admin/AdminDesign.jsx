@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { MoreHorizontal } from "lucide-react"; 
+import { MoreHorizontal, Plus } from "lucide-react"; // Use horizontal meatballs icon and plus icon
 
-const initialDesigns = [
+const initialAssets = [
   {
     id: 1,
     name: "John Doe",
@@ -12,27 +12,32 @@ const initialDesigns = [
   },
   {
     id: 2,
-    name: "Jane Smith Awesomeness Gray",
+    name: "Jane Smith Jane Smith Awesomeness Gray",
     date: new Date(),
     status: "Awaiting Approval",
     file: "logo.png",
   },
 ];
 
-export default function Admin() {
-  const [designs, setDesigns] = useState(initialDesigns);
+const ITEMS_PER_PAGE = 5;
+
+export default function AdminDesign() {
+  const [assets, setAssets] = useState(initialAssets);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [currentPendingPage, setCurrentPendingPage] = useState(1);
+  const [currentHistoryPage, setCurrentHistoryPage] = useState(1);
+  const [filterStatus, setFilterStatus] = useState("All");
 
   const updateStatus = (id, newStatus) => {
-    setDesigns((prev) =>
-      prev.map((design) =>
-        design.id === id ? { ...design, status: newStatus } : design
+    setAssets((prev) =>
+      prev.map((asset) =>
+        asset.id === id ? { ...asset, status: newStatus } : asset
       )
     );
   };
 
-  const deleteDesign = (id) => {
-    setDesigns((prev) => prev.filter((design) => design.id !== id));
+  const deleteAsset = (id) => {
+    setAssets((prev) => prev.filter((asset) => asset.id !== id));
   };
 
   // Close menu when clicking outside
@@ -46,34 +51,49 @@ export default function Admin() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  const pendingAssets = assets.filter(asset => asset.status === "Awaiting Approval");
+  const historyAssets = assets.filter(asset => asset.status !== "Awaiting Approval" && (filterStatus === "All" || asset.status === filterStatus));
+
+  const pendingPageCount = Math.ceil(pendingAssets.length / ITEMS_PER_PAGE);
+  const historyPageCount = Math.ceil(historyAssets.length / ITEMS_PER_PAGE);
+
+  const paginatedPendingAssets = pendingAssets.slice((currentPendingPage - 1) * ITEMS_PER_PAGE, currentPendingPage * ITEMS_PER_PAGE);
+  const paginatedHistoryAssets = historyAssets.slice((currentHistoryPage - 1) * ITEMS_PER_PAGE, currentHistoryPage * ITEMS_PER_PAGE);
+
   return (
     <div className="p-6">
       <h1 className="text-6xl font-bold mb-8">Designs</h1>
-      <h2 className="text-4xl font-semibold mb-6">
-        Pending Designs{" "}
-        <span className="text-gray-600 font-normal ml-6">({designs.length})</span>
-      </h2>
 
-        <div className="overflow-hidden rounded-2xl border shadow-lg">
-        <table className=" w-full border-collapse" >
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-4xl font-semibold">
+          Pending Designs{" "}
+          <span className="text-gray-600 font-normal ml-6">({pendingAssets.length})</span>
+        </h2>
+
+        {/* Upload File Button moved to the right */}
+        <button className="px-6 py-2 bg-[#222A2D] text-white rounded hover:bg-[#FFBF61] hover:text-black flex items-center">
+          <Plus className="w-5 h-5 mr-2" /> New Upload
+        </button>
+      </div>
+
+      <div className="overflow-hidden border rounded-2xl mb-12">
+        <table className="w-full border-collapse">
           <thead>
             <tr className="text-left text-gray-600 border-b">
-              <th className="p-2 pl-6  ">Name & Date</th>
+              <th className="p-2 pl-6 ">Name & Date</th>
               <th className="p-2 ">Status</th>
               <th className="p-2 ">File</th>
               <th className="p-2 "></th>
-
-
             </tr>
           </thead>
           <tbody>
-            {designs.map((design) => (
-              <tr key={design.id} className="text-left border-b">
+            {paginatedPendingAssets.map((asset) => (
+              <tr key={asset.id} className="text-left border-b">
                 {/* Name & Date */}
                 <td className="p-2 pl-6">
-                  <p className="font-semibold">{design.name}</p>
+                  <p className="font-semibold">{asset.name}</p>
                   <p className="text-sm text-gray-500">
-                    {format(design.date, "MMM dd, yyyy")}
+                    {format(asset.date, "MMM dd, yyyy")}
                   </p>
                 </td>
 
@@ -81,21 +101,21 @@ export default function Admin() {
                 <td className="p-2">
                   <span
                     className={`px-3 py-1 rounded text-sm font-medium ${
-                      design.status === "Approved"
+                      asset.status === "Approved"
                         ? "bg-green-500 text-white"
-                        : design.status === "Denied"
+                        : asset.status === "Denied"
                         ? "bg-red-500 text-white"
                         : "bg-yellow-500 text-white"
                     }`}
                   >
-                    {design.status}
+                    {asset.status}
                   </span>
                 </td>
 
                 {/* File */}
                 <td className="p-2">
                   <a
-                    href={`/uploads/${design.file}`}
+                    href={`/uploads/${asset.file}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -108,36 +128,36 @@ export default function Admin() {
                 <td className="p-2 flex items-center justify-center relative">
                   <button
                     className="px-4 py-2 text-green-600 rounded hover:bg-green-300 mr-2"
-                    onClick={() => updateStatus(design.id, "Approved")}
+                    onClick={() => updateStatus(asset.id, "Approved")}
                   >
                     Approve
                   </button>
                   <button
                     className="px-4 py-2 text-red-600 rounded hover:bg-red-300 mr-2"
-                    onClick={() => updateStatus(design.id, "Denied")}
+                    onClick={() => updateStatus(asset.id, "Denied")}
                   >
                     Deny
                   </button>
                 </td>
                 <td>
-                    {/* Meatballs Menu */}
+                  {/* Meatballs Menu */}
                   <div className="relative menu-container">
                     <button
                       className="p-2 rounded-full hover:bg-gray-200"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenMenuId(openMenuId === design.id ? null : design.id);
+                        setOpenMenuId(openMenuId === asset.id ? null : asset.id);
                       }}
                     >
                       <MoreHorizontal className="w-7 h-7 text-gray-600" />
                     </button>
 
                     {/* Menu */}
-                    {openMenuId === design.id && (
+                    {openMenuId === asset.id && (
                       <div className="absolute -top-12 left-0 flex bg-white border rounded-lg shadow-lg z-50">
                         <button
                           className="px-4 py-2 text-red-600 hover:bg-gray-100"
-                          onClick={() => deleteDesign(design.id)}
+                          onClick={() => deleteAsset(asset.id)}
                         >
                           Delete
                         </button>
@@ -149,6 +169,139 @@ export default function Admin() {
             ))}
           </tbody>
         </table>
+        <div className="flex justify-between items-center p-4">
+          <button
+            className="px-4 py-2 bg-gray-200 rounded"
+            disabled={currentPendingPage === 1}
+            onClick={() => setCurrentPendingPage(currentPendingPage - 1)}
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPendingPage} of {pendingPageCount}
+          </span>
+          <button
+            className="px-4 py-2 bg-gray-200 rounded"
+            disabled={currentPendingPage === pendingPageCount}
+            onClick={() => setCurrentPendingPage(currentPendingPage + 1)}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <h2 className="text-4xl font-semibold mb-6">Design History</h2>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <label className="mr-2">Filter by status:</label>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-4 py-2 border rounded"
+          >
+            <option value="All">All</option>
+            <option value="Approved">Approved</option>
+            <option value="Denied">Denied</option>
+          </select>
+        </div>
+      </div>
+      <div className="overflow-hidden border rounded-2xl">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="text-left text-gray-600 border-b">
+              <th className="p-2 pl-6 ">Name & Date</th>
+              <th className="p-2 ">Status</th>
+              <th className="p-2 ">File</th>
+              <th className="p-2 "></th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedHistoryAssets.map((asset) => (
+              <tr key={asset.id} className="text-left border-b">
+                {/* Name & Date */}
+                <td className="p-2 pl-6">
+                  <p className="font-semibold">{asset.name}</p>
+                  <p className="text-sm text-gray-500">
+                    {format(asset.date, "MMM dd, yyyy")}
+                  </p>
+                </td>
+
+                {/* Status */}
+                <td className="p-2">
+                  <span
+                    className={`px-3 py-1 rounded text-sm font-medium ${
+                      asset.status === "Approved"
+                        ? "bg-green-500 text-white"
+                        : asset.status === "Denied"
+                        ? "bg-red-500 text-white"
+                        : "bg-yellow-500 text-white"
+                    }`}
+                  >
+                    {asset.status}
+                  </span>
+                </td>
+
+                {/* File */}
+                <td className="p-2">
+                  <a
+                    href={`/uploads/${asset.file}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    View File
+                  </a>
+                </td>
+
+                {/* Actions */}
+                <td className="p-2 flex items-center justify-center relative">
+                  <div className="relative menu-container">
+                    <button
+                      className="p-2 rounded-full hover:bg-gray-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === asset.id ? null : asset.id);
+                      }}
+                    >
+                      <MoreHorizontal className="w-7 h-7 text-gray-600" />
+                    </button>
+
+                    {/* Menu */}
+                    {openMenuId === asset.id && (
+                      <div className="absolute -top-12 left-0 flex bg-white border rounded-lg shadow-lg z-50">
+                        <button
+                          className="px-4 py-2 text-red-600 hover:bg-gray-100"
+                          onClick={() => deleteAsset(asset.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="flex justify-between items-center p-4">
+          <button
+            className="px-4 py-2 bg-gray-200 rounded"
+            disabled={currentHistoryPage === 1}
+            onClick={() => setCurrentHistoryPage(currentHistoryPage - 1)}
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentHistoryPage} of {historyPageCount}
+          </span>
+          <button
+            className="px-4 py-2 bg-gray-200 rounded"
+            disabled={currentHistoryPage === historyPageCount}
+            onClick={() => setCurrentHistoryPage(currentHistoryPage + 1)}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
