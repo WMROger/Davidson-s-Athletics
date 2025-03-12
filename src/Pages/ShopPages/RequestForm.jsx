@@ -163,7 +163,9 @@ const RequestForm = () => {
         const orderCounterDoc = await transaction.get(orderCounterRef);
 
         if (!orderCounterDoc.exists()) {
-          throw new Error("Order counter document does not exist!");
+          // Create the orderCounter document if it does not exist
+          transaction.set(orderCounterRef, { currentOrderNumber: 0 });
+          return 1; // Start with order number 1
         }
 
         const currentOrderNumber = orderCounterDoc.data().currentOrderNumber;

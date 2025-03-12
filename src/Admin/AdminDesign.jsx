@@ -60,7 +60,7 @@ export default function AdminDesign() {
   const paginatedHistoryAssets = historyAssets.slice((currentHistoryPage - 1) * ITEMS_PER_PAGE, currentHistoryPage * ITEMS_PER_PAGE);
 
   return (
-    <div className={`p-6 ${selectedAsset ? "blur-background" : ""}`}>
+    <div className="relative p-6">
       <h1 className="text-6xl font-bold mb-8">Designs</h1>
 
       <div className="flex justify-between items-center mb-6">
@@ -68,8 +68,6 @@ export default function AdminDesign() {
           Pending Designs{" "}
           <span className="text-gray-600 font-normal ml-6">({pendingAssets.length})</span>
         </h2>
-
-        
       </div>
 
       <div className="overflow-hidden border rounded-2xl mb-12">
@@ -286,7 +284,7 @@ export default function AdminDesign() {
       </div>
 
       {selectedAsset && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/2"> {/* Adjusted width to 1/2 */}
             <h2 className="text-2xl font-semibold mb-4">Asset Details</h2>
             <div className="flex">
