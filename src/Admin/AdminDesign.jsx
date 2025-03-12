@@ -60,7 +60,7 @@ export default function AdminDesign() {
   const paginatedHistoryAssets = historyAssets.slice((currentHistoryPage - 1) * ITEMS_PER_PAGE, currentHistoryPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="p-6">
+    <div className={`p-6 ${selectedAsset ? "blur-background" : ""}`}>
       <h1 className="text-6xl font-bold mb-8">Designs</h1>
 
       <div className="flex justify-between items-center mb-6">
