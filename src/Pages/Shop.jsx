@@ -4,12 +4,14 @@ import { db } from "../Database/firebase"; // Ensure correct path
 import { collection, getDocs } from "firebase/firestore";
 
 const colors = ["black", "green", "red", "blue", "purple", "yellow", "orange"];
+const sizes = ["S", "M", "L", "XL"];
 
 const Shop = () => {
   const navigate = useNavigate();
   const [showDesignOptions, setShowDesignOptions] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [products, setProducts] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
 
   useEffect(() => {
     const fetchShirts = async () => {
@@ -63,12 +65,22 @@ const Shop = () => {
       state: { uploadedImages: files, imagePreviews: imageUrls },
     });
   };
-  
-  
 
   const triggerFileInput = () => {
     document.getElementById("fileUpload").click();
   };
+
+  const handleSizeFilterChange = (size) => {
+    setSelectedSizes((prevSelectedSizes) =>
+      prevSelectedSizes.includes(size)
+        ? prevSelectedSizes.filter((s) => s !== size)
+        : [...prevSelectedSizes, size]
+    );
+  };
+
+  const filteredProducts = products.filter((product) =>
+    selectedSizes.length === 0 || selectedSizes.some((size) => product.sizes?.includes(size))
+  );
 
   return (
     <div className="w-full">
@@ -104,9 +116,13 @@ const Shop = () => {
           <div className="mt-4">
             <label className="block mb-2 font-medium">Size</label>
             <div className="flex flex-col gap-2">
-              {["Small", "Medium", "Large", "Extra Large", "XX Large", "XXX Large"].map((size) => (
+              {sizes.map((size) => (
                 <label key={size} className="flex items-center gap-2">
-                  <input type="checkbox" className="form-checkbox" />
+                  <input
+                    type="checkbox"
+                    className="form-checkbox"
+                    onChange={() => handleSizeFilterChange(size)}
+                  />
                   {size}
                 </label>
               ))}
@@ -177,7 +193,7 @@ const Shop = () => {
               </div>
             </div>
 
-            {products.map((product, index) => (
+            {filteredProducts.map((product, index) => (
               <div key={product.id} className="border p-4 shadow-lg rounded-lg">
                 <img
                   src={product.image}
@@ -187,6 +203,8 @@ const Shop = () => {
                 />
                 <h3 className="text-sm font-semibold mt-2">{product.name}</h3>
                 <p className="text-gray-700">PHP {product.price}.00</p>
+                <p className="text-green-500">In stock: {product.stock}</p>
+                <p className="text-gray-500">Sizes: {product.sizes?.join(", ")}</p>
                 <div className="flex gap-1 mt-2">
                   {colors.map((color) => (
                     <span

@@ -101,14 +101,14 @@ export default function Assets() {
       const data = await response.json();
       if (data.success) {
         setImageUrl(data.url);
-        alert("Image uploaded successfully!");
+        alert("T-Shirt uploaded successfully!");
         return data.url;
       } else {
         throw new Error(data.error);
       }
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert("Image upload failed.");
+      alert("T-Shirt upload failed.");
       return null;
     } finally {
       setUploading(false);
