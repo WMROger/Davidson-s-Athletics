@@ -229,7 +229,7 @@ const OrdersManagement = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto py-6 px-4">
-        <h1 className="text-3xl font-bold mb-6">Orders</h1>
+        <h1 className="text-6xl font-bold mb-6">Orders</h1>
         
         <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
           <div className="flex flex-wrap gap-2">

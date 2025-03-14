@@ -80,7 +80,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <h2 className="text-3xl font-bold">Overview</h2>
+      <h2 className="text-6xl font-bold">Overview</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}

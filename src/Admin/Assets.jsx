@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { MoreHorizontal, Plus, ChevronDown, Edit, Trash } from "lucide-react";
+import { MoreHorizontal, Plus, ChevronDown, Edit, Trash, Calendar } from "lucide-react";
 import { db } from "../Database/firebase";
 import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
 import Select from 'react-select';
@@ -176,26 +176,29 @@ export default function Assets() {
 
   return (
     <div className="relative p-6">
-      <div className="max-w-full bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="max-w-full  overflow-hidden">
         <h1 className="text-6xl font-bold mb-8">Assets</h1>
 
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-start mb-4">
           <div className="flex items-center">
-            <div className="flex items-center space-x-2 bg-gray-100 rounded px-3 py-2">
-              <span className="text-gray-600 text-large">{dateRange}</span>
+            <div className="flex items-center space-x-2 bg-[#E6E6E6] rounded px-3 py-2">
+            <span className="text-gray-600 text-large flex items-center">
+              <Calendar className="w-5 h-5 mr-2" />
+              {dateRange}
+            </span>
               <ChevronDown size={16} className="text-gray-500" />
             </div>
           </div>
 
           <button
-            className="px-6 py-2 bg-[#222A2D] text-white rounded hover:bg-[#FFBF61] hover:text-black flex items-center"
+            className="px-6 py-2 ml-5 bg-[#222A2D] text-white rounded hover:bg-[#FFBF61] hover:text-black flex items-center"
             onClick={() => setShowAddProductPopup(true)}
           >
             <Plus className="w-5 h-5 mr-2" /> Add New Product
           </button>
         </div>
 
-        <div className="mb-4 bg-gray-100 inline-flex rounded-md p-1">
+        <div className="mb-6 bg-[#E6E6E6] inline-flex rounded-md px-4 py-1">
           <button 
             onClick={() => setActiveTab('All')}
             className={`px-4 py-1 rounded ${activeTab === 'All' ? 'bg-white' : ''}`}
@@ -219,7 +222,7 @@ export default function Assets() {
         <div className="overflow-hidden border rounded-2xl mb-12">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="text-left text-gray-600 border-b bg-gray-50">
+              <tr className="text-left text-gray-600 border-b bg-[#E6E6E6]">
                 <th className="p-4 pl-6 w-10">
                   <input type="checkbox" className="rounded" />
                 </th>
@@ -293,7 +296,7 @@ export default function Assets() {
       </div>
 
       {showAddProductPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <h2 className="text-xl font-semibold mb-6">Add New Product</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -389,7 +392,7 @@ export default function Assets() {
       )}
 
       {selectedProduct && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
             <div className="flex mb-6">
               <div className="w-1/2 pr-6">
