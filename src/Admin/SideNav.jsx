@@ -37,12 +37,8 @@ const AdminLayout = () => {
       to: "/admin/assets",
       label: "Assets",
       icon: <img src="/IcSideNav/pendingAssets.svg" className="size-6" alt="Assets" />
-    },
-    {
-      to: "/admin/NewShirt",
-      label: "New Shirt",
-      icon: <img src="/IcSideNav/pendingAssets.svg" className="size-6" alt="New Shirt" />
     }
+    
   ];
 
   // Bottom navigation links

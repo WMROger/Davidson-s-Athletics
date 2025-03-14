@@ -58,9 +58,9 @@ const Shop = () => {
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
     const imageUrls = files.map((file) => URL.createObjectURL(file));
-  
+
     setSelectedFile(imageUrls);
-  
+
     navigate("/ShopPages/RequestForm", {
       state: { uploadedImages: files, imagePreviews: imageUrls },
     });
@@ -78,8 +78,10 @@ const Shop = () => {
     );
   };
 
-  const filteredProducts = products.filter((product) =>
-    selectedSizes.length === 0 || selectedSizes.some((size) => product.sizes?.includes(size))
+  const filteredProducts = products.filter(
+    (product) =>
+      selectedSizes.length === 0 ||
+      selectedSizes.some((size) => product.sizes?.includes(size))
   );
 
   return (
@@ -146,7 +148,9 @@ const Shop = () => {
                 {["Jerseys", "Uniforms", "T-shirts"].map((designType) => (
                   <button
                     key={designType}
-                    onClick={() => handleDesignSelection(designType.toLowerCase())}
+                    onClick={() =>
+                      handleDesignSelection(designType.toLowerCase())
+                    }
                     className="border px-20 py-1 rounded-md hover:bg-gray-200"
                   >
                     {designType}
@@ -204,7 +208,9 @@ const Shop = () => {
                 <h3 className="text-sm font-semibold mt-2">{product.name}</h3>
                 <p className="text-gray-700">PHP {product.price}.00</p>
                 <p className="text-green-500">In stock: {product.stock}</p>
-                <p className="text-gray-500">Sizes: {product.sizes?.join(", ")}</p>
+                <p className="text-gray-500">
+                  Sizes: {product.sizes?.join(", ")}
+                </p>
                 <div className="flex gap-1 mt-2">
                   {colors.map((color) => (
                     <span
@@ -220,6 +226,8 @@ const Shop = () => {
           </div>
         </div>
       </div>
+      {/* Footer Section */}
+      <div className="w-full py-20 px-10 bg-gray-800"></div>
     </div>
   );
 };

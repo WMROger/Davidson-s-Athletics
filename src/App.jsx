@@ -12,7 +12,7 @@ import Dashboard from "./Admin/Dashboard";
 import ManageOrders from "./Admin/ManageOrders";
 import Design from "./Admin/AdminDesign";
 import Assets from "./Admin/Assets";
-import NewShirt from "./Admin/NewShirt"; // Import NewShirt component
+// import NewShirt from "./Admin/NewShirt"; // Import NewShirt component
 import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt";
 import RequestForm from "./Pages/ShopPages/RequestForm"; // Import RequestForm component
 import OrderConfirmation from './Pages/ShopPages/OrderConfirmation';
@@ -102,7 +102,6 @@ function App() {
           <Route path="manage-orders" element={<ManageOrders />} />
           <Route path="design" element={<Design />} />
           <Route path="assets" element={<Assets />} />
-          <Route path="NewShirt" element={<NewShirt />} />
         </Route>
 
         {/* Add the Customize Shirt Route */}

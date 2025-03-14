@@ -887,6 +887,9 @@ const CustomProduct = () => {
           </div>
         </div>
       </div>
+      {/* Footer Section */}
+        <div className="w-full py-20 px-10 bg-gray-800">
+        </div>
     </div>
   );
 };

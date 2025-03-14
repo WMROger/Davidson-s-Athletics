@@ -66,9 +66,12 @@ const Home = () => {
         {/* Custom T-Shirts Section */}
         <div className="w-full py-20 px-10 md:px-47 bg-orange-100 flex flex-col md:flex-row items-center gap-8">
           <div className="md:w-1/2 text-center md:text-left">
-            <h1 className="text-4xl font-semibold text-gray-800">Custom T-Shirts</h1>
+            <h1 className="text-4xl font-semibold text-gray-800">
+              Custom T-Shirts
+            </h1>
             <p className="text-2xl mt-3">
-              Make custom T-shirts that they will be pleased to wear—all at prices that fit every budget.
+              Make custom T-shirts that they will be pleased to wear—all at
+              prices that fit every budget.
             </p>
             <Link
               to="/shop"
@@ -139,7 +142,6 @@ const Home = () => {
           </div>
         </div>
 
-
         {/* Team Design Section */}
         <div className="w-full py-20 px-10 md:px-20 bg-gray-800 flex flex-col md:flex-row items-center gap-8">
           <div className="md:w-1/2 flex justify-center">
@@ -154,7 +156,8 @@ const Home = () => {
               Designing tees for your team just got easier.
             </h1>
             <p className="text-2xl mt-3 text-gray-200">
-              Create a look for the entire team without the need to start your design from scratch. Easy, simple, fast.
+              Create a look for the entire team without the need to start your
+              design from scratch. Easy, simple, fast.
             </p>
             <button className="bg-orange-100 text-black text-xl hover:bg-orange-300 transition duration-300 rounded-xl px-8 py-4 mt-3">
               Get Started
@@ -165,7 +168,9 @@ const Home = () => {
         {/* FAQ Section */}
         <div className="w-full py-20 px-10 bg-white md:px-46">
           <div className="md:w-5/7 text-center md:text-left">
-            <h1 className="text-4xl font-semibold text-gray-800">Frequently Asked Questions</h1>
+            <h1 className="text-4xl font-semibold text-gray-800">
+              Frequently Asked Questions
+            </h1>
             <div className="mt-10 space-y-4">
               {faqs.map((faq, index) => (
                 <div key={index} className=" border-gray-300 rounded-lg">
@@ -173,15 +178,26 @@ const Home = () => {
                     className="w-full text-left p-4 flex hover:bg-gray-50 justify-between items-center"
                     onClick={() => toggleFAQ(index)}
                   >
-                    <span className="text-xl font-semibold text-gray-800">{faq.question}</span>
-                    <span className="text-xl">{openIndex === index ? "−" : "+"}</span>
+                    <span className="text-xl font-semibold text-gray-800">
+                      {faq.question}
+                    </span>
+                    <span className="text-xl">
+                      {openIndex === index ? "−" : "+"}
+                    </span>
                   </button>
-                  {openIndex === index && <div className="p-4 text-lg text-black border-b border-gray-700f">{faq.answer}</div>}
+                  {openIndex === index && (
+                    <div className="p-4 text-lg text-black border-b border-gray-700f">
+                      {faq.answer}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </div>
+
+        {/* Footer Section */}
+        <div className="w-full py-20 px-10 bg-gray-800"></div>
       </div>
     </>
   );
