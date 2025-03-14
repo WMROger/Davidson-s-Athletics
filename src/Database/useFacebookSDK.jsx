@@ -18,7 +18,7 @@ export function useFacebookSDK() {
       js.onload = () => {
         window.fbAsyncInit = function () {
           FB.init({
-            appId: 'your-app-id', // Replace with your Facebook App ID
+            appId: '1229134612097733', // Replace with your Facebook App ID
             cookie: true,
             xfbml: true,
             version: 'v11.0',

@@ -16,6 +16,7 @@ import NewShirt from "./Admin/NewShirt"; // Import NewShirt component
 import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt";
 import RequestForm from "./Pages/ShopPages/RequestForm"; // Import RequestForm component
 import OrderConfirmation from './Pages/ShopPages/OrderConfirmation';
+import CustomProduct from "./Pages/ShopPages/CustomProduct";
 
 function App() {
   return (
@@ -64,6 +65,15 @@ function App() {
             <>
               <Navbar />
               <Services />
+            </>
+          }
+        />
+        <Route
+          path="/ShopPages/CustomProduct"
+          element={
+            <>
+              <Navbar />
+              <CustomProduct />
             </>
           }
         />

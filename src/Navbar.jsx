@@ -88,19 +88,15 @@ const Navbar = () => {
               Shop
             </Link>
           </li>
-          {user && (
-            <li>
-              <Link
-                to="/cart"
-                className="hover:text-red-500 transition flex items-center"
-              >
-                Cart
-              </Link>
-            </li>
-          )}
+        
           <li>
             <Link to="/services" className="hover:text-red-500 transition">
               About Us
+            </Link>
+          </li>
+          <li>
+            <Link to="/ShopPages/CustomProduct" className="hover:text-red-500 transition">
+              Custom Product
             </Link>
           </li>
         </ul>
