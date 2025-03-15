@@ -138,20 +138,20 @@ const Shop = () => {
           <div className="flex items-center ">
             <button
               onClick={handleRequestDesign}
-              className="bg-black text-white px-16 py-2 rounded-md"
+              className="bg-black text-white px-15 py-1 rounded-md duration-300 hover:scale-105 "
             >
-              Request Design {">"}
+              Request Design {showDesignOptions ? " < " : " > "}
             </button>
 
             {showDesignOptions && (
-              <div className="flex px-10 space-x-13">
+              <div className="flex px-10 space-x-13 transition-all duration-300 ease-in-out">
                 {["Jerseys", "Uniforms", "T-shirts"].map((designType) => (
                   <button
                     key={designType}
                     onClick={() =>
                       handleDesignSelection(designType.toLowerCase())
                     }
-                    className="border px-20 py-1 rounded-md hover:bg-gray-200"
+                    className="border px-20 py-1 rounded-md hover:bg-gray-200 transition-all duration-300 ease-in-out transform hover:scale-105"
                   >
                     {designType}
                   </button>
@@ -162,8 +162,8 @@ const Shop = () => {
 
           <div className="grid grid-cols-4 gap-6 mt-6">
             {/* Upload a Design Section */}
-            <div className="container mx-auto flex justify-center items-center">
-              <div className="border p-6 bg-orange-100 rounded-lg shadow-lg text-center w-96">
+            <div className="container  flex justify-center items-center">
+              <div className="border p-6 h-full bg-orange-100 rounded-lg shadow-lg text-center w-96">
                 <div
                   className="border-dashed bg-white border-2 p-15 rounded-lg cursor-pointer"
                   onClick={triggerFileInput}
@@ -198,11 +198,15 @@ const Shop = () => {
             </div>
 
             {filteredProducts.map((product, index) => (
-              <div key={product.id} className="border p-4 shadow-lg rounded-lg">
+              <div key={product.id} 
+                className="border p-4 shadow-lg rounded-lg transform transition-all duration-300 ease-in-out
+              hover:scale-105 hover:-translate-y-1 hover:shadow-xl">
+
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-48 object-cover rounded-lg cursor-pointer"
+                  className="w-full h-48 object-cover rounded-lg cursor-pointer  transition-transform duration-500 ease-in-out
+                  hover:scale-110"
                   onClick={() => handleImageClick(product)}
                 />
                 <h3 className="text-sm font-semibold mt-2">{product.name}</h3>
@@ -215,7 +219,7 @@ const Shop = () => {
                   {colors.map((color) => (
                     <span
                       key={color}
-                      className="w-5 h-5 rounded-full border cursor-pointer"
+                      className="w-5 h-5 rounded-full border cursor-pointe transition-transform duration-300 hover:scale-125"
                       style={{ backgroundColor: color }}
                       onClick={() => handleColorChange(index, color)}
                     ></span>
