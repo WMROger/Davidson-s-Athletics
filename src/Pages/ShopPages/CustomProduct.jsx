@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Download, Palette, Edit, Undo, Redo, Save, Image, Trash2, Type, ArrowLeft, ArrowRight } from 'lucide-react';
+import { RotateCw } from "lucide-react";
 
 // Mock data for shirt colors
 const shirtColors = [
@@ -20,11 +21,11 @@ const shirtColors = [
 // Mock design elements
 const designElements = [
   { id: 'design1', name: 'Facebook Logo', src: '/fb.svg' },
-  { id: 'design2', name: 'Stripes', src: '/SampleStripes.jpg' },
-  { id: 'design3', name: 'Pattern 1', src: '/api/placeholder/100/100' },
-  { id: 'design4', name: 'Pattern 2', src: '/api/placeholder/100/100' },
-  { id: 'design5', name: 'Abstract', src: '/api/placeholder/100/100' },
-  { id: 'design6', name: 'Geometric', src: '/api/placeholder/100/100' }
+  { id: 'design2', name: 'Stripes', src: '/vite.svg' },
+  { id: 'design3', name: 'Pattern 1', src: '/google.svg' },
+  { id: 'design4', name: 'Pattern 2', src: '/Logo.svg' },
+  { id: 'design5', name: 'Abstract', src: '/wave.jpeg' },
+
 ];
 
 // Available shirt categories and products
@@ -34,8 +35,8 @@ const shirtCategories = [
     name: 'T-Shirt',
     products: [
       { id: 'basic-tee', name: 'Basic Tee', image: '/T-shirt.svg' },
-      { id: 'v-neck', name: 'V-Neck', image: '/api/placeholder/100/100' },
-      { id: 'long-sleeve', name: 'Long Sleeve', image: '/SampleShirt.svg' }
+      { id: 'v-neck', name: 'V-Neck', image: '/Home Assets/TShirts/blue shirt.png' },
+      { id: 'long-sleeve', name: 'Long Sleeve', image: '/Home Assets/red shirt.png' }
     ]
   },
   { 
@@ -381,44 +382,83 @@ const CustomProduct = () => {
   // Get the current category
   const currentCategory = shirtCategories.find(category => category.id === shirtStyle);
 
-  // Render resize handles for active design
+  // Render resize & rotate handles for active design
+  const handleRotateStart = (e, design) => {
+    if (e.button !== 2) return; // Only trigger on right-click
+  
+    e.preventDefault(); // Prevent context menu
+  
+    const centerX = design.x + design.width / 2;
+    const centerY = design.y + design.height / 2;
+    const startAngle = design.rotation || 0;
+    const startX = e.clientX;
+    const startY = e.clientY;
+  
+    const handleMouseMove = (event) => {
+      const dx = event.clientX - centerX;
+      const dy = event.clientY - centerY;
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+  
+      design.rotation = angle;
+      updateDesign(design);
+    };
+  
+    const handleMouseUp = () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  };
+  
+  
+
   const renderResizeHandles = (design) => {
     const handles = [
-      { position: 'nw', cursor: 'nwse-resize' },
-      { position: 'n', cursor: 'ns-resize' },
-      { position: 'ne', cursor: 'nesw-resize' },
-      { position: 'e', cursor: 'ew-resize' },
-      { position: 'se', cursor: 'nwse-resize' },
-      { position: 's', cursor: 'ns-resize' },
-      { position: 'sw', cursor: 'nesw-resize' },
-      { position: 'w', cursor: 'ew-resize' }
+      { position: "nw", cursor: "nwse-resize" },
+      { position: "n", cursor: "ns-resize" },
+      { position: "ne", cursor: "nesw-resize" },
+      { position: "e", cursor: "ew-resize" },
+      { position: "se", cursor: "nwse-resize" },
+      { position: "s", cursor: "ns-resize" },
+      { position: "sw", cursor: "nesw-resize" },
+      { position: "w", cursor: "ew-resize" },
     ];
-    
-    // Create a container for the resize controls
+  
     return (
       <>
         {/* Display "Resize Mode" indicator */}
-        <div 
-          className="absolute -top-6 left-0 right-0 text-center bg-blue-600 text-white text-xs py-1 rounded"
+        <div
+          className="absolute -top-6 left-0 right-0 text-center  text-white text-xs py-1 rounded"
           style={{ zIndex: 101 }}
         >
-          Resize Mode
+
         </div>
-        
-        {/* Render all the handle points */}
+  
+        {/* Render all resize handles */}
         {handles.map(({ position, cursor }) => (
           <div
             key={position}
             className="absolute w-3 h-3 bg-white border-2 border-blue-500 rounded-full"
             style={{
               cursor: cursor,
-              top: position.includes('n') ? -4 : position.includes('s') ? design.height - 4 : design.height / 2 - 4,
-              left: position.includes('w') ? -4 : position.includes('e') ? design.width - 4 : design.width / 2 - 4,
-              zIndex: 100
+              top: position.includes("n") ? -4 : position.includes("s") ? design.height - 4 : design.height / 2 - 4,
+              left: position.includes("w") ? -4 : position.includes("e") ? design.width - 4 : design.width / 2 - 4,
+              zIndex: 100,
             }}
             onMouseDown={(e) => handleResizeStart(e, position, design.id)}
           />
         ))}
+  
+        {/* 🔄 Rotate Handle with Icon */}
+        <div
+          className="absolute bg-green-500 w-6 h-6 flex items-center justify-center rounded-full top-[-30px] left-1/2 transform -translate-x-1/2 cursor-pointer"
+          onContextMenu={(e) => e.preventDefault()} // Prevent default right-click menu
+          onMouseDown={(e) => handleRotateStart(e, design)}
+        >
+          <RotateCw className="text-white w-4 h-4" />
+        </div>
       </>
     );
   };
@@ -435,9 +475,9 @@ const CustomProduct = () => {
 
       </div>
       
-      <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+      <div className="bg-white  border-gray-200 px-4 py-2 flex items-center justify-between">
         <div className="flex items-center">
-          <h1 className="text-xl font-bold">Shirt Designer</h1>
+
         </div>
         <div className="flex items-center space-x-4">
           <button 
@@ -461,12 +501,24 @@ const CustomProduct = () => {
             <Save className="w-4 h-4 mr-2" />
             Save Design
           </button>
+
+          <button 
+            className="py-2 px-4 bg-blue-600 text-white rounded font-medium flex items-center justify-center hover:bg-blue-700"
+            onClick={null}
+          >
+            Proceed
+          </button>
         </div>
       </div>
       
       <div className="flex-1 flex overflow-hidden">
         {/* Left Canvas */}
-        <div className="flex-1 bg-white p-8 flex items-center justify-center overflow-auto">
+        
+        <div className="flex-1 bg-white p-8 flex flex-col items-center justify-center overflow-auto">
+        <div className='items-start'>
+              <h1 className="text-6xl font-bold  mr-20">Custom Design</h1>
+              <p className="text-2xl font-normal mb-4 mr-20">Create your own design here</p>
+          </div>
           <div 
             ref={canvasRef}
             className="relative w-800 h-800  rounded-lg mt-20 shadow-lg"
@@ -579,7 +631,7 @@ const CustomProduct = () => {
                     />
                   ) : (
                     <div 
-                      className="w-full h-full flex items-center justify-center"
+                      className="w-full h-full flex items-start justify-center"
                       style={{
                         fontSize: `${design.fontSize}px`,
                         fontFamily: design.fontFamily,
@@ -599,9 +651,9 @@ const CustomProduct = () => {
         </div>
         
         {/* Right Sidebar */}
-        <div className="w-100 bg-white border-l border-gray-200 mt- flex flex-col">
+        <div className="w-110 bg-white border-l border-gray-200 mt-2 flex flex-col">
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-t border-gray-200">
             <button 
               className={`flex-1 py-3 font-medium text-sm ${activeTab === 'shirt' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
               onClick={() => setActiveTab('shirt')}
@@ -764,6 +816,8 @@ const CustomProduct = () => {
                     <Type className="w-4 h-4 mr-2" />
                     Add Text
                   </button>
+
+                  
                 </div>
                 
                 {activeDesignObj?.type === 'text' && (
@@ -833,6 +887,9 @@ const CustomProduct = () => {
                         />
                       ))}
                     </div>
+
+
+                    
                   </div>
                 )}
                 
@@ -880,7 +937,34 @@ const CustomProduct = () => {
                           onBlur={() => addToHistory([...designs])}
                         />
                       </div>
+                      
                     </div>
+                    <div className="mt-4 p-3 border rounded border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Element Actions</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button 
+                        className="py-2 px-4 bg-gray-100 text-gray-700 rounded flex items-center justify-center hover:bg-gray-200"
+                        onClick={deleteActiveDesign}
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Delete
+                      </button>
+                      <button 
+                        className="py-2 px-4 bg-gray-100 text-gray-700 rounded flex items-center justify-center hover:bg-gray-200"
+                        onClick={bringForward}
+                      >
+                        <ArrowRight className="w-4 h-4 mr-1" />
+                        Forward
+                      </button>
+                      <button 
+                        className="py-2 px-4 bg-gray-100 text-gray-700 rounded flex items-center justify-center hover:bg-gray-200"
+                        onClick={sendBackward}
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-1" />
+                        Backward
+                      </button>
+                    </div>
+                  </div>
                   </div>
                 )}
               </div>

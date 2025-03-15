@@ -14,14 +14,16 @@ const ProfilePage = () => {
   };
 
   return (
+    <>
+    <div className="bg-black h-30 w-full mt-30"></div>
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <ProfileSidebar />
 
       {/* Main Profile Content */}
       <div className="flex-1 p-8">
-        <h1 className="text-2xl font-bold">My Account</h1>
-        <p className="text-gray-500">Manage your account here</p>
+        <h1 className="text-6xl font-bold">My Account</h1>
+        <p className="text-3xl text-gray-500">Manage your account here</p>
 
         {/* Profile Form */}
         <div className="mt-6 space-y-4">
@@ -54,6 +56,7 @@ const ProfilePage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
