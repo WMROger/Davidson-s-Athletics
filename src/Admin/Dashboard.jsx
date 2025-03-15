@@ -86,7 +86,7 @@ const Dashboard = () => {
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-[url('/background.svg')] bg-cover bg-center text-white">
+            <Card className="bg-[url('/background.svg')] bg-cover bg-center text-white ">
               <CardContent>
                 <h2 className="text-2xl font-semibold mb-4">Annual Sales</h2>
                 <p className="text-5xl font-bold">₱500,000</p>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { ChevronDown } from 'lucide-react';
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -166,35 +167,43 @@ const Home = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="w-full py-20 px-10 bg-white md:px-46">
-          <div className="md:w-5/7 text-center md:text-left">
-            <h1 className="text-4xl font-semibold text-gray-800">
-              Frequently Asked Questions
-            </h1>
-            <div className="mt-10 space-y-4">
-              {faqs.map((faq, index) => (
-                <div key={index} className=" border-gray-300 rounded-lg">
-                  <button
-                    className="w-full text-left p-4 flex hover:bg-gray-50 justify-between items-center"
-                    onClick={() => toggleFAQ(index)}
-                  >
-                    <span className="text-xl font-semibold text-gray-800">
-                      {faq.question}
-                    </span>
-                    <span className="text-xl">
-                      {openIndex === index ? "−" : "+"}
-                    </span>
-                  </button>
-                  {openIndex === index && (
-                    <div className="p-4 text-lg text-black border-b border-gray-700f">
-                      {faq.answer}
+          <div className="w-full py-20 px-10 bg-white md:px-46">
+            <div className="md:w-5/7 text-center md:text-left">
+              <h1 className="text-4xl font-semibold text-gray-800">
+                Frequently Asked Questions
+              </h1>
+              <div className="mt-10 space-y-4">
+                {faqs.map((faq, index) => (
+                  <div key={index} className="border-gray-300 rounded-lg">
+                    <button
+                      className="w-full text-left p-4 flex hover:bg-gray-50 justify-between items-center"
+                      onClick={() => toggleFAQ(index)}
+                    >
+                      <span className="text-xl font-semibold text-gray-800">
+                        {faq.question}
+                      </span>
+                      <span className="transition-transform duration-300 ease-in-out">
+  <ChevronDown 
+    className={`w-6 h-6 transition-transform duration-300 ${
+      openIndex === index ? "transform rotate-180" : ""
+    }`} 
+  />
+</span>
+                    </button>
+                    <div 
+                      className={`transition-all duration-700 ease-in-out overflow-hidden ${
+                        openIndex === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                      }`}
+                    >
+                      <div className="p-4 text-lg text-black border-b border-gray-700">
+                        {faq.answer}
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
         {/* Footer Section */}
         <div className="w-full py-20 px-10 bg-gray-800"></div>
