@@ -535,7 +535,7 @@ const OrdersManagement = () => {
             <button 
               onClick={prevPage}
               disabled={currentPage === 1}
-              className={`rounded-full px-3 py-2 flex items-center ${currentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
+              className={`rounded-full px-3 py-2 flex items-center ${currentPage === 1 ? ' text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
               aria-label="Previous page"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -552,7 +552,7 @@ const OrdersManagement = () => {
                   className={`rounded-full w-8 h-8 flex items-center justify-center ${
                     currentPage === page 
                       ? 'bg-black text-white' 
-                      : 'bg-gray-200 hover:bg-gray-300 text-gray-600'
+                      : ' hover:bg-gray-300 text-gray-600'
                   }`}
                   aria-label={`Go to page ${page}`}
                   aria-current={currentPage === page ? 'page' : undefined}
@@ -565,7 +565,7 @@ const OrdersManagement = () => {
             <button
               onClick={nextPage}
               disabled={currentPage === totalPages || totalPages === 0}
-              className={`rounded-full px-3 py-2 flex items-center ${currentPage === totalPages || totalPages === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
+              className={`rounded-full px-3 py-2 flex items-center ${currentPage === totalPages || totalPages === 0 ? ' text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
               aria-label="Next page"
             >
               <ChevronRight className="w-4 h-4" />

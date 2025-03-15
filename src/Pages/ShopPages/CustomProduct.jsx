@@ -424,6 +424,7 @@ const CustomProduct = () => {
   };
 
   return (
+    <>
     <div 
       className="w-full h-screen flex flex-col"
       onKeyDown={handleKeyDown}
@@ -465,11 +466,11 @@ const CustomProduct = () => {
       
       <div className="flex-1 flex overflow-hidden">
         {/* Left Canvas */}
-        <div className="flex-1 bg-gray-100 p-8 flex items-center justify-center overflow-auto">
+        <div className="flex-1 bg-white p-8 flex items-center justify-center overflow-auto">
           <div 
             ref={canvasRef}
-            className="relative w-128 h-128 bg-white rounded-lg shadow-lg"
-            style={{ width: '500px', height: '600px' }} 
+            className="relative w-800 h-800  rounded-lg mt-20 shadow-lg"
+            style={{ width: '600px', height: '700px' }} 
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
@@ -598,7 +599,7 @@ const CustomProduct = () => {
         </div>
         
         {/* Right Sidebar */}
-        <div className="w-80 bg-white border-l border-gray-200 mt- flex flex-col">
+        <div className="w-100 bg-white border-l border-gray-200 mt- flex flex-col">
           {/* Tabs */}
           <div className="flex border-b border-gray-200">
             <button 
@@ -887,10 +888,11 @@ const CustomProduct = () => {
           </div>
         </div>
       </div>
-      {/* Footer Section */}
-        <div className="w-full py-20 px-10 bg-gray-800">
-        </div>
     </div>
+    {/* Footer Section */}
+    <div className="w-full py-20 px-10 bg-gray-800">
+        </div>
+    </>
   );
 };
 
