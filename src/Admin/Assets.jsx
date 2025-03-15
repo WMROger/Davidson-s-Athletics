@@ -180,6 +180,7 @@ export default function Assets() {
         <h1 className="text-6xl font-bold mb-8">Assets</h1>
 
         <div className="flex items-center justify-start mb-4">
+
           <div className="flex items-center">
             <div className="flex items-center space-x-2 bg-[#E6E6E6] rounded px-3 py-2">
             <span className="text-gray-600 text-large flex items-center">

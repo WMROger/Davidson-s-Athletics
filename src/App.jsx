@@ -12,11 +12,13 @@ import Dashboard from "./Admin/Dashboard";
 import ManageOrders from "./Admin/ManageOrders";
 import Design from "./Admin/AdminDesign";
 import Assets from "./Admin/Assets";
-// import NewShirt from "./Admin/NewShirt"; // Import NewShirt component
 import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt";
-import RequestForm from "./Pages/ShopPages/RequestForm"; // Import RequestForm component
-import OrderConfirmation from './Pages/ShopPages/OrderConfirmation';
+import RequestForm from "./Pages/ShopPages/RequestForm";
+import OrderConfirmation from "./Pages/ShopPages/OrderConfirmation";
 import CustomProduct from "./Pages/ShopPages/CustomProduct";
+import ProfilePage from "./Pages/Profile/ProfilePage";
+import ProfileSidebar from "./Pages/Profile/ProfileSidebar";
+import Purchase from "./Pages/Profile/Purchase";
 
 function App() {
   return (
@@ -104,7 +106,7 @@ function App() {
           <Route path="assets" element={<Assets />} />
         </Route>
 
-        {/* Add the Customize Shirt Route */}
+        {/* Shop Pages */}
         <Route
           path="/ShopPages/CustomizeShirt"
           element={
@@ -114,7 +116,6 @@ function App() {
             </>
           }
         />
-
         <Route
           path="/ShopPages/OrderConfirmation"
           element={
@@ -124,10 +125,6 @@ function App() {
             </>
           }
         />
-        
-
-
-        {/* Add the Request Form Route */}
         <Route
           path="/ShopPages/RequestForm"
           element={
@@ -135,7 +132,28 @@ function App() {
               <Navbar />
               <RequestForm />
             </>
-            
+          }
+        />
+
+        {/* Profile Routes with Sidebar */}
+        <Route
+          path="/profile/ProfilePage"
+          element={
+            <>
+              <Navbar />
+ 
+                <ProfilePage />
+            </>
+          }
+        />
+        <Route
+          path="/profile/Purchase"
+          element={
+            <>
+              <Navbar />
+
+                <Purchase />
+            </>
           }
         />
       </Routes>
