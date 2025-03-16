@@ -54,54 +54,26 @@ const shirtCategories = [
     name: "T-Shirt",
     products: [
       { id: "basic-tee", name: "Basic Tee", image: "/T-shirt.svg" },
-      {
-        id: "v-neck",
-        name: "V-Neck",
-        image: "/Home Assets/TShirts/blue shirt.png",
-      },
-      {
-        id: "long-sleeve",
-        name: "Long Sleeve",
-        image: "/Home Assets/red shirt.png",
-      },
+      { id: "v-neck", name: "V-Neck", image: "/Home Assets/TShirts/blue shirt.png" },
+      { id: "long-sleeve", name: "Long Sleeve", image: "/Home Assets/red shirt.png" },
     ],
   },
   {
     id: "polo",
     name: "Polo",
     products: [
-      {
-        id: "classic-polo",
-        name: "Classic Polo",
-        image: "/api/placeholder/100/100",
-      },
-      { id: "slim-fit", name: "Slim Fit", image: "/api/placeholder/100/100" },
-      {
-        id: "striped-polo",
-        name: "Striped Polo",
-        image: "/api/placeholder/100/100",
-      },
+      { id: "classic-polo", name: "Classic Polo", image: "/Home Assets/TShirts/blue shirt.png" },
+      { id: "slim-fit", name: "Slim Fit", image: "/Home Assets/TShirts/another-image.png" },
+      { id: "striped-polo", name: "Striped Polo", image: "/Home Assets/TShirts/yet-another-image.png" },
     ],
   },
   {
     id: "hoodie",
     name: "Hoodie",
     products: [
-      {
-        id: "pullover",
-        name: "Pullover Hoodie",
-        image: "/api/placeholder/100/100",
-      },
-      {
-        id: "zip-up",
-        name: "Zip-up Hoodie",
-        image: "/api/placeholder/100/100",
-      },
-      {
-        id: "sleeveless",
-        name: "Sleeveless Hoodie",
-        image: "/api/placeholder/100/100",
-      },
+      { id: "pullover", name: "Pullover Hoodie", image: "/Home Assets/TShirts/yellow shirt.png" },
+      { id: "zip-up", name: "Zip-up Hoodie", image: "/Home Assets/TShirts/another-image.png" },
+      { id: "sleeveless", name: "Sleeveless Hoodie", image: "/Home Assets/TShirts/yet-another-image.png" },
     ],
   },
 ];
@@ -599,7 +571,9 @@ const CustomProduct = () => {
       const shirtImage = new window.Image();
       shirtImage.src = selectedProductObj.image; // Use the selected product's image
       shirtImage.onload = async () => {
-        ctx.drawImage(shirtImage, 0, 0, canvas.width, canvas.height);
+        // Adjust the x coordinate to move the image to the right
+        const xOffset = 50; // Adjust this value as needed
+        ctx.drawImage(shirtImage, xOffset, 0, canvas.width, canvas.height);
 
         // Draw the design elements
         await drawDesignElements(ctx);
@@ -662,6 +636,11 @@ const CustomProduct = () => {
             console.error("Error exporting design:", error);
             alert("Failed to save design. Please try again.");
           });
+      };
+
+      // Handle image loading error
+      shirtImage.onerror = () => {
+        alert("Failed to load the shirt image. Please try again.");
       };
     } catch (error) {
       console.error("Error exporting design:", error);
