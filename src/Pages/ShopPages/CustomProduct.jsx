@@ -13,7 +13,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { RotateCw } from "lucide-react";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, doc, setDoc } from "firebase/firestore";
 import {
   getStorage,
   ref,
@@ -600,55 +600,45 @@ const CustomProduct = () => {
 
         const dataUrl = tempCanvas.toDataURL("image/png");
 
-        // Prompt the user for a filename
-        const filename = prompt("Enter a filename for your design:", "design.png");
-        if (!filename) {
-          alert("Filename is required.");
-          return;
+        // Convert data URL to Blob
+        const blob = await fetch(dataUrl).then((res) => res.blob());
+
+        // Upload to Hostinger
+        const formData = new FormData();
+        formData.append("file", blob, `design-${Date.now()}.png`);
+
+        const response = await fetch(
+          "https://davidsonathletics.scarlet2.io/api/upload_request_design.php",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to upload image.");
         }
 
-        // Convert data URL to Blob
-        fetch(dataUrl)
-          .then((res) => res.blob())
-          .then((blob) => {
-            const formData = new FormData();
-            formData.append("file", blob, filename);
+        const data = await response.json();
+        if (!data.imageUrl) {
+          throw new Error("Error uploading image: " + data.error);
+        }
 
-            // Upload to Hostinger
-            return fetch(
-              "https://davidsonathletics.scarlet2.io/api/upload_request_design.php",
-              {
-                method: "POST",
-                body: formData,
-              }
-            );
-          })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Failed to upload image to Hostinger");
-            }
-            return response.json();
-          })
-          .then(({ imageUrl }) => {
-            // Add to cart
-            const newCartItem = {
-              id: Date.now().toString(),
-              name: "Custom Shirt",
-              variation: shirtStyle,
-              quantity: 1,
-              basePrice: 550,
-              imageUrl,
-              selected: false,
-            };
-            addToCart(newCartItem);
+        const imageUrl = data.imageUrl;
 
-            alert("Design saved and added to cart!");
-            navigate("/cart"); // Navigate to the cart page
-          })
-          .catch((error) => {
-            console.error("Error exporting design:", error);
-            alert("Failed to save design. Please try again.");
-          });
+        // Store the image URL in Firestore
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error("No user is currently logged in.");
+        }
+        const userId = user.uid;
+        const db = getFirestore();
+        const requestRef = doc(db, "users", userId, "requests", `request-${Date.now()}`);
+        await setDoc(requestRef, { imageUrl });
+
+        // Navigate to RequestForm with the uploaded image URL
+        navigate('/ShopPages/RequestForm', { state: { uploadedImages: [imageUrl], selectedProduct } });
       };
 
       // Handle image loading error

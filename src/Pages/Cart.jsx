@@ -3,9 +3,13 @@ import { Plus, Minus } from "lucide-react";
 import { db } from "../Database/firebase"; // Ensure correct path
 import { collection, getDocs } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchCartItems = async (userId) => {
@@ -36,9 +40,33 @@ const Cart = () => {
 
   // Toggle Checkbox Selection
   const toggleSelectItem = (index) => {
-    setCartItems((prevCart) =>
-      prevCart.map((item, i) => (i === index ? { ...item, selected: !item.selected } : item))
-    );
+    if (index === -1) {
+      // Handle "select all" logic
+      const newSelectAll = !selectAll;
+      setSelectAll(newSelectAll);
+      setCartItems((prevCart) =>
+        prevCart.map((item) => ({ ...item, selected: newSelectAll }))
+      );
+      setSelectedItems(newSelectAll ? [...cartItems] : []);
+    } else {
+      // Handle individual item selection
+      setCartItems((prevCart) =>
+        prevCart.map((item, i) => {
+          if (i === index) {
+            const updatedItem = { ...item, selected: !item.selected };
+            if (updatedItem.selected) {
+              setSelectedItems((prevSelected) => [...prevSelected, updatedItem]);
+            } else {
+              setSelectedItems((prevSelected) =>
+                prevSelected.filter((selectedItem) => selectedItem.id !== updatedItem.id)
+              );
+            }
+            return updatedItem;
+          }
+          return item;
+        })
+      );
+    }
   };
 
   // Update Quantity
@@ -55,6 +83,12 @@ const Cart = () => {
   // Remove Item from Cart
   const removeItem = (index) => {
     setCartItems((prevCart) => prevCart.filter((_, i) => i !== index));
+    setSelectedItems((prevSelected) => prevSelected.filter((_, i) => i !== index));
+  };
+
+  // Handle Checkout
+  const handleCheckout = () => {
+    navigate('/ShopPages/Checkout', { state: { selectedItems } });
   };
 
   return (
@@ -67,7 +101,12 @@ const Cart = () => {
         {/* Header */}
         <div className="bg-gray-800 text-white grid grid-cols-5 py-5 px-5 rounded-md text-center text-xl">
           <div className="flex items-center gap-2 justify-start col-span-2 text-xl">
-            <input type="checkbox" className="w-5 h-5" />
+            <input
+              type="checkbox"
+              className="w-5 h-5"
+              checked={selectAll}
+              onChange={() => toggleSelectItem(-1)}
+            />
             <span>Product</span>
           </div>
           <span>Price</span>
@@ -132,14 +171,21 @@ const Cart = () => {
                 <button onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700">
                   Cancel
                 </button>
-
-                <button onClick={() => navigate('/ShopPages/Checkout')} className="text-black hover:text-red-700">
-                  Checkout
-                </button>
               </div>
             </div>
           </div>
         ))}
+
+        {/* Checkout Button */}
+        <div className="flex justify-end mt-8">
+          <button
+            onClick={handleCheckout}
+            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            disabled={selectedItems.length === 0}
+          >
+            Checkout
+          </button>
+        </div>
       </div>
     </>
   );
