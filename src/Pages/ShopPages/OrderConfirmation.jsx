@@ -112,7 +112,7 @@ const OrderConfirmation = () => {
               Add to Cart
             </button>
             <button
-              className="w-56 bg-black text-white py-3 px-6 rounded-md font-medium hover:bg-gray-800 transition mt-4"
+              className="w-56 bg-black text-white py-3 px-6 ml-5 rounded-md font-medium hover:bg-gray-800 transition mt-4"
               onClick={handleProceedToCheckout}
             >
               Proceed to Checkout

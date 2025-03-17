@@ -5,32 +5,25 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-gray-200 py-4 px-6">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center mr-3">
-              <span className="text-white text-xs">🏀</span>
-            </div>
-            <div>
-              <div className="font-bold text-lg">Davidson</div>
-              <div className="text-yellow-500">Athletics</div>
-            </div>
-          </div>
+      <header className="border-b border-gray-200 py-4 px-6 mt-30">
+        <div className="container flex justify-end items-center">
+
+           
           
           {/* Progress indicator */}
-          <div className="flex items-center">
+          <div className="flex items-center mr-40">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center">
-                <Check size={16} />
+              <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-xl font-medium">
+                <Check size={30} />
               </div>
-              <span className="ml-2 text-sm font-medium">Review</span>
+              <span className="ml-4 text-2xl font-medium">Review</span>
             </div>
             <div className="w-16 h-px bg-gray-300 mx-2"></div>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium">2</span>
+              <div className="w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center text-xl font-medium">
+                <span className="text-xl font-medium">2</span>
               </div>
-              <span className="ml-2 text-sm font-medium">Checkout</span>
+              <span className="ml-4 text-2xl font-medium">Checkout</span>
             </div>
           </div>
         </div>
@@ -41,18 +34,25 @@ const Checkout = () => {
         <div className="flex flex-col md:flex-row">
           {/* Left column - Shipping Information */}
           <div className="w-full md:w-2/3 p-6 border-r border-gray-200">
-            <h1 className="text-2xl font-bold mb-6">Checkout</h1>
+            <h1 className="text-[45px] font-bold mb-6">Checkout</h1>
             
             <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
+              <h2 className="text-[34px] font-normal mb-4">Shipping Information</h2>
               <div className="flex gap-4 mb-4">
                 <label className="border border-gray-300 rounded-md px-4 py-3 flex items-center gap-2 flex-1 cursor-pointer">
                   <input type="radio" name="shipping" className="w-4 h-4" />
-                  <span className="text-gray-700">🚚 Delivery</span>
+                  <span className="text-[#817F7F] text-[24px] flex items-center">
+                    <img src="/Delivery_ic.svg" alt="Delivery Icon" className="size-[40px] mr-3" />
+                    Delivery
+                  </span>
                 </label>
+
                 <label className="border border-gray-300 rounded-md px-4 py-3 flex items-center gap-2 flex-1 cursor-pointer">
                   <input type="radio" name="shipping" className="w-4 h-4" />
-                  <span className="text-gray-700">📦 Pick up</span>
+                  <span className="text-[#817F7F] text-[24px] flex items-center font-extralight">
+                    <img src="/Delivery_ic.svg" alt="Delivery Icon" className="size-[40px] mr-3" />
+                    Pick Up
+                  </span>
                 </label>
               </div>
             </div>
@@ -64,7 +64,7 @@ const Checkout = () => {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-3/4 px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
               </div>
@@ -75,7 +75,7 @@ const Checkout = () => {
                 </label>
                 <input
                   type="email"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-3/4 px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
               </div>
@@ -86,7 +86,7 @@ const Checkout = () => {
                 </label>
                 <input
                   type="tel"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-3/4 px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
               </div>
@@ -97,7 +97,7 @@ const Checkout = () => {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-3/4 px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
               </div>
@@ -112,12 +112,12 @@ const Checkout = () => {
           </div>
           
           {/* Right column - Review Cart */}
-          <div className="w-full md:w-1/3 p-6">
+          <div className="w-full md:w-1/2 p-6 mt-6">
             <h2 className="text-xl font-semibold mb-4">Review your cart</h2>
             
             <div className="bg-gray-100 rounded-lg p-4 mb-6">
               <img 
-                src="/api/placeholder/400/320"
+                src="/T-shirt.svg"
                 alt="Amigos Jersey" 
                 className="w-full h-auto mb-4"
               />
