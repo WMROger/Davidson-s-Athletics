@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { db } from "../Database/firebase"; // Ensure correct path
 import { collection, getDocs } from "firebase/firestore";
 
-const colors = ["black", "green", "red", "blue", "purple", "yellow", "orange"];
 const sizes = ["S", "M", "L", "XL"];
 
 const Shop = () => {
@@ -33,19 +32,17 @@ const Shop = () => {
 
   const handleImageClick = (product) => {
     navigate(`/ShopPages/CustomizeShirt`, {
-      state: { selectedImage: product.image, selectedColor: product.color },
+      state: {
+        selectedImage: product.image,
+        selectedColor: product.color,
+        selectedName: product.name,
+        selectedPrice: product.price,
+        selectedSizes: product.sizes,
+      },
     });
   };
 
-  const handleColorChange = (index, color) => {
-    const updatedProducts = [...products];
-    updatedProducts[index].color = color;
-    updatedProducts[
-      index
-    ].image = `/Home Assets/home_img_longSleeve-${color}.svg`;
-    setProducts(updatedProducts);
-  };
-
+  
   const handleRequestDesign = () => {
     setShowDesignOptions(!showDesignOptions);
   };
@@ -89,7 +86,7 @@ const Shop = () => {
       <div className="w-full mt-30 h-30 bg-black"></div>
       <div className="container mx-auto p-4 flex bg-white">
         <aside className="w-1/4 mt-5 p-4 border-r">
-          <h2 className="text-2xl font-bold">Long Sleeve Shirts</h2>
+          <h2 className="text-2xl font-bold">Shirts</h2>
           <input
             type="text"
             placeholder="Search within this category"
@@ -103,18 +100,7 @@ const Shop = () => {
             <span>Backside Printing</span>
             <input type="checkbox" className="toggle-switch" />
           </div>
-          <div className="mt-4">
-            <label className="block mb-2 font-medium">Color</label>
-            <div className="flex gap-2">
-              {colors.map((color) => (
-                <span
-                  key={color}
-                  className="w-6 h-6 rounded-full border border-gray-400 cursor-pointer"
-                  style={{ backgroundColor: color }}
-                ></span>
-              ))}
-            </div>
-          </div>
+         
           <div className="mt-4">
             <label className="block mb-2 font-medium">Size</label>
             <div className="flex flex-col gap-2">
@@ -215,23 +201,28 @@ const Shop = () => {
                 <p className="text-gray-500">
                   Sizes: {product.sizes?.join(", ")}
                 </p>
-                <div className="flex gap-1 mt-2">
-                  {colors.map((color) => (
-                    <span
-                      key={color}
-                      className="w-5 h-5 rounded-full border cursor-pointe transition-transform duration-300 hover:scale-125"
-                      style={{ backgroundColor: color }}
-                      onClick={() => handleColorChange(index, color)}
-                    ></span>
-                  ))}
-                </div>
+                
               </div>
             ))}
           </div>
         </div>
       </div>
-      {/* Footer Section */}
-      <div className="w-full py-20 px-10 bg-gray-800"></div>
+      {/* Footer */}
+      <div className="w-full py-20 px-10 bg-gray-800 mt-12">
+        <div className="container mx-auto text-white">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-lg font-bold">Davidson Athletics</h3>
+              <p className="text-sm mt-2">© 2025 Davidson Athletics. All rights reserved.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">Contact Us</h3>
+              <p className="text-sm mt-2">Email: support@davidsonathletics.com</p>
+              <p className="text-sm">Phone: +1 234 567 890</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

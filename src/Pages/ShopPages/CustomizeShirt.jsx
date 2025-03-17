@@ -8,33 +8,16 @@ const CustomizeShirt = () => {
   const { state } = location;
   const selectedImage = state?.selectedImage;
   const selectedColor = state?.selectedColor;
+  const selectedName = state?.selectedName;
+  const selectedPrice = state?.selectedPrice;
+  const selectedSizes = state?.selectedSizes;
 
   const colors = ["black", "green", "red", "blue", "purple", "yellow"];
-  const sizes = ["S", "M", "L", "XL", "XXL"];
   const [currentColor, setCurrentColor] = useState(selectedColor || "black");
-  const [selectedSize, setSelectedSize] = useState("L");
+  const [selectedSize, setSelectedSize] = useState(selectedSizes ? selectedSizes[0] : "L");
   const [shirtImage, setShirtImage] = useState(selectedImage || "/images/default-shirt.jpg");
   const [quantity, setQuantity] = useState(1);
   const [user, setUser] = useState(null);
-
-  // Log the selectedImage and selectedColor values
-  useEffect(() => {
-    console.log("selectedImage:", selectedImage);
-    console.log("selectedColor:", selectedColor);
-  }, [selectedImage, selectedColor]);
-
-  // Function to handle navigation to OrderConfirmation
-  const handleProceed = () => {
-    navigate("/ShopPages/OrderConfirmation", {
-      state: {
-        selectedColor: currentColor,
-        selectedSize: selectedSize,
-        price: 450.00,
-        shirtImage: shirtImage,
-        quantity: quantity
-      }
-    });
-  };
 
   useEffect(() => {
     if (!selectedImage) {
@@ -51,14 +34,31 @@ const CustomizeShirt = () => {
     return () => unsubscribe();
   }, []);
 
+  const handleProceed = () => {
+    navigate("/ShopPages/OrderConfirmation", {
+      state: {
+        selectedColor: currentColor,
+        selectedSize: selectedSize,
+        price: selectedPrice,
+        shirtImage: shirtImage,
+        quantity: quantity,
+        selectedName: selectedName,
+      },
+    });
+  };
+
+  const moreLikeThisProducts = [
+    { name: "Blue Shirt", image: "/Home Assets/TShirts/blue shirt.png", price: 500 },
+    { name: "Green Shirt", image: "/Home Assets/TShirts/green shirt.png", price: 500 },
+    { name: "Purple Shirt", image: "/Home Assets/TShirts/purple shirt.png", price: 500 },
+    { name: "Red Shirt", image: "/Home Assets/TShirts/red shirt.png", price: 500 },
+    { name: "Yellow Shirt", image: "/Home Assets/TShirts/yellow shirt.png", price: 500 },
+  ];
+
   return (
     <div className="w-full">
-      {/* Black Background Section */}
       <div className="w-full mt-25 h-32 bg-black"></div>
-
-      {/* Shirt Customization Section */}
       <div className="container mx-auto p-6 flex gap-10">
-        {/* Left Side: Shirt Preview */}
         <div className="w-1/2">
           <img
             src={shirtImage}
@@ -66,11 +66,9 @@ const CustomizeShirt = () => {
             className="w-full rounded-lg shadow-lg"
           />
         </div>
-
-        {/* Right Side: Shirt Details */}
         <div className="w-1/2">
-          <h2 className="text-2xl font-bold">Long Sleeve Jersey</h2>
-          <p className="text-xl font-semibold mt-2">PHP 450.00 - PHP 550.00</p>
+          <h2 className="text-2xl font-bold">{selectedName}</h2>
+          <p className="text-xl font-semibold mt-2">PHP {selectedPrice}.00</p>
           <div className="mt-4">
             <label className="block text-lg font-medium">Quantity:</label>
             <input
@@ -98,7 +96,17 @@ const CustomizeShirt = () => {
           </div>
           <div className="mt-4">
             <label className="block text-lg font-medium">Sizes:</label>
-            <p className="text-gray-500">Sizes: S, M, L, XL, XXL</p>
+            <select
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+              className="border rounded-lg p-2 w-full"
+            >
+              {selectedSizes?.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="mt-4">
             <label className="block text-lg font-medium">Upload:</label>
@@ -119,18 +127,36 @@ const CustomizeShirt = () => {
 
       {/* More Like This Section */}
       <div className="container mx-auto mt-12">
-        <h2 className="text-2xl font-bold mb-4">You Might Also Like</h2>
-        <div className="grid mb-20 grid-cols-4 gap-6">
-          {["green", "red", "blue", "purple", "yellow"].map((color) => (
-            <div key={color} className="border p-4 shadow-lg rounded-lg cursor-pointer">
+        <h2 className="text-2xl font-bold mb-4">More Like This</h2>
+        <div className="grid grid-cols-4 gap-6">
+          {moreLikeThisProducts.map((product, index) => (
+            <div key={index} className="border p-4 shadow-lg rounded-lg">
               <img
-                src={`/Home Assets/TShirts/${color} shirt.png`}
-                alt={`${color} Shirt`}
+                src={product.image}
+                alt={product.name}
                 className="w-full h-48 object-cover rounded-lg"
               />
-              <p className="text-center text-lg font-semibold mt-2 capitalize">{color} Shirt</p>
+              <h3 className="text-sm font-semibold mt-2">{product.name}</h3>
+              <p className="text-gray-700">PHP {product.price}.00</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="w-full py-20 px-10 bg-gray-800 mt-12">
+        <div className="container mx-auto text-white">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-lg font-bold">Davidson Athletics</h3>
+              <p className="text-sm mt-2">© 2025 Davidson Athletics. All rights reserved.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">Contact Us</h3>
+              <p className="text-sm mt-2">Email: support@davidsonathletics.com</p>
+              <p className="text-sm">Phone: +1 234 567 890</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
