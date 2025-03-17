@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { MoreHorizontal, Plus } from "lucide-react"; // Use horizontal meatballs icon and plus icon
 import { db } from "../Database/firebase"; // Adjust the import path if necessary
-import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -16,28 +16,55 @@ export default function AdminDesign() {
 
   useEffect(() => {
     const fetchAssets = async () => {
-      const querySnapshot = await getDocs(collection(db, "requests"));
-      const assetsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setAssets(assetsData);
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const allRequests = [];
+
+      for (const userDoc of usersSnapshot.docs) {
+        const requestsSnapshot = await getDocs(collection(db, "users", userDoc.id, "requests"));
+        requestsSnapshot.forEach((requestDoc) => {
+          allRequests.push({ id: requestDoc.id, userId: userDoc.id, ...requestDoc.data() });
+        });
+      }
+
+      setAssets(allRequests);
     };
 
     fetchAssets();
   }, []);
 
-  const updateStatus = async (id, newStatus) => {
-    const assetDoc = doc(db, "requests", id);
-    await updateDoc(assetDoc, { status: newStatus });
-    setAssets((prev) =>
-      prev.map((asset) =>
-        asset.id === id ? { ...asset, status: newStatus } : asset
-      )
-    );
+  const updateStatus = async (userId, docId, newStatus) => {
+    try {
+      console.log("Updating status for:", { userId, docId, newStatus });
+      const assetDoc = doc(db, "users", String(userId), "requests", String(docId));
+      
+      // Check if the document exists
+      const assetDocSnapshot = await getDoc(assetDoc);
+      if (!assetDocSnapshot.exists()) {
+        console.error("No document to update:", assetDoc.path);
+        return;
+      }
+
+      await updateDoc(assetDoc, { status: newStatus });
+      setAssets((prev) =>
+        prev.map((asset) =>
+          asset.id === String(docId) ? { ...asset, status: newStatus } : asset
+        )
+      );
+      console.log("Status updated successfully");
+    } catch (error) {
+      console.error("Error updating status: ", error);
+    }
   };
 
-  const deleteAsset = async (id) => {
-    const assetDoc = doc(db, "requests", id);
-    await deleteDoc(assetDoc);
-    setAssets((prev) => prev.filter((asset) => asset.id !== id));
+  const deleteAsset = async (userId, requestId) => {
+    try {
+      const assetDoc = doc(db, "users", String(userId), "requests", String(requestId));
+      await deleteDoc(assetDoc);
+      setAssets((prev) => prev.filter((asset) => asset.id !== String(requestId)));
+      console.log("Asset deleted successfully");
+    } catch (error) {
+      console.error("Error deleting asset: ", error);
+    }
   };
 
   useEffect(() => {
@@ -117,13 +144,13 @@ export default function AdminDesign() {
                 <td className="p-2 flex items-center justify-center relative">
                   <button
                     className="px-4 py-2 text-green-600 rounded hover:bg-green-300 mr-2"
-                    onClick={() => updateStatus(asset.id, "Approved")}
+                    onClick={() => updateStatus(asset.userId, asset.id, "Approved")}
                   >
                     Approve
                   </button>
                   <button
                     className="px-4 py-2 text-red-600 rounded hover:bg-red-300 mr-2"
-                    onClick={() => updateStatus(asset.id, "Denied")}
+                    onClick={() => updateStatus(asset.userId, asset.id, "Denied")}
                   >
                     Deny
                   </button>
@@ -143,7 +170,7 @@ export default function AdminDesign() {
                       <div className="absolute -top-12 left-0 flex bg-white border rounded-lg shadow-lg z-50">
                         <button
                           className="px-4 py-2 text-red-600 hover:bg-gray-100"
-                          onClick={() => deleteAsset(asset.id)}
+                          onClick={() => deleteAsset(asset.userId, asset.id)}
                         >
                           Delete
                         </button>
@@ -236,6 +263,20 @@ export default function AdminDesign() {
                   </a>
                 </td>
                 <td className="p-2 flex items-center justify-center relative">
+                  <button
+                    className="px-4 py-2 text-green-600 rounded hover:bg-green-300 mr-2"
+                    onClick={() => updateStatus(asset.userId, asset.id, "Approved")}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    className="px-4 py-2 text-red-600 rounded hover:bg-red-300 mr-2"
+                    onClick={() => updateStatus(asset.userId, asset.id, "Denied")}
+                  >
+                    Deny
+                  </button>
+                </td>
+                <td>
                   <div className="relative menu-container">
                     <button
                       className="p-2 rounded-full hover:bg-gray-200"
@@ -250,7 +291,7 @@ export default function AdminDesign() {
                       <div className="absolute -top-12 left-0 flex bg-white border rounded-lg shadow-lg z-50">
                         <button
                           className="px-4 py-2 text-red-600 hover:bg-gray-100"
-                          onClick={() => deleteAsset(asset.id)}
+                          onClick={() => deleteAsset(asset.userId, asset.id)}
                         >
                           Delete
                         </button>

@@ -38,6 +38,7 @@ const Shop = () => {
         selectedName: product.name,
         selectedPrice: product.price,
         selectedSizes: product.sizes,
+        availableStock: product.stock,
       },
     });
   };

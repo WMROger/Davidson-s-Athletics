@@ -11,6 +11,7 @@ const CustomizeShirt = () => {
   const selectedName = state?.selectedName;
   const selectedPrice = state?.selectedPrice;
   const selectedSizes = state?.selectedSizes;
+  const availableStock = state?.availableStock;
 
   const colors = ["black", "green", "red", "blue", "purple", "yellow"];
   const [currentColor, setCurrentColor] = useState(selectedColor || "black");
@@ -33,6 +34,17 @@ const CustomizeShirt = () => {
 
     return () => unsubscribe();
   }, []);
+
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    if (value > availableStock) {
+      setQuantity(availableStock);
+    } else if (value < 1) {
+      setQuantity(1);
+    } else {
+      setQuantity(value);
+    }
+  };
 
   const handleProceed = () => {
     navigate("/ShopPages/OrderConfirmation", {
@@ -75,9 +87,10 @@ const CustomizeShirt = () => {
               type="number"
               min="1"
               value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
+              onChange={handleQuantityChange}
               className="border rounded-lg p-2 w-1/2"
             />
+            <p className="text-sm text-gray-500">Available stock: {availableStock}</p>
           </div>
           <div className="mt-4">
             <label className="block text-lg font-medium">Color:</label>

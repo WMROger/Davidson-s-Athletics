@@ -1,5 +1,8 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { db } from '../../Database/firebase'; // Ensure correct path
+import { collection, addDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -12,8 +15,37 @@ const OrderConfirmation = () => {
   const quantity = state?.quantity;
   const selectedName = state?.selectedName;
 
+  const handleAddToCart = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      console.error("No user is currently logged in.");
+      navigate("/login");
+      return;
+    }
+
+    const userId = user.uid; // Get the current user's ID
+    try {
+      const cartCollectionRef = collection(db, "users", userId, "cart");
+      await addDoc(cartCollectionRef, {
+        productId: "productId", // Replace with actual product ID
+        productName: selectedName,
+        quantity: quantity,
+        price: price,
+        size: selectedSize,
+        color: selectedColor,
+        imageUrl: shirtImage,
+      });
+      console.log("Item added to cart");
+      navigate("/cart"); // Redirect to cart page
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+    }
+  };
+
   const handleProceedToCheckout = () => {
-    navigate("/ShopPages/Checkout", {
+    navigate("ShopPages/Checkout", {
       state: {
         selectedColor,
         selectedSize,
@@ -75,9 +107,15 @@ const OrderConfirmation = () => {
             </div>
             <button
               className="w-56 bg-black text-white py-3 px-6 rounded-md font-medium hover:bg-gray-800 transition"
+              onClick={handleAddToCart}
+            >
+              Add to Cart
+            </button>
+            <button
+              className="w-56 bg-black text-white py-3 px-6 rounded-md font-medium hover:bg-gray-800 transition mt-4"
               onClick={handleProceedToCheckout}
             >
-              Proceed to checkout
+              Proceed to Checkout
             </button>
           </div>
         </div>

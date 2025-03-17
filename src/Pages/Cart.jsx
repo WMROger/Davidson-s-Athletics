@@ -1,27 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Minus } from "lucide-react";
+import { db } from "../Database/firebase"; // Ensure correct path
+import { collection, getDocs } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Long Sleeve Jersey",
-      variation: "XL",
-      quantity: 1,
-      basePrice: 550,
-      imageUrl: "SampleShirt.svg",
-      selected: false,
-    },
-    {
-      id: 2,
-      name: "Long Sleeve Jersey",
-      variation: "XL",
-      quantity: 1,
-      basePrice: 550,
-      imageUrl: "SampleShirt.svg",
-      selected: false,
-    },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+
+  useEffect(() => {
+    const fetchCartItems = async (userId) => {
+      try {
+        const cartCollectionRef = collection(db, "users", userId, "cart");
+        const snapshot = await getDocs(cartCollectionRef);
+        const cartData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setCartItems(cartData);
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+      }
+    };
+
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchCartItems(user.uid);
+      } else {
+        console.error("No user is currently logged in.");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Toggle Checkbox Selection
   const toggleSelectItem = (index) => {
@@ -80,7 +91,7 @@ const Cart = () => {
                 onChange={() => toggleSelectItem(index)}
                 className="w-5 h-5"
               />
-              <span className="font-medium">{item.name}</span>
+              <span className="font-medium">{item.productName}</span>
             </div>
 
             {/* Inner Box - Wrapped Inside the Outer Box */}
@@ -90,13 +101,13 @@ const Cart = () => {
                 <div className="col-span-2 flex items-center gap-4">
                   <img src={item.imageUrl} alt="Product" className="w-28 h-28 object-fit rounded-md bg-gray-100" />
                   <div>
-                    <h3 className="text-xl text-left">Custom Long Sleeve Jersey</h3>
+                    <h3 className="text-xl text-left">{item.productName}</h3>
                   </div>
-                  <p className="text-gray-500 text-left text-xl">Variations: {item.variation}</p>
+                  <p className="text-gray-500 text-left text-xl">Variations: {item.size}</p>
                 </div>
 
                 {/* Price */}
-                <div className="font-medium text-xl">₱{(item.basePrice * item.quantity).toFixed(2)}</div>
+                <div className="font-medium text-xl">₱{(item.price * item.quantity).toFixed(2)}</div>
 
                 {/* Quantity Selector - Properly Aligned */}
                 <div className="flex justify-center">
@@ -120,6 +131,10 @@ const Cart = () => {
                 {/* Remove Button */}
                 <button onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700">
                   Cancel
+                </button>
+
+                <button onClick={() => navigate('/ShopPages/Checkout')} className="text-black hover:text-red-700">
+                  Checkout
                 </button>
               </div>
             </div>

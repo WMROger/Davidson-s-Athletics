@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { db } from "../../Database/firebase"; // Ensure correct path
 import { collection, addDoc, runTransaction, doc } from "firebase/firestore"; // Import necessary Firestore functions
 import { v4 as uuidv4 } from 'uuid'; // Import the uuid library
+import { getAuth } from "firebase/auth";
 
 const RequestForm = () => {
   const location = useLocation();
@@ -129,6 +130,15 @@ const RequestForm = () => {
 
   const handleSubmit = async () => {
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        console.error("No user is currently logged in.");
+        return;
+      }
+
+      const userId = user.uid; // Get the current user's ID
       const uploadedUrls = [];
 
       // Upload each image to the server
@@ -187,8 +197,8 @@ const RequestForm = () => {
         status: "Pending Approval", // Add status field
       };
 
-      // Add the request data to Firestore
-      await addDoc(collection(db, "requests"), requestData);
+      // Add the request data to Firestore under the user's collection
+      await addDoc(collection(db, "users", userId, "requests"), requestData);
 
       alert("Request submitted successfully!");
     } catch (error) {
@@ -240,7 +250,7 @@ const RequestForm = () => {
                 htmlFor="fullName"
                 className={`absolute transition-all duration-200 pointer-events-none ${
                   focusedFields["fullName"] || formData.customerInfo.fullName
-                    ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                     : "text-gray-500 top-2 left-2 z-0"
                 }`}
               >
@@ -264,7 +274,7 @@ const RequestForm = () => {
                 htmlFor="email"
                 className={`absolute transition-all duration-200 pointer-events-none ${
                   focusedFields["email"] || formData.customerInfo.email
-                    ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                     : "text-gray-500 top-2 left-2 z-0"
                 }`}
               >
@@ -289,7 +299,7 @@ const RequestForm = () => {
                   htmlFor="phone"
                   className={`absolute transition-all duration-200 pointer-events-none ${
                     focusedFields["phone"] || formData.customerInfo.phone
-                      ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                      ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                       : "text-gray-500 top-2 left-2 z-0"
                   }`}
                 >
@@ -313,7 +323,7 @@ const RequestForm = () => {
                   htmlFor="teamName"
                   className={`absolute transition-all duration-200 pointer-events-none ${
                     focusedFields["teamName"] || formData.customerInfo.teamName
-                      ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                      ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                       : "text-gray-500 top-2 left-2 z-0"
                   }`}
                 >
@@ -331,7 +341,10 @@ const RequestForm = () => {
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <span className="text-2xl">📤</span>
+               <span className="text-2xl"><img
+                      src="/upload_ic.svg" 
+                      alt="Upload"
+                    /> </span>
               <p className="text-sm">Upload team logo</p>
             </label>
 
@@ -381,7 +394,7 @@ const RequestForm = () => {
                 htmlFor="productType"
                 className={`absolute transition-all duration-200 pointer-events-none ${
                   focusedFields["productType"] || formData.productType
-                    ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                     : "text-gray-500 top-2 left-2 z-0"
                 }`}
               >
@@ -429,7 +442,7 @@ const RequestForm = () => {
                   htmlFor="cutType"
                   className={`absolute transition-all duration-200 pointer-events-none ${
                     focusedFields["cutType"] || formData.designDetails.cutType
-                      ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                      ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                       : "text-gray-500 top-2 left-2 z-0"
                   }`}
                 >
@@ -473,7 +486,7 @@ const RequestForm = () => {
                 className={`absolute transition-all duration-200 pointer-events-none ${
                   focusedFields["primaryColor"] ||
                   formData.designDetails.primaryColor
-                    ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                     : "text-gray-500 top-2 left-2 z-0"
                 }`}
               >
@@ -500,7 +513,7 @@ const RequestForm = () => {
                 className={`absolute transition-all duration-200 pointer-events-none ${
                   focusedFields["secondaryColor"] ||
                   formData.designDetails.secondaryColor
-                    ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                     : "text-gray-500 top-2 left-2 z-0"
                 }`}
               >
@@ -524,7 +537,7 @@ const RequestForm = () => {
                 htmlFor="pattern"
                 className={`absolute transition-all duration-200 pointer-events-none ${
                   focusedFields["pattern"] || formData.designDetails.pattern
-                    ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                     : "text-gray-500 top-2 left-2 z-0"
                 }`}
               >
@@ -549,7 +562,7 @@ const RequestForm = () => {
                 htmlFor="quantity"
                 className={`absolute transition-all duration-200 pointer-events-none ${
                   focusedFields["quantity"] || formData.designDetails.quantity > 0
-                    ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                     : "text-gray-500 top-2 left-2 z-0"
                 }`}
               >
@@ -595,7 +608,7 @@ const RequestForm = () => {
                         className={`absolute transition-all duration-200 pointer-events-none ${
                           focusedFields[`name-${i}`] ||
                           formData.designDetails.names[i]
-                            ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                            ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                             : "text-gray-500 top-2 left-2 z-0"
                         }`}
                       >
@@ -623,7 +636,7 @@ const RequestForm = () => {
                       className={`absolute transition-all duration-200 pointer-events-none ${
                         focusedFields[`size-${i}`] ||
                         formData.designDetails.sizes[i]
-                          ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                          ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                           : "text-gray-500 top-2 left-2 z-0"
                       }`}
                     >
@@ -668,7 +681,7 @@ const RequestForm = () => {
                 className={`absolute transition-all duration-200 pointer-events-none ${
                   focusedFields["specialInstructions"] ||
                   formData.designDetails.specialInstructions
-                    ? "text-xs text-blue-600 -top-2 left-2 bg-white px-1 z-20"
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
                     : "text-gray-500 top-2 left-2 z-0"
                 }`}
               >

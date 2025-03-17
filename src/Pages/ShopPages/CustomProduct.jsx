@@ -21,6 +21,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { getAuth } from "firebase/auth";
 
 // Mock data for shirt colors
 const shirtColors = [
@@ -434,11 +435,23 @@ const CustomProduct = () => {
     }
   };
 
-  const addToCart = (item) => {
-    // Implement your logic to add the item to the cart
-    // For example, you can use a state or context to manage the cart items
-    // This is a placeholder function
-    console.log("Item added to cart:", item);
+  const addToCart = async (item) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+  
+    if (!user) {
+      console.error("No user is currently logged in.");
+      return;
+    }
+  
+    const userId = user.uid; // Get the current user's ID
+    try {
+      const cartCollectionRef = collection(db, "users", userId, "cart");
+      await addDoc(cartCollectionRef, item);
+      console.log("Item added to cart:", item);
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+    }
   };
 
   const drawDesignElements = async (ctx) => {
