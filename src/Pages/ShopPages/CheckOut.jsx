@@ -38,11 +38,12 @@ const Checkout = () => {
             
             <div className="mb-6">
               <h2 className="text-[34px] font-normal mb-4">Shipping Information</h2>
-              <div className="flex gap-4 mb-4">
-                <label className="border border-gray-300 rounded-md px-4 py-3 flex items-center gap-2 flex-1 cursor-pointer">
+              
+              <div className="flex gap-4 mb-4 w-3/4">
+                <label className="border border-gray-300 rounded-md px-4 py-2 flex items-center gap-2 flex-1 cursor-pointer">
                   <input type="radio" name="shipping" className="w-4 h-4" />
-                  <span className="text-[#817F7F] text-[24px] flex items-center">
-                    <img src="/Delivery_ic.svg" alt="Delivery Icon" className="size-[40px] mr-3" />
+                  <span className="text-[#817F7F] text-[24px] flex items-center font-extralight">
+                    <img src="/Delivery_ic.svg" alt="Delivery Icon" className="size-[30px] mr-4" />
                     Delivery
                   </span>
                 </label>
@@ -50,17 +51,18 @@ const Checkout = () => {
                 <label className="border border-gray-300 rounded-md px-4 py-3 flex items-center gap-2 flex-1 cursor-pointer">
                   <input type="radio" name="shipping" className="w-4 h-4" />
                   <span className="text-[#817F7F] text-[24px] flex items-center font-extralight">
-                    <img src="/Delivery_ic.svg" alt="Delivery Icon" className="size-[40px] mr-3" />
+                    <img src="/Pickup_ic.svg" alt="Delivery Icon" className="size-[30px] mr-4" />
                     Pick Up
                   </span>
                 </label>
+                
               </div>
             </div>
             
             <form>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Full name<span className="text-red-500">*</span>
+                <label className="block text-sm font-normalx mb-1 text-[24px]">
+                  Full name<span className="text-red-500 ">*</span>
                 </label>
                 <input
                   type="text"
@@ -70,7 +72,7 @@ const Checkout = () => {
               </div>
               
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-[24px] font-normal mb-1">
                   Email address<span className="text-red-500">*</span>
                 </label>
                 <input
@@ -81,7 +83,7 @@ const Checkout = () => {
               </div>
               
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-[24px] font-normal mb-1">
                   Phone Number<span className="text-red-500">*</span>
                 </label>
                 <input
@@ -92,7 +94,7 @@ const Checkout = () => {
               </div>
               
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-[24px] font-normal mb-1">
                   Address<span className="text-red-500">*</span>
                 </label>
                 <input
@@ -105,42 +107,44 @@ const Checkout = () => {
               <div className="mb-6">
                 <label className="flex items-center">
                   <input type="checkbox" className="w-4 h-4 mr-2" />
-                  <span>I have read the <a href="#" className="underline">Terms and Conditions</a>.</span>
+                  <span className='text-[24px]'>I have read the <a href="#" className="underline">Terms and Conditions</a>.</span>
                 </label>
               </div>
             </form>
           </div>
           
           {/* Right column - Review Cart */}
-          <div className="w-full md:w-1/2 p-6 mt-6">
-            <h2 className="text-xl font-semibold mb-4">Review your cart</h2>
+          <div className="w-full md:w-1/2 p-6 mt-2">
+            <h2 className="text-[34px] font-semibold mb-4">Review your cart</h2>
             
             <div className="bg-gray-100 rounded-lg p-4 mb-6">
               <img 
                 src="/T-shirt.svg"
                 alt="Amigos Jersey" 
-                className="w-full h-auto mb-4"
+                className="w-full h-100 mb-4"
               />
             </div>
             
             <div className="space-y-2 mb-6">
-              <div className="flex justify-between">
+              <div className="flex justify-between text-[20px]">
                 <span>Subtotal</span>
                 <span>₱450.00</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between text-[20px]">
                 <span>Delivery Fee</span>
                 <span>₱50.00</span>
               </div>
-              <div className="flex justify-between font-semibold text-lg pt-2 border-t border-gray-300 mt-2">
+              <div className="flex justify-between font-semibold text-lg pt-2 border-t border-gray-300 mt-2 text-[20px]">
                 <span>Total</span>
                 <span>₱500.00</span>
               </div>
             </div>
             
-            <button className="w-full bg-black text-white py-3 rounded-md font-medium">
+            <div className="flex justify-center">
+            <button className="w-[382px] bg-black text-white py-3 rounded-xl font-medium text-[25px]">
               Proceed
             </button>
+            </div>
           </div>
         </div>
       </div>
