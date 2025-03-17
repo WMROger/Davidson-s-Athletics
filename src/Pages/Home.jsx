@@ -183,12 +183,12 @@ const Home = () => {
                         {faq.question}
                       </span>
                       <span className="transition-transform duration-300 ease-in-out">
-  <ChevronDown 
-    className={`w-6 h-6 transition-transform duration-300 ${
-      openIndex === index ? "transform rotate-180" : ""
-    }`} 
-  />
-</span>
+                    <ChevronDown 
+                      className={`w-6 h-6 transition-transform duration-300 ${
+                        openIndex === index ? "transform rotate-180" : ""
+                      }`} 
+                    />
+                  </span>
                     </button>
                     <div 
                       className={`transition-all duration-700 ease-in-out overflow-hidden ${

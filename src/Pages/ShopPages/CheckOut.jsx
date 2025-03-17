@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-const CheckOut = () => {
+const Checkout = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -148,4 +148,4 @@ const CheckOut = () => {
   );
 };
 
-export default CheckOut;
+export default Checkout;

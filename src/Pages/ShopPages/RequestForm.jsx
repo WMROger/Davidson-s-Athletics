@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { db } from "../../Database/firebase"; // Ensure correct path
-import { collection, addDoc, runTransaction, doc } from "firebase/firestore"; // Import necessary Firestore functions
+import { collection, addDoc, runTransaction, doc, setDoc } from "firebase/firestore"; // Import necessary Firestore functionsunctions
 import { v4 as uuidv4 } from 'uuid'; // Import the uuid library
 import { getAuth } from "firebase/auth";
 
@@ -197,8 +197,8 @@ const RequestForm = () => {
         status: "Pending Approval", // Add status field
       };
 
-      // Add the request data to Firestore under the user's collection
-      await addDoc(collection(db, "users", userId, "requests"), requestData);
+      // Add the request data to Firestore under the user's collection with the newOrderNumber as the document ID with the newOrderNumber as the document ID
+      await setDoc(doc(db, "users", userId, "requests", String(newOrderNumber)), requestData);
 
       alert("Request submitted successfully!");
     } catch (error) {

@@ -45,7 +45,7 @@ const OrderConfirmation = () => {
   };
 
   const handleProceedToCheckout = () => {
-    navigate("ShopPages/Checkout", {
+    navigate("/ShopPages/Checkout", {
       state: {
         selectedColor,
         selectedSize,

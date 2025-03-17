@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { MoreHorizontal, Plus } from "lucide-react"; // Use horizontal meatballs icon and plus icon
 import { db } from "../Database/firebase"; // Adjust the import path if necessary
-import { collection, getDocs, updateDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -20,9 +27,15 @@ export default function AdminDesign() {
       const allRequests = [];
 
       for (const userDoc of usersSnapshot.docs) {
-        const requestsSnapshot = await getDocs(collection(db, "users", userDoc.id, "requests"));
+        const requestsSnapshot = await getDocs(
+          collection(db, "users", userDoc.id, "requests")
+        );
         requestsSnapshot.forEach((requestDoc) => {
-          allRequests.push({ id: requestDoc.id, userId: userDoc.id, ...requestDoc.data() });
+          allRequests.push({
+            id: requestDoc.id,
+            userId: userDoc.id,
+            ...requestDoc.data(),
+          });
         });
       }
 
@@ -35,8 +48,14 @@ export default function AdminDesign() {
   const updateStatus = async (userId, docId, newStatus) => {
     try {
       console.log("Updating status for:", { userId, docId, newStatus });
-      const assetDoc = doc(db, "users", String(userId), "requests", String(docId));
-      
+      const assetDoc = doc(
+        db,
+        "users",
+        String(userId),
+        "requests",
+        String(docId)
+      );
+
       // Check if the document exists
       const assetDocSnapshot = await getDoc(assetDoc);
       if (!assetDocSnapshot.exists()) {
@@ -58,9 +77,17 @@ export default function AdminDesign() {
 
   const deleteAsset = async (userId, requestId) => {
     try {
-      const assetDoc = doc(db, "users", String(userId), "requests", String(requestId));
+      const assetDoc = doc(
+        db,
+        "users",
+        String(userId),
+        "requests",
+        String(requestId)
+      );
       await deleteDoc(assetDoc);
-      setAssets((prev) => prev.filter((asset) => asset.id !== String(requestId)));
+      setAssets((prev) =>
+        prev.filter((asset) => asset.id !== String(requestId))
+      );
       console.log("Asset deleted successfully");
     } catch (error) {
       console.error("Error deleting asset: ", error);
@@ -77,14 +104,26 @@ export default function AdminDesign() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const pendingAssets = assets.filter(asset => asset.status === "Pending Approval");
-  const historyAssets = assets.filter(asset => asset.status !== "Pending Approval" && (filterStatus === "All" || asset.status === filterStatus));
+  const pendingAssets = assets.filter(
+    (asset) => asset.status === "Pending Approval"
+  );
+  const historyAssets = assets.filter(
+    (asset) =>
+      asset.status !== "Pending Approval" &&
+      (filterStatus === "All" || asset.status === filterStatus)
+  );
 
   const pendingPageCount = Math.ceil(pendingAssets.length / ITEMS_PER_PAGE);
   const historyPageCount = Math.ceil(historyAssets.length / ITEMS_PER_PAGE);
 
-  const paginatedPendingAssets = pendingAssets.slice((currentPendingPage - 1) * ITEMS_PER_PAGE, currentPendingPage * ITEMS_PER_PAGE);
-  const paginatedHistoryAssets = historyAssets.slice((currentHistoryPage - 1) * ITEMS_PER_PAGE, currentHistoryPage * ITEMS_PER_PAGE);
+  const paginatedPendingAssets = pendingAssets.slice(
+    (currentPendingPage - 1) * ITEMS_PER_PAGE,
+    currentPendingPage * ITEMS_PER_PAGE
+  );
+  const paginatedHistoryAssets = historyAssets.slice(
+    (currentHistoryPage - 1) * ITEMS_PER_PAGE,
+    currentHistoryPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="relative p-6">
@@ -93,7 +132,9 @@ export default function AdminDesign() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-4xl font-semibold">
           Pending Designs{" "}
-          <span className="text-gray-600 font-normal ml-6">({pendingAssets.length})</span>
+          <span className="text-gray-600 font-normal ml-6">
+            ({pendingAssets.length})
+          </span>
         </h2>
       </div>
 
@@ -112,8 +153,15 @@ export default function AdminDesign() {
               <tr key={asset.id} className="text-left border-b">
                 <td className="p-2 pl-6">
                   <div className="flex flex-col">
-                    <p className="font-semibold">Order #{(currentPendingPage - 1) * ITEMS_PER_PAGE + index + 1}</p> {/* Display the readable order number */}
-                    <p className="font-semibold mt-1">{asset.customerInfo.fullName}</p> {/* Add margin-top to create a small gap */}
+                    <p className="font-semibold">
+                      Order #
+                      {(currentPendingPage - 1) * ITEMS_PER_PAGE + index + 1}
+                    </p>{" "}
+                    {/* Display the readable order number */}
+                    <p className="font-semibold mt-1">
+                      {asset.customerInfo.fullName}
+                    </p>{" "}
+                    {/* Add margin-top to create a small gap */}
                     <p className="text-sm text-gray-500">
                       {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
                     </p>
@@ -141,16 +189,20 @@ export default function AdminDesign() {
                     View File
                   </a>
                 </td>
-                <td className="p-2 flex items-center justify-center relative">
+                <td className="p-2 py-5 px-5 items-center relative flex justify-end">
                   <button
                     className="px-4 py-2 text-green-600 rounded hover:bg-green-300 mr-2"
-                    onClick={() => updateStatus(asset.userId, asset.id, "Approved")}
+                    onClick={() =>
+                      updateStatus(asset.userId, asset.id, "Approved")
+                    }
                   >
                     Approve
                   </button>
                   <button
                     className="px-4 py-2 text-red-600 rounded hover:bg-red-300 mr-2"
-                    onClick={() => updateStatus(asset.userId, asset.id, "Denied")}
+                    onClick={() =>
+                      updateStatus(asset.userId, asset.id, "Denied")
+                    }
                   >
                     Deny
                   </button>
@@ -161,7 +213,9 @@ export default function AdminDesign() {
                       className="p-2 rounded-full hover:bg-gray-200"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenMenuId(openMenuId === asset.id ? null : asset.id);
+                        setOpenMenuId(
+                          openMenuId === asset.id ? null : asset.id
+                        );
                       }}
                     >
                       <MoreHorizontal className="w-7 h-7 text-gray-600" />
@@ -222,7 +276,7 @@ export default function AdminDesign() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-left text-gray-600 border-b">
-              <th className="p-2 pl-6 ">Name & Date</th>
+              <th className="p-2 pl-6">Name & Date</th>
               <th className="p-2 ">Status</th>
               <th className="p-2 ">File</th>
               <th className="p-2 "></th>
@@ -233,8 +287,15 @@ export default function AdminDesign() {
               <tr key={asset.id} className="text-left border-b">
                 <td className="p-2 pl-6">
                   <div className="flex flex-col">
-                    <p className="font-semibold">Order #{(currentHistoryPage - 1) * ITEMS_PER_PAGE + index + 1}</p> {/* Display the readable order number */}
-                    <p className="font-semibold mt-1">{asset.customerInfo.fullName}</p> {/* Add margin-top to create a small gap */}
+                    <p className="font-semibold">
+                      Order #
+                      {(currentHistoryPage - 1) * ITEMS_PER_PAGE + index + 1}
+                    </p>{" "}
+                    {/* Display the readable order number */}
+                    <p className="font-semibold mt-1">
+                      {asset.customerInfo.fullName}
+                    </p>{" "}
+                    {/* Add margin-top to create a small gap */}
                     <p className="text-sm text-gray-500">
                       {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
                     </p>
@@ -262,27 +323,15 @@ export default function AdminDesign() {
                     View File
                   </a>
                 </td>
-                <td className="p-2 flex items-center justify-center relative">
-                  <button
-                    className="px-4 py-2 text-green-600 rounded hover:bg-green-300 mr-2"
-                    onClick={() => updateStatus(asset.userId, asset.id, "Approved")}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    className="px-4 py-2 text-red-600 rounded hover:bg-red-300 mr-2"
-                    onClick={() => updateStatus(asset.userId, asset.id, "Denied")}
-                  >
-                    Deny
-                  </button>
-                </td>
                 <td>
                   <div className="relative menu-container">
                     <button
                       className="p-2 rounded-full hover:bg-gray-200"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenMenuId(openMenuId === asset.id ? null : asset.id);
+                        setOpenMenuId(
+                          openMenuId === asset.id ? null : asset.id
+                        );
                       }}
                     >
                       <MoreHorizontal className="w-7 h-7 text-gray-600" />
@@ -326,27 +375,76 @@ export default function AdminDesign() {
 
       {selectedAsset && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2"> {/* Adjusted width to 1/2 */}
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
             <h2 className="text-2xl font-semibold mb-4">Asset Details</h2>
             <div className="flex">
-              <img src={selectedAsset.imageUrls[0]} alt="Asset" className="w-1/2 h-auto mr-4" />
+              <img
+                src={selectedAsset.imageUrls[0]}
+                alt="Asset"
+                className="w-1/2 h-auto mr-4"
+              />
               <div className="w-1/2">
-                <p><strong>Order:</strong> #{(currentPendingPage - 1) * ITEMS_PER_PAGE + assets.indexOf(selectedAsset) + 1}</p>
-                <p><strong>Name:</strong> {selectedAsset.customerInfo.fullName}</p>
-                <p><strong>Email:</strong> {selectedAsset.customerInfo.email}</p>
-                <p><strong>Phone:</strong> {selectedAsset.customerInfo.phone}</p>
-                <p><strong>Team Name:</strong> {selectedAsset.customerInfo.teamName}</p>
-                <p><strong>Date:</strong> {format(selectedAsset.timestamp.toDate(), "MMM dd, yyyy")}</p>
-                <p><strong>Status:</strong> {selectedAsset.status}</p>
-                <p><strong>Product Type:</strong> {selectedAsset.productType}</p>
-                <p><strong>Cut Type:</strong> {selectedAsset.designDetails.cutType}</p>
-                <p><strong>Pattern:</strong> {selectedAsset.designDetails.pattern}</p>
-                <p><strong>Primary Color:</strong> {selectedAsset.designDetails.primaryColor}</p>
-                <p><strong>Secondary Color:</strong> {selectedAsset.designDetails.secondaryColor}</p>
-                <p><strong>Quantity:</strong> {selectedAsset.designDetails.quantity}</p>
-                <p><strong>Sizes:</strong> {selectedAsset.designDetails.sizes.join(", ")}</p>
-                <p><strong>Special Instructions:</strong> {selectedAsset.designDetails.specialInstructions}</p>
-                <p><strong>Names:</strong> {selectedAsset.designDetails.names.join(", ")}</p>
+                <p>
+                  <strong>Order:</strong> #
+                  {(currentPendingPage - 1) * ITEMS_PER_PAGE +
+                    assets.indexOf(selectedAsset) +
+                    1}
+                </p>
+                <p>
+                  <strong>Name:</strong> {selectedAsset.customerInfo.fullName}
+                </p>
+                <p>
+                  <strong>Email:</strong> {selectedAsset.customerInfo.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {selectedAsset.customerInfo.phone}
+                </p>
+                <p>
+                  <strong>Team Name:</strong>{" "}
+                  {selectedAsset.customerInfo.teamName}
+                </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {format(selectedAsset.timestamp.toDate(), "MMM dd, yyyy")}
+                </p>
+                <p>
+                  <strong>Status:</strong> {selectedAsset.status}
+                </p>
+                <p>
+                  <strong>Product Type:</strong> {selectedAsset.productType}
+                </p>
+                <p>
+                  <strong>Cut Type:</strong>{" "}
+                  {selectedAsset.designDetails.cutType}
+                </p>
+                <p>
+                  <strong>Pattern:</strong>{" "}
+                  {selectedAsset.designDetails.pattern}
+                </p>
+                <p>
+                  <strong>Primary Color:</strong>{" "}
+                  {selectedAsset.designDetails.primaryColor}
+                </p>
+                <p>
+                  <strong>Secondary Color:</strong>{" "}
+                  {selectedAsset.designDetails.secondaryColor}
+                </p>
+                <p>
+                  <strong>Quantity:</strong>{" "}
+                  {selectedAsset.designDetails.quantity}
+                </p>
+                <p>
+                  <strong>Sizes:</strong>{" "}
+                  {selectedAsset.designDetails.sizes.join(", ")}
+                </p>
+                <p>
+                  <strong>Special Instructions:</strong>{" "}
+                  {selectedAsset.designDetails.specialInstructions}
+                </p>
+                <p>
+                  <strong>Names:</strong>{" "}
+                  {selectedAsset.designDetails.names.join(", ")}
+                </p>
               </div>
             </div>
             <button
