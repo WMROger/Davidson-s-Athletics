@@ -84,7 +84,7 @@ const Shop = () => {
 
   return (
     <div className="w-full">
-      <div className="w-full mt-30 h-30 bg-black"></div>
+      <div className="w-full mt-30 h-20 bg-black"></div>
       <div className="container mx-auto p-4 flex bg-white">
         <aside className="w-1/4 mt-5 p-4 border-r">
           <h2 className="text-2xl font-bold">Shirts</h2>

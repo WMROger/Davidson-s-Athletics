@@ -64,12 +64,12 @@ const OrderConfirmation = () => {
         <div className="flex justify-end items-center gap-4 mb-16">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center text-xl font-medium">1</div>
-            <span className="ml-4 text-2xl font-medium">Review</span>
+            <span className="ml-2 text-2xl font-medium">Review</span>
           </div>
           <div className="w-32 h-px bg-gray-300"></div>
           <div className="flex items-center">
             <div className="w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center text-xl font-medium">2</div>
-            <span className="ml-4 text-2xl font-medium">Checkout</span>
+            <span className="ml-2 text-base font-medium">Checkout</span>
           </div>
         </div>
         <div className="text-center mb-12">
