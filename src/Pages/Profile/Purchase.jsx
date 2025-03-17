@@ -51,7 +51,7 @@ const Purchase = () => {
             <div className="flex justify-between items-center px-8 py-6 border-b">
               <div className="flex-1"></div>
               <div className="flex items-center">
-                <span className="text-lg font-medium border-r pr-6 mr-6">Item is on its way</span>
+                <span className="text- font-medium border-r pr-6 mr-6">Item is on its way</span>
 
                 <span className="text-blue-500 text-xl">To Receive</span>
               </div>

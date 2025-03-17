@@ -19,7 +19,8 @@ import CustomProduct from "./Pages/ShopPages/CustomProduct";
 import ProfilePage from "./Pages/Profile/ProfilePage";
 import ProfileSidebar from "./Pages/Profile/ProfileSidebar";
 import Purchase from "./Pages/Profile/Purchase";
-import Checkout from "./Pages/ShopPages/Checkout"; // Import the Checkout component
+import Checkout from "./Pages/ShopPages/CheckOut"; // Import the Checkout component
+import PaymentPage from "./Pages/ShopPages/PaymentPage";
 
 function App() {
   return (
@@ -164,7 +165,19 @@ function App() {
             </>
           }
         />
+
+<       Route
+          path="/ShopPages/PaymentPage"
+          element={
+            <>
+              <Navbar />
+              <PaymentPage />
+            </>
+          }
+        />
       </Routes>
+
+      
     </div>
   );
 }

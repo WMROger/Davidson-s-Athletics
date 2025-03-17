@@ -1,7 +1,14 @@
 import React from 'react';
 import { Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Checkout = () => {
+  const navigate = useNavigate();
+
+  const handleProceed = () => {
+    navigate('/ShopPages/PaymentPage');
+  };
+
   return (
     <div className="min-h-screen bg-white mt-30">
       {/* Header */}
@@ -137,7 +144,10 @@ const Checkout = () => {
             </div>
             
             <div className="flex justify-center">
-              <button className="w-full md:w-3/4 lg:w-4/5 bg-black text-white py-2 md:py-3 rounded-xl font-medium text-base md:text-lg">
+              <button 
+                className="w-full md:w-3/4 lg:w-4/5 bg-black text-white py-2 md:py-3 rounded-xl font-medium text-base md:text-lg"
+                onClick={handleProceed}
+              >
                 Proceed
               </button>
             </div>
