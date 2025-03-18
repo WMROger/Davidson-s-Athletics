@@ -438,7 +438,7 @@ const OrdersManagement = () => {
                       <td className="px-4 py-3">
                         <div className="flex items-center">
                           <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden mr-2">
-                            <img src="/api/placeholder/32/32" alt="User" className="h-8 w-8 object-cover" />
+                            <img src="../public/Icons/calendar.svg" alt="User" className="h-8 w-8 object-cover" />
                           </div>
                           <span className="text-sm">{order.customer}</span>
                         </div>

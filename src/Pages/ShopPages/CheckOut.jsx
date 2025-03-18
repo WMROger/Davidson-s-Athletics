@@ -48,16 +48,16 @@ const Checkout = () => {
 
   const handleProceed = () => {
     // Navigate to payment page with selectedItems and formData
-    navigate('/ShopPages/PaymentPage', { state: { selectedItems, formData, subtotal, deliveryFee, total } });
+    navigate('/ShopPages/PaymentPage', { state: { selectedItems, formData, subtotal, deliveryFee, total, shippingMethod: formData.shippingMethod } });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsProcessing(true);
     setErrorMessage("");
-  
+
     // Navigate to payment page with selectedItems and formData
-    navigate('/ShopPages/PaymentPage', { state: { selectedItems, formData, subtotal, deliveryFee, total } });
+    navigate('/ShopPages/PaymentPage', { state: { selectedItems, formData, subtotal, deliveryFee, total, shippingMethod: formData.shippingMethod } });
   };
 
   const deliveryFee = 50; // Example delivery fee
