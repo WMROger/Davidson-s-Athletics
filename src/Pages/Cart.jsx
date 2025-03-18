@@ -11,10 +11,11 @@ import {
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
+// Fetch Request Data Function
 const fetchRequestData = async () => {
   const userId = "aulIj4vUZKVgqkO8HgkUfzxgNlZ2";
   const requestId = "14";
-  const docRef = doc(db, `users/${userId}/requests`, requestId);
+  const docRef = doc(db, "users", userId, "requests", String(requestId));
 
   try {
     const docSnap = await getDoc(docRef);
@@ -55,7 +56,12 @@ const Cart = () => {
 
     const fetchRequests = async (userId) => {
       try {
-        const requestsCollectionRef = collection(db, "users", userId, "requests");
+        const requestsCollectionRef = collection(
+          db,
+          "users",
+          userId,
+          "requests"
+        );
         const snapshot = await getDocs(requestsCollectionRef);
         const requestsData = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -154,6 +160,36 @@ const Cart = () => {
   // Handle Checkout
   const handleCheckout = () => {
     navigate("/ShopPages/Checkout", { state: { selectedItems } });
+  };
+
+  const updateRequestQuantity = (requestId, change) => {
+    setRequests((prevRequests) =>
+      prevRequests.map((request) =>
+        request.id === requestId
+          ? {
+              ...request,
+              quantity: Math.max(1, (request.quantity || 1) + change), // Default to 1 if quantity is not set
+            }
+          : request
+      )
+    );
+  };
+
+  // Remove Request from Firestore
+  const removeRequest = async (requestId) => {
+    const userId = getAuth().currentUser.uid; // Get current user's ID
+    try {
+      const requestIdStr = String(requestId); // Ensure requestId is a string
+      console.log("Removing request with ID:", requestIdStr); // Log for debugging
+
+      const docRef = doc(db, "users", userId, "requests", requestIdStr);
+      await deleteDoc(docRef); // Remove the document from Firestore
+      setRequests((prevRequests) =>
+        prevRequests.filter((request) => request.id !== requestIdStr)
+      ); // Update local state
+    } catch (error) {
+      console.error("Error removing request:", error);
+    }
   };
 
   return (
@@ -261,46 +297,102 @@ const Cart = () => {
             requests.map((request) => (
               <div
                 key={request.id}
-                className="border rounded-md p-4 mt-4 bg-gray-100"
+                className={`border rounded-md p-4 mt-4 bg-gray-100 ${
+                  request.selected ? "border-blue-500" : "border-gray-300"
+                }`}
               >
-                <h3 className="text-xl font-medium">
-                  {request.customerInfo?.fullName}
-                </h3>
-                <p>Email: {request.customerInfo?.email}</p>
-                <p>Phone: {request.customerInfo?.phone}</p>
-                <p>Team Name: {request.customerInfo?.teamName}</p>
-                <p>Product Type: {request.productType}</p>
-                <p>Status: {request.status}</p>
-                <p>Primary Color: {request.designDetails?.primaryColor}</p>
-                <p>Secondary Color: {request.designDetails?.secondaryColor}</p>
-                <p>Pattern: {request.designDetails?.pattern}</p>
-                <p>Quantity: {request.designDetails?.quantity}</p>
-                <p>Names: {request.designDetails?.names?.join(", ")}</p>
-                <div className="mt-4">
-                  {request.imageUrls?.map((url, index) => (
-                    <img
-                      key={index}
-                      src={url}
-                      alt="Request Design"
-                      className="w-28 h-28 object-cover rounded-md bg-gray-100"
-                    />
-                  ))}
+                {/* Product Row for Request */}
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="checkbox"
+                    checked={request.selected}
+                    onChange={() => toggleSelectItem(request.id)}
+                    className="w-5 h-5"
+                  />
+                  <span className="font-medium">{request.productName}</span>
+                </div>
+
+                {/* Inner Box - Wrapped Inside the Outer Box */}
+                <div className="border rounded-md p-4 bg-white">
+                  <div className="grid grid-cols-5 items-center text-center">
+                    {/* Request Section */}
+                    <div className="col-span-2 flex items-center gap-4">
+                      {request.imageUrls?.map((url, index) => (
+                        <img
+                          key={index}
+                          src={url}
+                          alt="Request Design"
+                          className="w-28 h-28 object-fit rounded-md bg-gray-100"
+                        />
+                      ))}
+                      <div>
+                        <h3 className="text-xl text-left">{request.productName}</h3>
+                      </div>
+                    </div>
+
+                    {/* Quantity and Price for Request */}
+                    <div className="font-medium text-xl">
+                      ₱{(request.price * request.quantity).toFixed(2)}
+                    </div>
+
+                    {/* Quantity Selector for Request */}
+                    <div className="flex justify-center">
+                      <div className="flex items-center border rounded-md w-24 justify-between">
+                        <button
+                          onClick={() => updateRequestQuantity(request.id, -1)}
+                          className="px-2 py-1 border-r hover:bg-gray-200"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="w-8 text-center">{request.quantity}</span>
+                        <button
+                          onClick={() => updateRequestQuantity(request.id, 1)}
+                          className="px-2 py-1 border-l hover:bg-gray-200"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Remove Request Button */}
+                    <button
+                      onClick={() => removeRequest(request.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Remove Request
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
           )}
         </div>
-        {/*  */}
+        {/* Checkout Section */}
+      <div className="w-full h-20">
+        <button
+          onClick={handleCheckout}
+          className="bg-black text-white w-full py-3 text-2xl font-medium"
+        >
+          Proceed to Checkout
+        </button>
+      </div>
+      </div>
 
-        {/* Checkout Button */}
-        <div className="flex justify-end mt-8">
-          <button
-            onClick={handleCheckout}
-            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            disabled={selectedItems.length === 0}
-          >
-            Checkout
-          </button>
+      
+      {/* Footer */}
+      <div className="w-full py-20 px-10 bg-gray-800 mt-12">
+        <div className="container mx-auto text-white">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-lg font-bold">Davidson Athletics</h3>
+              <p className="text-sm mt-2">© 2025 Davidson Athletics. All rights reserved.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">Contact Us</h3>
+              <p className="text-sm mt-2">Email: support@davidsonathletics.com</p>
+              <p className="text-sm">Phone: +1 234 567 890</p>
+            </div>
+          </div>
         </div>
       </div>
     </>

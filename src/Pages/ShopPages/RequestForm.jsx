@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { db } from "../../Database/firebase"; // Ensure correct path
-import { collection, addDoc, runTransaction, doc, setDoc } from "firebase/firestore"; // Import necessary Firestore functionsunctions
-import { v4 as uuidv4 } from 'uuid'; // Import the uuid library
+import {
+  collection,
+  addDoc,
+  runTransaction,
+  doc,
+  setDoc,
+} from "firebase/firestore"; // Import necessary Firestore functionsunctions
+import { v4 as uuidv4 } from "uuid"; // Import the uuid library
 import { getAuth } from "firebase/auth";
 import { getFirestore, getDoc } from "firebase/firestore"; // Add this import
 
@@ -144,7 +150,13 @@ const RequestForm = () => {
 
       // Fetch the image URL from Firestore
       const db = getFirestore(); // Ensure getFirestore is imported and used here
-      const requestRef = doc(db, "users", userId, "requests", `request-${Date.now()}`);
+      const requestRef = doc(
+        db,
+        "users",
+        userId,
+        "requests",
+        `request-${Date.now()}`
+      );
       const requestDoc = await getDoc(requestRef);
       if (requestDoc.exists()) {
         const requestData = requestDoc.data();
@@ -155,7 +167,7 @@ const RequestForm = () => {
 
       // Include uploadedImages from state
       uploadedImages.forEach((image) => {
-        if (typeof image === 'string') {
+        if (typeof image === "string") {
           uploadedUrls.push(image);
         }
       });
@@ -174,7 +186,9 @@ const RequestForm = () => {
         const currentOrderNumber = orderCounterDoc.data().currentOrderNumber;
         const newOrderNumber = currentOrderNumber + 1;
 
-        transaction.update(orderCounterRef, { currentOrderNumber: newOrderNumber });
+        transaction.update(orderCounterRef, {
+          currentOrderNumber: newOrderNumber,
+        });
 
         return newOrderNumber;
       });
@@ -191,7 +205,10 @@ const RequestForm = () => {
       };
 
       // Add the request data to Firestore under the user's collection with the newOrderNumber as the document ID
-      await setDoc(doc(db, "users", userId, "requests", String(newOrderNumber)), requestData);
+      await setDoc(
+        doc(db, "users", userId, "requests", String(newOrderNumber)),
+        requestData
+      );
 
       alert("Request submitted successfully!");
     } catch (error) {
@@ -334,10 +351,9 @@ const RequestForm = () => {
                 onChange={handleFileChange}
                 className="hidden"
               />
-               <span className="text-2xl"><img
-                      src="/upload_ic.svg" 
-                      alt="Upload"
-                    /> </span>
+              <span className="text-2xl">
+                <img src="/upload_ic.svg" alt="Upload" />{" "}
+              </span>
               <p className="text-sm">Upload team logo</p>
             </label>
 
@@ -381,327 +397,331 @@ const RequestForm = () => {
 
           {/* Right Column - Design Details */}
           <div className="flex flex-col w-full md:w-1/2 mt-6 md:mt-0 md:pl-4">
-  {/* Conditionally render Product Type */}
-  {!selectedProduct && (
-    <div className="relative mb-4">
-      <select
-        id="productType"
-        value={formData.productType}
-        onChange={(e) =>
-          setFormData({ ...formData, productType: e.target.value })
-        }
-        onFocus={() => handleFocus("productType")}
-        onBlur={(e) => handleBlur("productType", e.target.value)}
-        className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
-      >
-        <option value=""></option>
-        {productTypeOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <label
-        htmlFor="productType"
-        className={`absolute transition-all duration-200 pointer-events-none ${
-          focusedFields["productType"] || formData.productType
-            ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-            : "text-gray-500 top-2 left-2 z-0"
-        }`}
-      >
-        Product Type
-      </label>
-      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-        <svg
-          className="w-4 h-4 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 9l-7 7-7-7"
-          ></path>
-        </svg>
-      </div>
-    </div>
-  )}
+            {/* Conditionally render Product Type */}
+            {!selectedProduct && (
+              <div className="relative mb-4">
+                <select
+                  id="productType"
+                  value={formData.productType}
+                  onChange={(e) =>
+                    setFormData({ ...formData, productType: e.target.value })
+                  }
+                  onFocus={() => handleFocus("productType")}
+                  onBlur={(e) => handleBlur("productType", e.target.value)}
+                  className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
+                >
+                  <option value=""></option>
+                  {productTypeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  htmlFor="productType"
+                  className={`absolute transition-all duration-200 pointer-events-none ${
+                    focusedFields["productType"] || formData.productType
+                      ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                      : "text-gray-500 top-2 left-2 z-0"
+                  }`}
+                >
+                  Product Type
+                </label>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+            )}
 
-  {/* Cut Type - Only shows for Jersey */}
-  {formData.productType === "Jersey" && (
-    <div className="relative mb-4">
-      <select
-        id="cutType"
-        value={formData.designDetails.cutType || ""}
-        onChange={(e) =>
-          handleInputChange(e, "cutType", "designDetails")
-        }
-        onFocus={() => handleFocus("cutType")}
-        onBlur={(e) => handleBlur("cutType", e.target.value)}
-        className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
-      >
-        <option value=""></option>
-        {getCutTypeOptions().map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <label
-        htmlFor="cutType"
-        className={`absolute transition-all duration-200 pointer-events-none ${
-          focusedFields["cutType"] || formData.designDetails.cutType
-            ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-            : "text-gray-500 top-2 left-2 z-0"
-        }`}
-      >
-        Cut Type
-      </label>
-      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-        <svg
-          className="w-4 h-4 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 9l-7 7-7-7"
-          ></path>
-        </svg>
-      </div>
-    </div>
-  )}
+            {/* Cut Type - Only shows for Jersey */}
+            {formData.productType === "Jersey" && (
+              <div className="relative mb-4">
+                <select
+                  id="cutType"
+                  value={formData.designDetails.cutType || ""}
+                  onChange={(e) =>
+                    handleInputChange(e, "cutType", "designDetails")
+                  }
+                  onFocus={() => handleFocus("cutType")}
+                  onBlur={(e) => handleBlur("cutType", e.target.value)}
+                  className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
+                >
+                  <option value=""></option>
+                  {getCutTypeOptions().map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  htmlFor="cutType"
+                  className={`absolute transition-all duration-200 pointer-events-none ${
+                    focusedFields["cutType"] || formData.designDetails.cutType
+                      ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                      : "text-gray-500 top-2 left-2 z-0"
+                  }`}
+                >
+                  Cut Type
+                </label>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+            )}
 
-  {/* Primary Color Field */}
-  <div className="relative mb-4">
-    <input
-      id="primaryColor"
-      type="text"
-      value={formData.designDetails.primaryColor}
-      onChange={(e) =>
-        handleInputChange(e, "primaryColor", "designDetails")
-      }
-      onFocus={() => handleFocus("primaryColor")}
-      onBlur={(e) => handleBlur("primaryColor", e.target.value)}
-      className="border p-2 rounded w-full z-10 relative bg-transparent"
-      placeholder=" "
-    />
-    <label
-      htmlFor="primaryColor"
-      className={`absolute transition-all duration-200 pointer-events-none ${
-        focusedFields["primaryColor"] ||
-        formData.designDetails.primaryColor
-          ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-          : "text-gray-500 top-2 left-2 z-0"
-      }`}
-    >
-      Primary Color
-    </label>
-  </div>
+            {/* Primary Color Field */}
+            <div className="relative mb-4">
+              <input
+                id="primaryColor"
+                type="text"
+                value={formData.designDetails.primaryColor}
+                onChange={(e) =>
+                  handleInputChange(e, "primaryColor", "designDetails")
+                }
+                onFocus={() => handleFocus("primaryColor")}
+                onBlur={(e) => handleBlur("primaryColor", e.target.value)}
+                className="border p-2 rounded w-full z-10 relative bg-transparent"
+                placeholder=" "
+              />
+              <label
+                htmlFor="primaryColor"
+                className={`absolute transition-all duration-200 pointer-events-none ${
+                  focusedFields["primaryColor"] ||
+                  formData.designDetails.primaryColor
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                    : "text-gray-500 top-2 left-2 z-0"
+                }`}
+              >
+                Primary Color
+              </label>
+            </div>
 
-  {/* Secondary Color Field */}
-  <div className="relative mb-4">
-    <input
-      id="secondaryColor"
-      type="text"
-      value={formData.designDetails.secondaryColor}
-      onChange={(e) =>
-        handleInputChange(e, "secondaryColor", "designDetails")
-      }
-      onFocus={() => handleFocus("secondaryColor")}
-      onBlur={(e) => handleBlur("secondaryColor", e.target.value)}
-      className="border p-2 rounded w-full z-10 relative bg-transparent"
-      placeholder=" "
-    />
-    <label
-      htmlFor="secondaryColor"
-      className={`absolute transition-all duration-200 pointer-events-none ${
-        focusedFields["secondaryColor"] ||
-        formData.designDetails.secondaryColor
-          ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-          : "text-gray-500 top-2 left-2 z-0"
-      }`}
-    >
-      Secondary Color
-    </label>
-  </div>
+            {/* Secondary Color Field */}
+            <div className="relative mb-4">
+              <input
+                id="secondaryColor"
+                type="text"
+                value={formData.designDetails.secondaryColor}
+                onChange={(e) =>
+                  handleInputChange(e, "secondaryColor", "designDetails")
+                }
+                onFocus={() => handleFocus("secondaryColor")}
+                onBlur={(e) => handleBlur("secondaryColor", e.target.value)}
+                className="border p-2 rounded w-full z-10 relative bg-transparent"
+                placeholder=" "
+              />
+              <label
+                htmlFor="secondaryColor"
+                className={`absolute transition-all duration-200 pointer-events-none ${
+                  focusedFields["secondaryColor"] ||
+                  formData.designDetails.secondaryColor
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                    : "text-gray-500 top-2 left-2 z-0"
+                }`}
+              >
+                Secondary Color
+              </label>
+            </div>
 
-  {/* Pattern Field */}
-  <div className="relative mb-4">
-    <input
-      id="pattern"
-      type="text"
-      value={formData.designDetails.pattern}
-      onChange={(e) => handleInputChange(e, "pattern", "designDetails")}
-      onFocus={() => handleFocus("pattern")}
-      onBlur={(e) => handleBlur("pattern", e.target.value)}
-      className="border p-2 rounded w-full z-10 relative bg-transparent"
-      placeholder=" "
-    />
-    <label
-      htmlFor="pattern"
-      className={`absolute transition-all duration-200 pointer-events-none ${
-        focusedFields["pattern"] || formData.designDetails.pattern
-          ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-          : "text-gray-500 top-2 left-2 z-0"
-      }`}
-    >
-      Pattern Preference
-    </label>
-  </div>
+            {/* Pattern Field */}
+            <div className="relative mb-4">
+              <input
+                id="pattern"
+                type="text"
+                value={formData.designDetails.pattern}
+                onChange={(e) =>
+                  handleInputChange(e, "pattern", "designDetails")
+                }
+                onFocus={() => handleFocus("pattern")}
+                onBlur={(e) => handleBlur("pattern", e.target.value)}
+                className="border p-2 rounded w-full z-10 relative bg-transparent"
+                placeholder=" "
+              />
+              <label
+                htmlFor="pattern"
+                className={`absolute transition-all duration-200 pointer-events-none ${
+                  focusedFields["pattern"] || formData.designDetails.pattern
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                    : "text-gray-500 top-2 left-2 z-0"
+                }`}
+              >
+                Pattern Preference
+              </label>
+            </div>
 
-  {/* Quantity Field */}
-  <div className="relative mb-4">
-    <input
-      id="quantity"
-      type="number"
-      min="1"
-      value={formData.designDetails.quantity}
-      onChange={handleQuantityChange}
-      onFocus={() => handleFocus("quantity")}
-      onBlur={(e) => handleBlur("quantity", e.target.value)}
-      className="border p-2 rounded w-full z-10 relative bg-transparent"
-      placeholder=" "
-    />
-    <label
-      htmlFor="quantity"
-      className={`absolute transition-all duration-200 pointer-events-none ${
-        focusedFields["quantity"] || formData.designDetails.quantity > 0
-          ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-          : "text-gray-500 top-2 left-2 z-0"
-      }`}
-    >
-      Quantity
-    </label>
-  </div>
+            {/* Quantity Field */}
+            <div className="relative mb-4">
+              <input
+                id="quantity"
+                type="number"
+                min="1"
+                value={formData.designDetails.quantity}
+                onChange={handleQuantityChange}
+                onFocus={() => handleFocus("quantity")}
+                onBlur={(e) => handleBlur("quantity", e.target.value)}
+                className="border p-2 rounded w-full z-10 relative bg-transparent"
+                placeholder=" "
+              />
+              <label
+                htmlFor="quantity"
+                className={`absolute transition-all duration-200 pointer-events-none ${
+                  focusedFields["quantity"] ||
+                  formData.designDetails.quantity > 0
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                    : "text-gray-500 top-2 left-2 z-0"
+                }`}
+              >
+                Quantity
+              </label>
+            </div>
 
-  {/* Add Name Checkbox */}
-  <label className="flex items-center space-x-2 mb-4">
-    <input
-      type="checkbox"
-      checked={formData.designDetails.hasName}
-      onChange={(e) =>
-        setFormData({
-          ...formData,
-          designDetails: {
-            ...formData.designDetails,
-            hasName: e.target.checked,
-          },
-        })
-      }
-      className="w-4 h-4"
-    />
-    <span>Add Name</span>
-  </label>
-
-  {/* Name & Size Fields */}
-  {Array.from({ length: formData.designDetails.quantity }).map(
-    (_, i) => (
-      <div key={i} className="flex space-x-2 mb-2">
-        {formData.designDetails.hasName && (
-          <div className="relative w-1/2">
-            <input
-              type="text"
-              value={formData.designDetails.names[i]}
-              onChange={(e) => handleNameChange(i, e.target.value)}
-              onFocus={() => handleFocus(`name-${i}`)}
-              onBlur={(e) => handleBlur(`name-${i}`, e.target.value)}
-              className="border p-2 rounded w-full z-10 relative bg-transparent"
-              placeholder=" "
-            />
-            <label
-              className={`absolute transition-all duration-200 pointer-events-none ${
-                focusedFields[`name-${i}`] ||
-                formData.designDetails.names[i]
-                  ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-                  : "text-gray-500 top-2 left-2 z-0"
-              }`}
-            >
-              Name {i + 1}
+            {/* Add Name Checkbox */}
+            <label className="flex items-center space-x-2 mb-4">
+              <input
+                type="checkbox"
+                checked={formData.designDetails.hasName}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    designDetails: {
+                      ...formData.designDetails,
+                      hasName: e.target.checked,
+                    },
+                  })
+                }
+                className="w-4 h-4"
+              />
+              <span>Add Name</span>
             </label>
+
+            {/* Name & Size Fields */}
+            {Array.from({ length: formData.designDetails.quantity }).map(
+              (_, i) => (
+                <div key={i} className="flex space-x-2 mb-2">
+                  {formData.designDetails.hasName && (
+                    <div className="relative w-1/2">
+                      <input
+                        type="text"
+                        value={formData.designDetails.names[i]}
+                        onChange={(e) => handleNameChange(i, e.target.value)}
+                        onFocus={() => handleFocus(`name-${i}`)}
+                        onBlur={(e) => handleBlur(`name-${i}`, e.target.value)}
+                        className="border p-2 rounded w-full z-10 relative bg-transparent"
+                        placeholder=" "
+                      />
+                      <label
+                        className={`absolute transition-all duration-200 pointer-events-none ${
+                          focusedFields[`name-${i}`] ||
+                          formData.designDetails.names[i]
+                            ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                            : "text-gray-500 top-2 left-2 z-0"
+                        }`}
+                      >
+                        Name {i + 1}
+                      </label>
+                    </div>
+                  )}
+
+                  <div className="relative w-1/2">
+                    <select
+                      value={formData.designDetails.sizes[i]}
+                      onChange={(e) => handleSizeChange(i, e.target.value)}
+                      onFocus={() => handleFocus(`size-${i}`)}
+                      onBlur={(e) => handleBlur(`size-${i}`, e.target.value)}
+                      className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
+                    >
+                      <option value=""></option>
+                      {sizeOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <label
+                      className={`absolute transition-all duration-200 pointer-events-none ${
+                        focusedFields[`size-${i}`] ||
+                        formData.designDetails.sizes[i]
+                          ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                          : "text-gray-500 top-2 left-2 z-0"
+                      }`}
+                    >
+                      Size {i + 1}
+                    </label>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <svg
+                        className="w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        ></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
+
+            {/* Special Instructions Field */}
+            <div className="relative mb-4">
+              <textarea
+                id="specialInstructions"
+                value={formData.designDetails.specialInstructions}
+                onChange={(e) =>
+                  handleInputChange(e, "specialInstructions", "designDetails")
+                }
+                onFocus={() => handleFocus("specialInstructions")}
+                onBlur={(e) =>
+                  handleBlur("specialInstructions", e.target.value)
+                }
+                className="border p-2 rounded w-full h-24 z-10 relative bg-transparent"
+                placeholder=" "
+              ></textarea>
+              <label
+                htmlFor="specialInstructions"
+                className={`absolute transition-all duration-200 pointer-events-none ${
+                  focusedFields["specialInstructions"] ||
+                  formData.designDetails.specialInstructions
+                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                    : "text-gray-500 top-2 left-2 z-0"
+                }`}
+              >
+                Special Instructions
+              </label>
+            </div>
           </div>
-        )}
-
-        <div className="relative w-1/2">
-          <select
-            value={formData.designDetails.sizes[i]}
-            onChange={(e) => handleSizeChange(i, e.target.value)}
-            onFocus={() => handleFocus(`size-${i}`)}
-            onBlur={(e) => handleBlur(`size-${i}`, e.target.value)}
-            className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
-          >
-            <option value=""></option>
-            {sizeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <label
-            className={`absolute transition-all duration-200 pointer-events-none ${
-              focusedFields[`size-${i}`] ||
-              formData.designDetails.sizes[i]
-                ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-                : "text-gray-500 top-2 left-2 z-0"
-            }`}
-          >
-            Size {i + 1}
-          </label>
-          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 9l-7 7-7-7"
-              ></path>
-            </svg>
-          </div>
-        </div>
-      </div>
-    )
-  )}
-
-  {/* Special Instructions Field */}
-  <div className="relative mb-4">
-    <textarea
-      id="specialInstructions"
-      value={formData.designDetails.specialInstructions}
-      onChange={(e) =>
-        handleInputChange(e, "specialInstructions", "designDetails")
-      }
-      onFocus={() => handleFocus("specialInstructions")}
-      onBlur={(e) => handleBlur("specialInstructions", e.target.value)}
-      className="border p-2 rounded w-full h-24 z-10 relative bg-transparent"
-      placeholder=" "
-    ></textarea>
-    <label
-      htmlFor="specialInstructions"
-      className={`absolute transition-all duration-200 pointer-events-none ${
-        focusedFields["specialInstructions"] ||
-        formData.designDetails.specialInstructions
-          ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-          : "text-gray-500 top-2 left-2 z-0"
-      }`}
-    >
-      Special Instructions
-    </label>
-  </div>
-</div>
-
         </div>
 
         <div className="flex justify-center space-x-6 mt-6">
