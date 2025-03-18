@@ -55,7 +55,7 @@ const shirtCategories = [
     name: "T-Shirt",
     products: [
       { id: "basic-tee", name: "Basic Tee", image: "/T-shirt.svg" },
-      { id: "v-neck", name: "V-Neck", image: "/Home Assets/TShirts/blue shirt.png" },
+      { id: "v-neck", name: "V-Neck", image: "/Home Assets/TShirts/Polo_sample.jpg" },
       { id: "long-sleeve", name: "Long Sleeve", image: "/Home Assets/red shirt.png" },
     ],
   },
@@ -63,8 +63,8 @@ const shirtCategories = [
     id: "polo",
     name: "Polo",
     products: [
-      { id: "classic-polo", name: "Classic Polo", image: "/Home Assets/TShirts/blue shirt.png" },
-      { id: "slim-fit", name: "Slim Fit", image: "/Home Assets/TShirts/another-image.png" },
+      { id: "classic-polo", name: "Polo", image: "/Home Assets/TShirts/blue shirt.png" },
+      { id: "slim-fit", name: "Polo", image: "/Home Assets/TShirts/Polo_sample.jpg" },
       { id: "striped-polo", name: "Striped Polo", image: "/Home Assets/TShirts/yet-another-image.png" },
     ],
   },

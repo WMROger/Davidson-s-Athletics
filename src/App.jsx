@@ -12,6 +12,7 @@ import Dashboard from "./Admin/Dashboard";
 import ManageOrders from "./Admin/ManageOrders";
 import Design from "./Admin/AdminDesign";
 import Assets from "./Admin/Assets";
+import Notification from "./Admin/Notification";
 import CustomizeShirt from "./Pages/ShopPages/CustomizeShirt";
 import RequestForm from "./Pages/ShopPages/RequestForm";
 import OrderConfirmation from "./Pages/ShopPages/OrderConfirmation";
@@ -106,6 +107,7 @@ function App() {
           <Route path="manage-orders" element={<ManageOrders />} />
           <Route path="design" element={<Design />} />
           <Route path="assets" element={<Assets />} />
+          <Route path="notification" element={<Notification />} />
         </Route>
 
         {/* Shop Pages */}

@@ -36,6 +36,8 @@ const Cart = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [requests, setRequests] = useState([]); // Stores user requests
+  const [selectAllProducts, setSelectAllProducts] = useState(false);
+  const [selectAllRequests, setSelectAllRequests] = useState(false);
   const navigate = useNavigate();
   const auth = getAuth();
 
@@ -87,38 +89,57 @@ const Cart = () => {
   }, []);
 
   // Toggle Checkbox Selection
-  const toggleSelectItem = (index) => {
+  const toggleSelectItem = (index, type) => {
     if (index === -1) {
       // Handle "select all" logic
-      const newSelectAll = !selectAll;
-      setSelectAll(newSelectAll);
-      setCartItems((prevCart) =>
-        prevCart.map((item) => ({ ...item, selected: newSelectAll }))
-      );
-      setSelectedItems(newSelectAll ? [...cartItems] : []);
+      if (type === "cart") {
+        const newSelectAll = !selectAllProducts;
+        setSelectAllProducts(newSelectAll);
+        setCartItems((prevCart) =>
+          prevCart.map((item) => ({ ...item, selected: newSelectAll }))
+        );
+        setSelectedItems(newSelectAll ? [...cartItems] : []);
+      } else if (type === "request") {
+        const newSelectAll = !selectAllRequests;
+        setSelectAllRequests(newSelectAll);
+        setRequests((prevRequests) =>
+          prevRequests.map((request) => ({ ...request, selected: newSelectAll }))
+        );
+      }
     } else {
       // Handle individual item selection
-      setCartItems((prevCart) =>
-        prevCart.map((item, i) => {
-          if (i === index) {
-            const updatedItem = { ...item, selected: !item.selected };
-            if (updatedItem.selected) {
-              setSelectedItems((prevSelected) => [
-                ...prevSelected,
-                updatedItem,
-              ]);
-            } else {
-              setSelectedItems((prevSelected) =>
-                prevSelected.filter(
-                  (selectedItem) => selectedItem.id !== updatedItem.id
-                )
-              );
+      if (type === "cart") {
+        setCartItems((prevCart) =>
+          prevCart.map((item, i) => {
+            if (i === index) {
+              const updatedItem = { ...item, selected: !item.selected };
+              if (updatedItem.selected) {
+                setSelectedItems((prevSelected) => [
+                  ...prevSelected,
+                  updatedItem,
+                ]);
+              } else {
+                setSelectedItems((prevSelected) =>
+                  prevSelected.filter(
+                    (selectedItem) => selectedItem.id !== updatedItem.id
+                  )
+                );
+              }
+              return updatedItem;
             }
-            return updatedItem;
-          }
-          return item;
-        })
-      );
+            return item;
+          })
+        );
+      } else if (type === "request") {
+        setRequests((prevRequests) =>
+          prevRequests.map((request, i) => {
+            if (i === index) {
+              return { ...request, selected: !request.selected };
+            }
+            return request;
+          })
+        );
+      }
     }
   };
 
@@ -159,6 +180,10 @@ const Cart = () => {
 
   // Handle Checkout
   const handleCheckout = () => {
+    const selectedItems = [
+      ...cartItems.filter(item => item.selected),
+      ...requests.filter(request => request.selected)
+    ];
     navigate("/ShopPages/Checkout", { state: { selectedItems } });
   };
 
@@ -205,8 +230,8 @@ const Cart = () => {
             <input
               type="checkbox"
               className="w-5 h-5"
-              checked={selectAll}
-              onChange={() => toggleSelectItem(-1)}
+              checked={selectAllProducts}
+              onChange={() => toggleSelectItem(-1, "cart")}
             />
             <span>Product</span>
           </div>
@@ -228,7 +253,7 @@ const Cart = () => {
               <input
                 type="checkbox"
                 checked={item.selected}
-                onChange={() => toggleSelectItem(index)}
+                onChange={() => toggleSelectItem(index, "cart")}
                 className="w-5 h-5"
               />
               <span className="font-medium">{item.productName}</span>
@@ -291,10 +316,19 @@ const Cart = () => {
         {/* Requests */}
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Requests</h2>
+          <div className="flex items-center gap-2 mb-2">
+            <input
+              type="checkbox"
+              className="w-5 h-5"
+              checked={selectAllRequests}
+              onChange={() => toggleSelectItem(-1, "request")}
+            />
+            <span>Select All Requests</span>
+          </div>
           {requests.length === 0 ? (
-            <p className="text-gray-500">No requests found.</p> // ✅ Show a message if empty
+            <p className="text-gray-500">No requests found.</p>
           ) : (
-            requests.map((request) => (
+            requests.map((request, index) => (
               <div
                 key={request.id}
                 className={`border rounded-md p-4 mt-4 bg-gray-100 ${
@@ -306,7 +340,7 @@ const Cart = () => {
                   <input
                     type="checkbox"
                     checked={request.selected}
-                    onChange={() => toggleSelectItem(request.id)}
+                    onChange={() => toggleSelectItem(index, "request")}
                     className="w-5 h-5"
                   />
                   <span className="font-medium">{request.productName}</span>
@@ -327,12 +361,15 @@ const Cart = () => {
                       ))}
                       <div>
                         <h3 className="text-xl text-left">{request.productName}</h3>
+                        <p className="text-gray-500 text-left text-xl">
+                          Variations: {request.size || "Default Size"}
+                        </p>
                       </div>
                     </div>
 
                     {/* Quantity and Price for Request */}
                     <div className="font-medium text-xl">
-                      ₱{(request.price * request.quantity).toFixed(2)}
+                      ₱{((request.price || 380) * (request.quantity || 1)).toFixed(2)}
                     </div>
 
                     {/* Quantity Selector for Request */}
@@ -344,7 +381,7 @@ const Cart = () => {
                         >
                           <Minus className="w-4 h-4" />
                         </button>
-                        <span className="w-8 text-center">{request.quantity}</span>
+                        <span className="w-8 text-center">{request.quantity || 1}</span>
                         <button
                           onClick={() => updateRequestQuantity(request.id, 1)}
                           className="px-2 py-1 border-l hover:bg-gray-200"

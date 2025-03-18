@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ChevronDown, Star } from 'lucide-react';
 
-const NotificationsPage = () => {
+const Notification = () => {
   const [notifications, setNotifications] = useState([
     { id: 1, source: 'System', message: 'Your product is on its way. Please ready the payment before receiving the product.', date: 'Feb 21', starred: false },
     { id: 2, source: 'System', message: 'Your product is on its way. Please ready the payment before receiving the product.', date: 'Feb 21', starred: false },
@@ -114,4 +114,4 @@ const NotificationsPage = () => {
   );
 };
 
-export default NotificationsPage;
+export default Notification;
