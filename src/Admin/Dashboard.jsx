@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,18 +9,13 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../Database/firebase";
 import Card from "../DashboardCards/Card";
 import CardContent from "../DashboardCards/CardContent";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-const ordersData = [
-  { id: 1, product: "Jersey", type: "Sleeveless", price: "₱350", status: "Pending", image: "/T-shirt.svg" },
-  { id: 2, product: "Hoodie", type: "Long Sleeves", price: "₱450", status: "Processing" },
-  { id: 3, product: "T-Shirt", type: "Short Sleeves", price: "₱350", status: "Shipped" },
-  { id: 4, product: "Tracksuit", type: "Uniform", price: "₱400", status: "Cancelled" },
-];
 
 const statusColors = {
   Pending: "bg-yellow-500",
@@ -31,20 +26,44 @@ const statusColors = {
 };
 
 const Dashboard = () => {
+  const [ordersData, setOrdersData] = useState([]);
   const [statusFilter, setStatusFilter] = useState("All Orders");
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const querySnapshot = await getDocs(collection(db, "orders"));
+      const orders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setOrdersData(orders);
+    };
+
+    fetchOrders();
+  }, []);
 
   const filteredOrders =
     statusFilter === "All Orders"
       ? ordersData
       : ordersData.filter((order) => order.status === statusFilter);
 
-  // Sample data for Bar Chart (Monthly Sales)
+  // Filter paid orders
+  const paidOrders = ordersData.filter(order => order.receiptFile);
+
+  // Calculate monthly sales
+  const monthlySales = Array(12).fill(0);
+  paidOrders.forEach(order => {
+    const month = new Date(order.createdAt.toDate()).getMonth();
+    monthlySales[month] += order.total;
+  });
+
+  // Calculate annual sales
+  const annualSales = monthlySales.reduce((acc, curr) => acc + curr, 0);
+
+  // Data for Bar Chart (Monthly Sales)
   const salesData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
         label: "Monthly Sales (₱)",
-        data: [5000, 8000, 7500, 9000, 12000, 11000, 9500, 10000, 8500, 13000, 14000, 15000],
+        data: monthlySales,
         backgroundColor: "#FF9800",
         borderRadius: 10,
         barThickness: 30, // Adjusted for better visibility
@@ -79,7 +98,6 @@ const Dashboard = () => {
   };
 
   return (
-
     <div className="py-6 px-3 space-y-6">
       <h2 className="text-6xl font-bold">Overview</h2>
 
@@ -90,13 +108,13 @@ const Dashboard = () => {
             <Card className="bg-[url('/background.svg ')] bg-cover bg-center text-white ">
               <CardContent>
                 <h2 className="text-2xl font-semibold mb-4">Annual Sales</h2>
-                <p className="text-5xl font-bold">₱500,000</p>
+                <p className="text-5xl font-bold">₱{annualSales.toLocaleString()}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent>
                 <h2 className="text-2xl font-semibold mb-4">Monthly Sales</h2>
-                <p className="text-5xl font-bold">₱40,000</p>
+                <p className="text-5xl font-bold">₱{monthlySales[new Date().getMonth()].toLocaleString()}</p>
               </CardContent>
             </Card>
           </div>
@@ -153,38 +171,40 @@ const Dashboard = () => {
                     </tr>
                   </thead>
 
-                  
                   <tbody>
-                      {filteredOrders.length > 0 ? (
-                        filteredOrders.map((order, index) => (
-                          <tr key={order.id} className={`${index % 2 === 0 ? "bg-white" : ""}`}>
-                            {/* Product Column - Image, Name & Quantity */}
-                            <td className="p-3 flex items-center space-x-4">
-                              <img src={order.image} alt={order.product} className="w-14 h-14 object-fill rounded-md" />
-                              <div>
-                                <p className="font-semibold">{order.product}</p>
-                                <p className="text-sm text-gray-500">Quantity: {order.quantity}</p>
+                    {filteredOrders.length > 0 ? (
+                      filteredOrders.map((order, index) => (
+                        <tr key={order.id} className={`${index % 2 === 0 ? "bg-white" : ""}`}>
+                          {/* Product Column - Image, Name & Quantity */}
+                          <td className="p-3">
+                            {order.selectedItems.map((item, i) => (
+                              <div key={i} className="flex items-center space-x-4 mb-2">
+                                <img src={item.imageUrl} alt={item.productName} className="w-14 h-14 object-fill rounded-md" />
+                                <div>
+                                  <p className="font-semibold">{item.productName}</p>
+                                  <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                                </div>
                               </div>
-                            </td>
+                            ))}
+                          </td>
 
-                            <td className="p-3">{order.type}</td>
-                            <td className="p-3">{order.price}</td>
-                            <td className="p-3">
-                              <span className={`px-3 py-1 text-white text-sm rounded-full ${statusColors[order.status]}`}>
-                                {order.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td className="p-4 text-center" colSpan="4">
-                            No orders found
+                          <td className="p-3">{order.shippingMethod}</td>
+                          <td className="p-3">₱{order.total}</td>
+                          <td className="p-3">
+                            <span className={`px-3 py-1 text-white text-sm rounded-full ${statusColors[order.status]}`}>
+                              {order.status}
+                            </span>
                           </td>
                         </tr>
-                      )}
-                    </tbody>
-
+                      ))
+                    ) : (
+                      <tr>
+                        <td className="p-4 text-center" colSpan="4">
+                          No orders found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
                 </table>
               </div>
             </CardContent>

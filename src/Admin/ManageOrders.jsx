@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, MoreHorizontal, Check, X, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { db } from '../Database/firebase'; // Ensure correct path
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 
 const OrdersManagement = () => {
   const [selectedOrders, setSelectedOrders] = useState([]);
@@ -11,40 +11,37 @@ const OrdersManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [allOrders, setAllOrders] = useState([]);
-
-  // Dropdown state management
   const [openDropdown, setOpenDropdown] = useState(null);
-  
-  // Refs for dropdown elements
+  const [dropdownOrderId, setDropdownOrderId] = useState(null);
+
   const typeDropdownRef = useRef(null);
   const statusDropdownRef = useRef(null);
   const dateDropdownRef = useRef(null);
   const uniqueDates = allOrders.length > 0 ? [...new Set(allOrders.map(order => order.date))] : [];
   const itemsPerPage = 7;
-  
-  // Handle outside click to close dropdowns
+
   useEffect(() => {
     const fetchOrders = async () => {
-      try {
-        const ordersCollection = collection(db, 'orders');
-        const ordersSnapshot = await getDocs(ordersCollection);
-        const ordersList = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setAllOrders(ordersList);
-      } catch (error) {
-        console.error("Error fetching orders: ", error);
-      }
+      const querySnapshot = await getDocs(collection(db, "orders"));
+      const orders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setAllOrders(orders);
     };
-  
+
     fetchOrders();
   }, []);
-  
-  // Toggle dropdown function
-  const toggleDropdown = (dropdown) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+
+  const toggleDropdown = (orderId) => {
+    setDropdownOrderId(orderId);
+    setOpenDropdown(openDropdown === orderId ? null : orderId);
   };
 
+  const handleStatusChange = async (orderId, newStatus) => {
+    const orderDoc = doc(db, "orders", orderId);
+    await updateDoc(orderDoc, { status: newStatus });
+    setAllOrders(allOrders.map(order => order.id === orderId ? { ...order, status: newStatus } : order));
+    setOpenDropdown(null);
+  };
 
-  // Filter orders based on selected filters
   const filteredOrders = Array.isArray(allOrders) ? allOrders.filter(order => {
     return (
       (typeFilter === '' || order.type === typeFilter) &&
@@ -56,20 +53,17 @@ const OrdersManagement = () => {
     );
   }) : [];
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
   const orders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
 
-  // Handle filter changes
   const handleFilterChange = (setter, value) => {
     setter(value);
     setCurrentPage(1); // Reset to first page when filter changes
     setOpenDropdown(null); // Close dropdown after selection
   };
 
-  // Handle page changes
   const nextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
@@ -88,7 +82,6 @@ const OrdersManagement = () => {
     }
   };
 
-  // Generate pagination links with truncation
   const getPaginationLinks = () => {
     const maxVisiblePages = 5; // Maximum number of page links to show
     const links = [];
@@ -145,44 +138,16 @@ const OrdersManagement = () => {
     }
   };
 
-  const StatusIcon = ({ status }) => {
-    if (status === 'Paid') {
+  const StatusIcon = ({ receiptFile }) => {
+    if (receiptFile) {
       return <Check className="w-4 h-4 text-green-500 mr-1" />;
-    } else if (status === 'Cancelled') {
+    } else {
       return <X className="w-4 h-4 text-red-500 mr-1" />;
-    } else if (status === 'Returned') {
-      return <RotateCcw className="w-4 h-4 text-gray-500 mr-1" />;
     }
-    return null;
   };
 
-  const getStatusColor = (status) => {
-    if (status === 'Paid') return 'text-green-500';
-    if (status === 'Cancelled') return 'text-red-500';
-    if (status === 'Returned') return 'text-gray-500';
-    return '';
-  };
-
-  // Handle keyboard navigation for dropdowns
-  const handleDropdownKeyDown = (e, dropdownName, dropdownItems, currentIndex, handleSelect) => {
-    if (e.key === 'Escape') {
-      setOpenDropdown(null);
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (currentIndex < dropdownItems.length - 1) {
-        const nextItem = dropdownItems[currentIndex + 1];
-        handleSelect(nextItem);
-      }
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (currentIndex > 0) {
-        const prevItem = dropdownItems[currentIndex - 1];
-        handleSelect(prevItem);
-      }
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setOpenDropdown(null);
-    }
+  const getStatusColor = (receiptFile) => {
+    return receiptFile ? 'text-green-500' : 'text-red-500';
   };
 
   return (
@@ -440,19 +405,19 @@ const OrdersManagement = () => {
                           <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden mr-2">
                             <img src="../public/Icons/calendar.svg" alt="User" className="h-8 w-8 object-cover" />
                           </div>
-                          <span className="text-sm">{order.customer}</span>
+                          <span className="text-sm">{order.fullName}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm">{order.type}</td>
+                      <td className="px-4 py-3 text-sm">{order.shippingMethod}</td> {/* This line ensures the type is displayed */}
                       <td className="px-4 py-3">
-                        <div className={`flex items-center ${getStatusColor(order.status)}`}>
-                          <StatusIcon status={order.status} />
-                          <span className="text-sm">{order.status}</span>
+                        <div className={`flex items-center ${getStatusColor(order.receiptFile)}`}>
+                          <StatusIcon receiptFile={order.receiptFile} />
+                          <span className="text-sm">{order.receiptFile ? 'Paid' : 'Unpaid'}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex">
-                          {order.products && order.products.map((product, i) => (
+                          {order.selectedItems && order.selectedItems.map((product, i) => (
                             <div 
                               key={i} 
                               className={`w-6 h-6 border ${product.color === 'yellow' ? 'bg-yellow-400' : 'bg-black'} rounded ${i > 0 ? '-ml-2' : ''}`}
@@ -461,15 +426,44 @@ const OrdersManagement = () => {
                           ))}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium">{order.total}</td>
-                      <td className="px-4 py-3 text-sm">{order.date}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-sm font-medium">₱{order.total}</td>
+                      <td className="px-4 py-3 text-sm">{order.createdAt.toDate().toLocaleDateString()}</td>
+                      <td className="px-4 py-3 relative">
                         <button 
                           className="text-gray-400 hover:text-gray-600"
                           aria-label={`More options for order ${order.id}`}
+                          onClick={() => toggleDropdown(order.id)}
                         >
                           <MoreHorizontal className="w-5 h-5" />
                         </button>
+                        {openDropdown === order.id && (
+                          <div className="fixed right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-10">
+                            <button 
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              onClick={() => handleStatusChange(order.id, 'To Ship')}
+                            >
+                              To Ship
+                            </button>
+                            <button 
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              onClick={() => handleStatusChange(order.id, 'To Deliver')}
+                            >
+                              To Deliver
+                            </button>
+                            <button 
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              onClick={() => handleStatusChange(order.id, 'To Receive')}
+                            >
+                              To Receive
+                            </button>
+                            <button 
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              onClick={() => handleStatusChange(order.id, 'Completed')}
+                            >
+                              Completed
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))

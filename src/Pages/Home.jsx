@@ -16,7 +16,7 @@ const faqs = [
   {
     question: "What sizes are the T-shirts available in?",
     answer:
-      "Adults’ T-shirts from VistaPrint are available in XXS – 5XL. We also offer kids’ sizes. To find the exact length and width of each size, check our size charts tab on the T-shirt page of your choice.",
+      "Adults' T-shirts from VistaPrint are available in XXS – 5XL. We also offer kids' sizes. To find the exact length and width of each size, check our size charts tab on the T-shirt page of your choice.",
   },
   {
     question: "Can I print my artwork or design onto the T-shirts?",
@@ -106,7 +106,7 @@ const Home = () => {
               style={{ fontFamily: "Inter, sans-serif" }}
             >
               Our custom T-shirts come in a variety of sleeve and neck styles
-              whatever you need, we’ve got you covered.
+              whatever you need, we've got you covered.
             </p>
 
             {/* Apparel Category Container*/}
@@ -166,44 +166,88 @@ const Home = () => {
           </div>
         </div>
 
-        {/* FAQ Section */}
-          <div className="w-full py-20 px-10 bg-white md:px-46">
-            <div className="md:w-5/7 text-center md:text-left">
-              <h1 className="text-4xl font-semibold text-gray-800">
-                Frequently Asked Questions
+        {/* Our Services Section */}
+        <div className="w-full py-20 px-10 md:px-20 bg-[#FFF9F0]">
+          <div className="container mx-25">
+            {/* Heading */}
+            <div className="mb-6">
+              <h1 className="text-4xl font-semibold text-gray-800 border-gray-300 pb-2 inline-block">
+                Our Services
               </h1>
-              <div className="mt-10 space-y-4">
-                {faqs.map((faq, index) => (
-                  <div key={index} className="border-gray-300 rounded-lg">
-                    <button
-                      className="w-full text-left p-4 flex hover:bg-gray-50 justify-between items-center"
-                      onClick={() => toggleFAQ(index)}
-                    >
-                      <span className="text-xl font-semibold text-gray-800">
-                        {faq.question}
-                      </span>
-                      <span className="transition-transform duration-300 ease-in-out">
-      <ChevronDown 
-        className={`w-6 h-6 transition-transform duration-300 ${
-          openIndex === index ? "transform rotate-180" : ""
-        }`} 
-      />
-    </span>
-                    </button>
-                    <div 
-                      className={`transition-all duration-700 ease-in-out overflow-hidden ${
-                        openIndex === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                      }`}
-                    >
-                      <div className="p-4 text-lg text-black border-b border-gray-700">
-                        {faq.answer}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <p className="text-2xl text-gray-700">
+                Our custom T-shirts come in a variety of sleeve and neck styles whatever you <br></br>need, 
+                we've got you covered.
+              </p>
+            </div>
+            
+            {/* Description */}
+            <div className="mb-10">
+            
+            </div>
+            
+            {/* Services Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Sublimation Service */}
+              <Link to="/shop" className="relative group overflow-hidden rounded-lg shadow-lg">
+                <img 
+                  src="/Home Assets/Sublimation.svg" 
+                  alt="Sublimation printing process" 
+                  className="w-full h-auto object-fill transition-transform duration-300 group-hover:scale-105"
+                />
+
+              </Link>
+              
+              {/* Customize Service */}
+              <Link to="/ShopPages/RequestForm" className="relative group overflow-hidden rounded-lg shadow-lg">
+                <img 
+                  src="/Home Assets/Customize.svg" 
+                  alt="T-shirt customization workspace" 
+                  className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                
+              </Link>
             </div>
           </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="w-full py-20 px-10 bg-white md:px-46">
+          <div className="md:w-5/7 text-center md:text-left">
+            <h1 className="text-4xl font-semibold text-gray-800">
+              Frequently Asked Questions
+            </h1>
+            <div className="mt-10 space-y-4">
+              {faqs.map((faq, index) => (
+                <div key={index} className="border-gray-300 rounded-lg">
+                  <button
+                    className="w-full text-left p-4 flex hover:bg-gray-50 justify-between items-center"
+                    onClick={() => toggleFAQ(index)}
+                  >
+                    <span className="text-xl font-semibold text-gray-800">
+                      {faq.question}
+                    </span>
+                    <span className="transition-transform duration-300 ease-in-out">
+                      <ChevronDown 
+                        className={`w-6 h-6 transition-transform duration-300 ${
+                          openIndex === index ? "transform rotate-180" : ""
+                        }`} 
+                      />
+                    </span>
+                  </button>
+                  <div 
+                    className={`transition-all duration-700 ease-in-out overflow-hidden ${
+                      openIndex === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className="p-4 text-lg text-black border-b border-gray-700">
+                      {faq.answer}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
         {/* Footer Section */}
         <div className="w-full py-20 px-10 bg-gray-800"></div>

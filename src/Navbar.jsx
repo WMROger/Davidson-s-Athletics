@@ -149,12 +149,7 @@ const Navbar = () => {
                     >
                       Profile
                     </Link>
-                    <Link
-                      to="/settings"
-                      className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                    >
-                      Settings
-                    </Link>
+
                     <button
                       onClick={handleSignOut}
                       className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"

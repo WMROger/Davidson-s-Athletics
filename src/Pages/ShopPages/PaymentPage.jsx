@@ -1,6 +1,14 @@
 import React, { useState } from "react";
-import { db } from '../../Database/firebase'; // Ensure correct path
-import { collection, addDoc, doc, getDoc, updateDoc, getDocs } from 'firebase/firestore';
+import { db } from "../../Database/firebase"; // Ensure correct path
+import {
+  collection,
+  addDoc,
+  doc,
+  getDoc,
+  updateDoc,
+  getDocs,
+  setDoc,
+} from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const PaymentPage = () => {
@@ -64,52 +72,52 @@ const PaymentPage = () => {
       setReceiptPreview(null);
     }
   };
-  
+
   const getNextOrderId = async () => {
-    const counterDocRef = doc(db, 'counters', 'orderCounter');
+    const counterDocRef = doc(db, "counters", "orderCounter");
     const counterDoc = await getDoc(counterDocRef);
-  
+
     if (counterDoc.exists()) {
       const currentOrderNumber = counterDoc.data().currentOrderNumber;
       const nextOrderNumber = currentOrderNumber + 1;
-  
+
       if (nextOrderNumber > 100000) {
-        throw new Error('Order ID limit reached');
+        throw new Error("Order ID limit reached");
       }
-  
+
       await updateDoc(counterDocRef, { currentOrderNumber: nextOrderNumber });
       return nextOrderNumber;
     } else {
-      throw new Error('Counter document does not exist');
+      throw new Error("Counter document does not exist");
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       setErrorMessage("Please enter a valid payment amount.");
       return;
     }
-  
+
     if (phoneNumber.length !== 10) {
       setErrorMessage("Please enter a valid 10-digit phone number.");
       return;
     }
-  
+
     if (!receiptFile) {
       setErrorMessage("Please upload your GCash receipt.");
       return;
     }
-  
+
     try {
       setIsProcessing(true);
       console.log("Processing started");
-  
+
       const orderId = await getNextOrderId();
       console.log("Order ID:", orderId);
-  
+
       const orderData = {
         orderId,
         ...formData,
@@ -122,22 +130,22 @@ const PaymentPage = () => {
         receiptFile: receiptFile.name,
         createdAt: new Date(),
       };
-  
+
       // Retrieve the current highest subcollection ID
-      const ordersCollectionRef = collection(db, 'orders');
+      const ordersCollectionRef = collection(db, "orders");
       const ordersSnapshot = await getDocs(ordersCollectionRef);
       const subcollectionId = ordersSnapshot.size + 1;
       console.log("Subcollection ID:", subcollectionId);
-  
+
       // Add the order with the new subcollection ID
-      await addDoc(collection(db, 'orders', subcollectionId.toString(), 'data'), orderData);
+      await setDoc(doc(db, "orders", subcollectionId.toString()), orderData);
       console.log("Order added to Firestore");
-  
+
       setSuccessMessage("Order successfully uploaded!");
       setTimeout(() => {
-        navigate('/Home', { state: { orderId } });
+        navigate("/Home", { state: { orderId } });
       }, 3000); // Redirect to order confirmation after 3 seconds
-  
+
       setStep(2);
     } catch (error) {
       console.error("Error:", error);

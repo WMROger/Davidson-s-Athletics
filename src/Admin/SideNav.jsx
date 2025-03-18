@@ -48,11 +48,7 @@ const AdminLayout = () => {
       label: "Notification",
       icon: <Bell size={24} className="flex-shrink-0" />
     },
-    {
-      to: "/admin/settings",
-      label: "Settings",
-      icon: <Settings size={24} className="flex-shrink-0" />
-    }
+    
   ];
 
   // Logout function

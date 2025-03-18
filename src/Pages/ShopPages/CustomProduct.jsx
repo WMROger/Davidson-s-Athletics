@@ -55,8 +55,8 @@ const shirtCategories = [
     name: "T-Shirt",
     products: [
       { id: "basic-tee", name: "Basic Tee", image: "/T-shirt.svg" },
-      { id: "v-neck", name: "V-Neck", image: "/Home Assets/TShirts/V-neck.png" },
-      { id: "long-sleeve", name: "Long Sleeve", image: "/Home Assets/TShirts/Long Sleeve.png" },
+      { id: "v-neck", name: "V-Neck", image: "./TShirts/V-neck.png" },
+      { id: "long-sleeve", name: "Long Sleeve", image: "./TShirts/Long Sleeve.png" },
     ],
   },
   {

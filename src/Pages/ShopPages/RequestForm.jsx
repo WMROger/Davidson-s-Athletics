@@ -7,6 +7,7 @@ import {
   runTransaction,
   doc,
   setDoc,
+  deleteDoc,
 } from "firebase/firestore"; // Import necessary Firestore functionsunctions
 import { v4 as uuidv4 } from "uuid"; // Import the uuid library
 import { getAuth } from "firebase/auth";
@@ -209,6 +210,9 @@ const RequestForm = () => {
         doc(db, "users", userId, "requests", String(newOrderNumber)),
         requestData
       );
+
+      // Delete the temporary database entry
+      await deleteDoc(requestRef);
 
       alert("Request submitted successfully!");
     } catch (error) {
