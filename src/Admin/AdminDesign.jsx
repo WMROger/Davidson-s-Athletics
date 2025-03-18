@@ -159,7 +159,7 @@ export default function AdminDesign() {
                     </p>{" "}
                     {/* Display the readable order number */}
                     <p className="font-semibold mt-1">
-                      {asset.customerInfo.fullName}
+                      {asset.customerInfo?.fullName || "Unknown"}
                     </p>{" "}
                     {/* Add margin-top to create a small gap */}
                     <p className="text-sm text-gray-500">

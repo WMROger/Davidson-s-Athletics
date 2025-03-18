@@ -2,7 +2,7 @@ import React from 'react';
 import { ShoppingCart } from "lucide-react";
 import { Link, useLocation } from 'react-router-dom';
 
-const ProfileSidebar = () => {
+const ProfileSidebar = ({ name }) => {
   const location = useLocation();
   
   return (
@@ -12,7 +12,7 @@ const ProfileSidebar = () => {
         <div className="h-10 w-10 rounded-full bg-gray-300 overflow-hidden">
           <img src="/api/placeholder/32/32" alt="Profile" />
         </div>
-        <span className="ml-3 text-xl font-medium">Ari Jacob Necesario</span>
+        <span className="ml-3 text-xl font-medium">{name}</span>
       </div>
       
       {/* Navigation items */}

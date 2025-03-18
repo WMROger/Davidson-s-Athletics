@@ -13,7 +13,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { RotateCw } from "lucide-react";
-import { getFirestore, collection, addDoc, doc, setDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
 import {
   getStorage,
   ref,
@@ -55,8 +55,8 @@ const shirtCategories = [
     name: "T-Shirt",
     products: [
       { id: "basic-tee", name: "Basic Tee", image: "/T-shirt.svg" },
-      { id: "v-neck", name: "V-Neck", image: "./TShirts/V-neck.png" },
-      { id: "long-sleeve", name: "Long Sleeve", image: "./TShirts/Long Sleeve.png" },
+      { id: "v-neck", name: "V-Neck", image: "/Home Assets/TShirts/V-neck.png" },
+      { id: "long-sleeve", name: "Long Sleeve", image: "/Home Assets/TShirts/Long Sleeve.png" },
     ],
   },
   {
@@ -73,9 +73,9 @@ const shirtCategories = [
     id: "hoodie",
     name: "Hoodie",
     products: [
-      { id: "pullover", name: "Pullover Hoodie", image: "/Home Assets/Hoodie/Hoodie.png" },
-      { id: "zip-up", name: "Zip-up Hoodie", image: "/Home Assets/Hoodie/Hoodie zipup.png" },
-      { id: "sleeveless", name: "Sleeveless Hoodie", image: "/Home Assets/Hoodie/Sleeveless hoodie.png" },
+      { id: "pullover", name: "Pullover Hoodie", image: "/Home Assets/ Hoodie/ Hoodie.png" },
+      { id: "zip-up", name: "Zip-up Hoodie", image: "/Home Assets/Hoodie/ Hoodie zipup.png" },
+      { id: "sleeveless", name: "Sleeveless Hoodie", image: "/Home Assets/Hoodie/ Sleeveless hoodie.png" },
     ],
   },
 ];
@@ -640,6 +640,9 @@ const CustomProduct = () => {
 
         // Navigate to RequestForm with the uploaded image URL
         navigate('/ShopPages/RequestForm', { state: { uploadedImages: [imageUrl], selectedProduct } });
+
+        // Delete the temporary database entry
+        await deleteDoc(requestRef);
       };
 
       // Handle image loading error
