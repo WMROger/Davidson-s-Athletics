@@ -55,26 +55,27 @@ const shirtCategories = [
     name: "T-Shirt",
     products: [
       { id: "basic-tee", name: "Basic Tee", image: "/T-shirt.svg" },
-      { id: "v-neck", name: "V-Neck", image: "/Home Assets/TShirts/Polo_sample.jpg" },
-      { id: "long-sleeve", name: "Long Sleeve", image: "/Home Assets/red shirt.png" },
+      { id: "v-neck", name: "V-Neck", image: "/Home Assets/TShirts/V-neck.png" },
+      { id: "long-sleeve", name: "Long Sleeve", image: "/Home Assets/TShirts/Long Sleeve.png" },
     ],
   },
   {
     id: "polo",
     name: "Polo",
     products: [
-      { id: "classic-polo", name: "Polo", image: "/Home Assets/TShirts/blue shirt.png" },
-      { id: "slim-fit", name: "Polo", image: "/Home Assets/TShirts/Polo_sample.jpg" },
-      { id: "striped-polo", name: "Striped Polo", image: "/Home Assets/TShirts/yet-another-image.png" },
+      { id: "classic-polo", name: "Polo", image: "/Home Assets/Polo/Polo.png" },
+      { id: "slim-fit", name: "Polo", image: "/Home Assets/Polo/Polo brown.png" },
+      { id: "striped-polo", name: "Striped Polo", image: "/Home Assets/Polo/Slimfit polo.png" },
+      { id: "striped-polo", name: "Striped Polo", image: "/Home Assets/Polo/Polo slimfit.png" }
     ],
   },
   {
     id: "hoodie",
     name: "Hoodie",
     products: [
-      { id: "pullover", name: "Pullover Hoodie", image: "/Home Assets/TShirts/yellow shirt.png" },
-      { id: "zip-up", name: "Zip-up Hoodie", image: "/Home Assets/TShirts/another-image.png" },
-      { id: "sleeveless", name: "Sleeveless Hoodie", image: "/Home Assets/TShirts/yet-another-image.png" },
+      { id: "pullover", name: "Pullover Hoodie", image: "/Home Assets/Hoodie/Hoodie.png" },
+      { id: "zip-up", name: "Zip-up Hoodie", image: "/Home Assets/Hoodie/Hoodie zipup.png" },
+      { id: "sleeveless", name: "Sleeveless Hoodie", image: "/Home Assets/Hoodie/Sleeveless hoodie.png" },
     ],
   },
 ];
@@ -824,7 +825,7 @@ const CustomProduct = () => {
                   {shirtStyle === "polo" && (
                     <>
                       <image
-                        href="/Home Assets/TShirts/blue shirt.png"
+                        href="/Home Assets/Polo/polo.png"
                         x="0"
                         y="0"
                         width="600"
@@ -837,7 +838,7 @@ const CustomProduct = () => {
                   {shirtStyle === "hoodie" && (
                     <>
                       <image
-                        href="/Home Assets/TShirts/yellow shirt.png"
+                        href="/Home Assets/Hoodie/Hoodie.png"
                         x="0"
                         y="0"
                         width="600"

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, MoreHorizontal, Check, X, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { db } from '../Database/firebase'; // Ensure correct path
+import { collection, getDocs } from 'firebase/firestore';
 
 const OrdersManagement = () => {
   const [selectedOrders, setSelectedOrders] = useState([]);
@@ -8,7 +10,8 @@ const OrdersManagement = () => {
   const [dateFilter, setDateFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  
+  const [allOrders, setAllOrders] = useState([]);
+
   // Dropdown state management
   const [openDropdown, setOpenDropdown] = useState(null);
   
@@ -16,77 +19,33 @@ const OrdersManagement = () => {
   const typeDropdownRef = useRef(null);
   const statusDropdownRef = useRef(null);
   const dateDropdownRef = useRef(null);
-  
+  const uniqueDates = allOrders.length > 0 ? [...new Set(allOrders.map(order => order.date))] : [];
   const itemsPerPage = 7;
   
   // Handle outside click to close dropdowns
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        openDropdown === 'type' && 
-        typeDropdownRef.current && 
-        !typeDropdownRef.current.contains(event.target)
-      ) {
-        setOpenDropdown(null);
-      } else if (
-        openDropdown === 'status' && 
-        statusDropdownRef.current && 
-        !statusDropdownRef.current.contains(event.target)
-      ) {
-        setOpenDropdown(null);
-      } else if (
-        openDropdown === 'date' && 
-        dateDropdownRef.current && 
-        !dateDropdownRef.current.contains(event.target)
-      ) {
-        setOpenDropdown(null);
+    const fetchOrders = async () => {
+      try {
+        const ordersCollection = collection(db, 'orders');
+        const ordersSnapshot = await getDocs(ordersCollection);
+        const ordersList = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setAllOrders(ordersList);
+      } catch (error) {
+        console.error("Error fetching orders: ", error);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [openDropdown]);
+  
+    fetchOrders();
+  }, []);
   
   // Toggle dropdown function
   const toggleDropdown = (dropdown) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
-  
-  // Expanded orders array with more items for pagination
-  const allOrders = [
-    { id: '#102328', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 11', dateValue: '2025-02-11' },
-    { id: '#102329', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 11', dateValue: '2025-02-11' },
-    { id: '#102330', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 12', dateValue: '2025-02-12' },
-    { id: '#102331', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 12', dateValue: '2025-02-12' },
-    { id: '#102332', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 13', dateValue: '2025-02-13' },
-    { id: '#102333', customer: 'Ari Necesario', type: 'Delivery', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 13', dateValue: '2025-02-13' },
-    { id: '#102334', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 14', dateValue: '2025-02-14' },
-    { id: '#102335', customer: 'Ari Necesario', type: 'Delivery', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 14', dateValue: '2025-02-14' },
-    { id: '#102336', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 15', dateValue: '2025-02-15' },
-    { id: '#102337', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 15', dateValue: '2025-02-15' },
-    { id: '#102338', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 16', dateValue: '2025-02-16' },
-    { id: '#102339', customer: 'Ari Necesario', type: 'Pickup', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 16', dateValue: '2025-02-16' },
-    { id: '#102340', customer: 'Ari Necesario', type: 'Delivery', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 17', dateValue: '2025-02-17' },
-    { id: '#102341', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 17', dateValue: '2025-02-17' },
-    { id: '#102342', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 18', dateValue: '2025-02-18' },
-    { id: '#102343', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 18', dateValue: '2025-02-18' },
-    { id: '#102344', customer: 'Ari Necesario', type: 'Delivery', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 19', dateValue: '2025-02-19' },
-    { id: '#102345', customer: 'Ari Necesario', type: 'Pickup', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 19', dateValue: '2025-02-19' },
-    { id: '#102346', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 20', dateValue: '2025-02-20' },
-    { id: '#102347', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 20', dateValue: '2025-02-20' },
-    { id: '#102348', customer: 'Ari Necesario', type: 'Delivery', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
-    { id: '#102349', customer: 'Ari Necesario', type: 'Pickup', status: 'Cancelled', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 21', dateValue: '2025-02-21' },
-    { id: '#102350', customer: 'Ari Necesario', type: 'Delivery', status: 'Returned', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
-    { id: '#102351', customer: 'Ari Necesario', type: 'Pickup', status: 'Paid', products: ['yellow', 'black'], total: '₱850.00', date: 'Feb 22', dateValue: '2025-02-22' },
-  ];
 
-  // Get unique dates for the date filter
-  const uniqueDates = [...new Set(allOrders.map(order => order.date))];
 
   // Filter orders based on selected filters
-  const filteredOrders = allOrders.filter(order => {
+  const filteredOrders = Array.isArray(allOrders) ? allOrders.filter(order => {
     return (
       (typeFilter === '' || order.type === typeFilter) &&
       (statusFilter === '' || order.status === statusFilter) &&
@@ -95,7 +54,7 @@ const OrdersManagement = () => {
         order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.customer.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-  });
+  }) : [];
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
@@ -493,11 +452,11 @@ const OrdersManagement = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex">
-                          {order.products.map((color, i) => (
+                          {order.products && order.products.map((product, i) => (
                             <div 
                               key={i} 
-                              className={`w-6 h-6 border ${color === 'yellow' ? 'bg-yellow-400' : 'bg-black'} rounded ${i > 0 ? '-ml-2' : ''}`}
-                              aria-label={`Product color: ${color}`}
+                              className={`w-6 h-6 border ${product.color === 'yellow' ? 'bg-yellow-400' : 'bg-black'} rounded ${i > 0 ? '-ml-2' : ''}`}
+                              aria-label={`Product color: ${product.color}`}
                             />
                           ))}
                         </div>

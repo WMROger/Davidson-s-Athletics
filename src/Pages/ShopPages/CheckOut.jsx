@@ -21,6 +21,9 @@ const Checkout = () => {
 
   const [isFormValid, setIsFormValid] = useState(false);
   const [isTermsChecked, setIsTermsChecked] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const { fullName, email, phoneNumber, address, shippingMethod } = formData;
@@ -43,22 +46,18 @@ const Checkout = () => {
     setIsTermsChecked(e.target.checked);
   };
 
-  const handleProceed = async () => {
-    try {
-      // Add order to Firestore
-      await addDoc(collection(db, 'orders'), {
-        ...formData,
-        selectedItems,
-        subtotal,
-        deliveryFee,
-        total,
-        createdAt: new Date()
-      });
-      // Navigate to payment page
-      navigate('/ShopPages/PaymentPage');
-    } catch (error) {
-      console.error('Error adding document: ', error);
-    }
+  const handleProceed = () => {
+    // Navigate to payment page with selectedItems and formData
+    navigate('/ShopPages/PaymentPage', { state: { selectedItems, formData, subtotal, deliveryFee, total } });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    setErrorMessage("");
+  
+    // Navigate to payment page with selectedItems and formData
+    navigate('/ShopPages/PaymentPage', { state: { selectedItems, formData, subtotal, deliveryFee, total } });
   };
 
   const deliveryFee = 50; // Example delivery fee
@@ -151,7 +150,7 @@ const Checkout = () => {
               </div>
             </div>
             
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="block text-sm md:text-base font-medium mb-1">
                   Full name<span className="text-red-500">*</span>
@@ -219,6 +218,10 @@ const Checkout = () => {
                   <span className="text-sm md:text-base">I have read the <a href="#" className="underline">Terms and Conditions</a>.</span>
                 </label>
               </div>
+
+             
+              {errorMessage && <p className="text-red-500 text-center mt-4">{errorMessage}</p>}
+              {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
             </form>
           </div>
           
