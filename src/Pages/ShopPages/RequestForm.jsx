@@ -8,7 +8,7 @@ import {
   doc,
   setDoc,
   deleteDoc,
-} from "firebase/firestore"; // Import necessary Firestore functionsunctions
+} from "firebase/firestore"; // Import necessary Firestore functions
 import { v4 as uuidv4 } from "uuid"; // Import the uuid library
 import { getAuth } from "firebase/auth";
 import { getFirestore, getDoc } from "firebase/firestore"; // Add this import
@@ -22,6 +22,10 @@ const RequestForm = () => {
   const [imagePreviews, setImagePreviews] = useState(
     location.state?.imagePreviews || []
   );
+  
+  // Available sizes for the products
+  const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+  
   const getCutTypeOptions = () => {
     return [
       { value: "v-neck", label: "V-Neck" },
@@ -29,6 +33,8 @@ const RequestForm = () => {
       { value: "scoop-neck", label: "Scoop Neck" },
     ];
   };
+
+  // Initialize state with size quantities structure
   const [formData, setFormData] = useState({
     customerInfo: {
       fullName: "",
@@ -42,11 +48,17 @@ const RequestForm = () => {
       primaryColor: "",
       secondaryColor: "",
       pattern: "",
+      cutType: "",
       quantity: 1,
       specialInstructions: "",
       hasName: false,
       names: Array(1).fill(""),
       sizes: Array(1).fill(""),
+      // New property for size quantities when bundling
+      sizeQuantities: AVAILABLE_SIZES.reduce((acc, size) => {
+        acc[size] = 0;
+        return acc;
+      }, {})
     },
   });
 
@@ -105,6 +117,7 @@ const RequestForm = () => {
       });
   };
 
+  // Handle quantity change for the overall order
   const handleQuantityChange = (e) => {
     const newQuantity = Math.max(1, parseInt(e.target.value, 10) || 1);
     setFormData((prev) => ({
@@ -112,8 +125,12 @@ const RequestForm = () => {
       designDetails: {
         ...prev.designDetails,
         quantity: newQuantity,
-        names: Array(newQuantity).fill(""),
-        sizes: Array(newQuantity).fill(""),
+        names: Array(newQuantity).fill("").map((_, i) => 
+          prev.designDetails.names[i] || ""
+        ),
+        sizes: Array(newQuantity).fill("").map((_, i) => 
+          prev.designDetails.sizes[i] || ""
+        ),
       },
     }));
   };
@@ -134,6 +151,38 @@ const RequestForm = () => {
       ...prev,
       designDetails: { ...prev.designDetails, sizes: updatedSizes },
     }));
+  };
+
+  // Handle size quantity change for bundled orders
+  const handleSizeQuantityChange = (size, value) => {
+    const quantity = parseInt(value) || 0;
+    
+    setFormData((prev) => {
+      const newSizeQuantities = {
+        ...prev.designDetails.sizeQuantities,
+        [size]: quantity
+      };
+      
+      // Calculate total quantity based on all size quantities
+      const newTotalQuantity = Object.values(newSizeQuantities).reduce((sum, qty) => sum + qty, 0);
+      
+      return {
+        ...prev,
+        designDetails: {
+          ...prev.designDetails,
+          sizeQuantities: newSizeQuantities,
+          quantity: newTotalQuantity || 1 // Ensure quantity is at least 1
+        }
+      };
+    });
+  };
+
+  // Calculate total quantity from size quantities
+  const getTotalQuantity = () => {
+    if (!formData.designDetails.hasName) {
+      return Object.values(formData.designDetails.sizeQuantities).reduce((sum, qty) => sum + qty, 0) || 1;
+    }
+    return formData.designDetails.quantity;
   };
 
   const handleSubmit = async () => {
@@ -229,10 +278,13 @@ const RequestForm = () => {
   ];
 
   const sizeOptions = [
+    { value: "XS", label: "XS" },
     { value: "S", label: "Small" },
     { value: "M", label: "Medium" },
     { value: "L", label: "Large" },
     { value: "XL", label: "X-Large" },
+    { value: "2XL", label: "2X-Large" },
+    { value: "3XL", label: "3X-Large" },
   ];
 
   return (
@@ -579,32 +631,6 @@ const RequestForm = () => {
               </label>
             </div>
 
-            {/* Quantity Field */}
-            <div className="relative mb-4">
-              <input
-                id="quantity"
-                type="number"
-                min="1"
-                value={formData.designDetails.quantity}
-                onChange={handleQuantityChange}
-                onFocus={() => handleFocus("quantity")}
-                onBlur={(e) => handleBlur("quantity", e.target.value)}
-                className="border p-2 rounded w-full z-10 relative bg-transparent"
-                placeholder=" "
-              />
-              <label
-                htmlFor="quantity"
-                className={`absolute transition-all duration-200 pointer-events-none ${
-                  focusedFields["quantity"] ||
-                  formData.designDetails.quantity > 0
-                    ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-                    : "text-gray-500 top-2 left-2 z-0"
-                }`}
-              >
-                Quantity
-              </label>
-            </div>
-
             {/* Add Name Checkbox */}
             <label className="flex items-center space-x-2 mb-4">
               <input
@@ -624,78 +650,149 @@ const RequestForm = () => {
               <span>Add Name</span>
             </label>
 
-            {/* Name & Size Fields */}
-            {Array.from({ length: formData.designDetails.quantity }).map(
-              (_, i) => (
-                <div key={i} className="flex space-x-2 mb-2">
-                  {formData.designDetails.hasName && (
-                    <div className="relative w-1/2">
-                      <input
-                        type="text"
-                        value={formData.designDetails.names[i]}
-                        onChange={(e) => handleNameChange(i, e.target.value)}
-                        onFocus={() => handleFocus(`name-${i}`)}
-                        onBlur={(e) => handleBlur(`name-${i}`, e.target.value)}
-                        className="border p-2 rounded w-full z-10 relative bg-transparent"
-                        placeholder=" "
-                      />
-                      <label
-                        className={`absolute transition-all duration-200 pointer-events-none ${
-                          focusedFields[`name-${i}`] ||
-                          formData.designDetails.names[i]
-                            ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-                            : "text-gray-500 top-2 left-2 z-0"
-                        }`}
-                      >
-                        Name {i + 1}
-                      </label>
-                    </div>
-                  )}
+            {formData.designDetails.hasName ? (
+              <>
+                {/* Quantity Field - only visible when "Add Name" is checked */}
+                <div className="relative mb-4">
+                  <input
+                    id="quantity"
+                    type="number"
+                    min="1"
+                    value={formData.designDetails.quantity}
+                    onChange={handleQuantityChange}
+                    onFocus={() => handleFocus("quantity")}
+                    onBlur={(e) => handleBlur("quantity", e.target.value)}
+                    className="border p-2 rounded w-full z-10 relative bg-transparent"
+                    placeholder=" "
+                  />
+                  <label
+                    htmlFor="quantity"
+                    className={`absolute transition-all duration-200 pointer-events-none ${
+                      focusedFields["quantity"] ||
+                      formData.designDetails.quantity > 0
+                        ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                        : "text-gray-500 top-2 left-2 z-0"
+                    }`}
+                  >
+                    Quantity
+                  </label>
+                </div>
 
-                  <div className="relative w-1/2">
-                    <select
-                      value={formData.designDetails.sizes[i]}
-                      onChange={(e) => handleSizeChange(i, e.target.value)}
-                      onFocus={() => handleFocus(`size-${i}`)}
-                      onBlur={(e) => handleBlur(`size-${i}`, e.target.value)}
-                      className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
-                    >
-                      <option value=""></option>
-                      {sizeOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <label
-                      className={`absolute transition-all duration-200 pointer-events-none ${
-                        focusedFields[`size-${i}`] ||
-                        formData.designDetails.sizes[i]
-                          ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-                          : "text-gray-500 top-2 left-2 z-0"
-                      }`}
-                    >
-                      Size {i + 1}
-                    </label>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 9l-7 7-7-7"
-                        ></path>
-                      </svg>
+                {/* Name & Size Fields */}
+                {Array.from({ length: formData.designDetails.quantity }).map(
+                  (_, i) => (
+                    <div key={i} className="flex space-x-2 mb-2">
+                      <div className="relative w-1/2">
+                        <input
+                          type="text"
+                          value={formData.designDetails.names[i] || ""}
+                          onChange={(e) => handleNameChange(i, e.target.value)}
+                          onFocus={() => handleFocus(`name-${i}`)}
+                          onBlur={(e) => handleBlur(`name-${i}`, e.target.value)}
+                          className="border p-2 rounded w-full z-10 relative bg-transparent"
+                          placeholder=" "
+                        />
+                        <label
+                          className={`absolute transition-all duration-200 pointer-events-none ${
+                            focusedFields[`name-${i}`] ||
+                            formData.designDetails.names[i]
+                              ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                              : "text-gray-500 top-2 left-2 z-0"
+                          }`}
+                        >
+                          Name {i + 1}
+                        </label>
+                      </div>
+
+                      <div className="relative w-1/2">
+                        <select
+                          value={formData.designDetails.sizes[i] || ""}
+                          onChange={(e) => handleSizeChange(i, e.target.value)}
+                          onFocus={() => handleFocus(`size-${i}`)}
+                          onBlur={(e) => handleBlur(`size-${i}`, e.target.value)}
+                          className="border p-2 rounded w-full z-10 relative bg-transparent appearance-none"
+                        >
+                          <option value=""></option>
+                          {sizeOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <label
+                          className={`absolute transition-all duration-200 pointer-events-none ${
+                            focusedFields[`size-${i}`] ||
+                            formData.designDetails.sizes[i]
+                              ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                              : "text-gray-500 top-2 left-2 z-0"
+                          }`}
+                        >
+                          Size {i + 1}
+                        </label>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                          <svg
+                            className="w-4 h-4 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 9l-7 7-7-7"
+                            ></path>
+                          </svg>
+                        </div>
+                      </div>
                     </div>
+                  )
+                )}
+              </>
+            ) : (
+              /* Bundle Order - Size Quantities (when "Add Name" is not checked) */
+              <>
+                <div className="mb-4">
+                  <h4 className="text-lg font-medium mb-2">Select Quantities by Size</h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Please specify the quantity for each size you need.
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    {AVAILABLE_SIZES.map((size) => (
+                      <div key={size} className="relative">
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.designDetails.sizeQuantities[size]}
+                          onChange={(e) => handleSizeQuantityChange(size, e.target.value)}
+                          onFocus={() => handleFocus(`size-qty-${size}`)}
+                          onBlur={(e) => handleBlur(`size-qty-${size}`, e.target.value)}
+                          className="border p-2 rounded w-full z-10 relative bg-transparent"
+                          placeholder=" "
+                        />
+                        <label
+                          className={`absolute transition-all duration-200 pointer-events-none ${
+                            focusedFields[`size-qty-${size}`] ||
+                            formData.designDetails.sizeQuantities[size] > 0
+                              ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
+                              : "text-gray-500 top-2 left-2 z-0"
+                          }`}
+                        >
+                          Size {size}
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )
+                
+                <div className="p-3 bg-gray-100 rounded-lg mb-4">
+                  <p className="font-medium">
+                    Total Quantity: {getTotalQuantity()}
+                  </p>
+                </div>
+              </>
             )}
 
             {/* Special Instructions Field */}
