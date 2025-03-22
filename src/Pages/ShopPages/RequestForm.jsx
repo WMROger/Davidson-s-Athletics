@@ -56,7 +56,7 @@ const RequestForm = () => {
       sizes: Array(1).fill(""),
       // New property for size quantities when bundling
       sizeQuantities: AVAILABLE_SIZES.reduce((acc, size) => {
-        acc[size] = 0;
+        
         return acc;
       }, {})
     },
@@ -180,7 +180,7 @@ const RequestForm = () => {
   // Calculate total quantity from size quantities
   const getTotalQuantity = () => {
     if (!formData.designDetails.hasName) {
-      return Object.values(formData.designDetails.sizeQuantities).reduce((sum, qty) => sum + qty, 0) || 1;
+      return Object.values(formData.designDetails.sizeQuantities).reduce((sum, qty) => sum + qty, 0) || 0;
     }
     return formData.designDetails.quantity;
   };
@@ -770,7 +770,7 @@ const RequestForm = () => {
                           onFocus={() => handleFocus(`size-qty-${size}`)}
                           onBlur={(e) => handleBlur(`size-qty-${size}`, e.target.value)}
                           className="border p-2 rounded w-full z-10 relative bg-transparent"
-                          placeholder=" "
+                          placeholder=""
                         />
                         <label
                           className={`absolute transition-all duration-200 pointer-events-none ${

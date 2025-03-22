@@ -40,72 +40,80 @@ export default function Register() {
 
   return (
     <div className="h-screen flex items-center justify-center bg-[url('/background.svg')] bg-cover bg-center">
-      <div className="bg-neutral-800 p-15 border-1 border-white rounded-2xl shadow-lg w-[450px] mt-22 pb-16">
-        <h2 className="text-2xl font-bold text-center mb-6 text-neutral-300">Create Account</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-[#222A2D] p-8 border border-[#676767] rounded-2xl shadow-xl w-full max-w-md mx-4 mt-30">
+        <h2 className="text-3xl font-bold text-center mb-8 text-white">Create Account</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-neutral-400 text-sm font-medium">Email Address</label>
+            <label className="block text-neutral-300 text-lg font-medium mb-2">Email Address</label>
             <input
               type="email"
               value={email}
+              placeholder="name@email.com"
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 text-white rounded-lg"
+              className="block w-full p-3 border border-neutral-600 bg-neutral-700 text-white rounded-lg text-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
               required
             />
           </div>
 
-          <div className="flex gap-4">
-            <div>
-              <label className="text-neutral-400 text-sm font-medium">First Name</label>
+          <div className="flex flex-col sm:flex-row gap-6">
+            <div className="w-full">
+              <label className="block text-neutral-300 text-lg font-medium mb-2">First Name</label>
               <input
                 type="text"
+                placeholder="Juan"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full p-2 border border-white text-white rounded-lg"
+                className="block w-full p-3 border border-neutral-600 bg-neutral-700 text-white rounded-lg text-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                 required
               />
             </div>
-            <div>
-              <label className="text-neutral-400 text-sm font-medium">Last Name</label>
+            <div className="w-full">
+              <label className="block text-neutral-300 text-lg font-medium mb-2">Last Name</label>
               <input
                 type="text"
+                placeholder="Dela Cruz"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full p-2 border border-gray-300 text-white rounded-lg"
+                className="block w-full p-3 border border-neutral-600 bg-neutral-700 text-white rounded-lg text-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-neutral-400 text-sm font-medium">Username</label>
+            <label className="block text-neutral-300 text-lg font-medium mb-2">Username</label>
             <input
               type="text"
+              placeholder="juandelacruz"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 text-white rounded-lg"
+              className="block w-full p-3 border border-neutral-600 bg-neutral-700 text-white rounded-lg text-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
               required
             />
           </div>
 
           <div>
-            <label className="block text-neutral-400 text-sm font-medium">Password</label>
+            <label className="block text-neutral-300 text-lg font-medium mb-2">Password</label>
             <input
               type="password"
+              placeholder="at least 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 text-white rounded-lg"
+              className="block w-full p-3 border border-neutral-600 bg-neutral-700 text-white rounded-lg text-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
               required
             />
           </div>
 
-          <button type="submit" className="w-full bg-stone-300 text-black p-2 rounded-lg">
-            Register
+          <button 
+            type="submit" 
+            className="w-full bg-red-500 hover:bg-red-600 text-white p-4 rounded-lg text-lg font-bold mt-4 transition-colors"
+          >
+            Create Account
           </button>
 
-          <p className="text-neutral-200 text-sm text-center mt-2">
+          <p className="text-neutral-300 text-lg text-center mt-6">
             Already have an account?{" "}
-            <Link to="/login" className="text-red-500 underline">
+            <Link to="/login" className="text-red-400 hover:text-red-300 font-medium underline transition-colors">
               Sign In
             </Link>
           </p>
