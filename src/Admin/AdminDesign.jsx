@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { MoreHorizontal, Plus } from "lucide-react"; // Use horizontal meatballs icon and plus icon
+import { MoreHorizontal, Plus, X, Check, X as XIcon } from "lucide-react"; // Added Check and X icons
 import { db } from "../Database/firebase"; // Adjust the import path if necessary
 import {
   collection,
@@ -141,7 +141,7 @@ export default function AdminDesign() {
       <div className="overflow-hidden border rounded-2xl mb-12">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="text-left text-gray-600 border-b">
+            <tr className="text-left text-gray-600 border-b ">
               <th className="p-2 pl-6">Name & Date</th>
               <th className="p-2 ">Status</th>
               <th className="p-2 ">File</th>
@@ -156,12 +156,10 @@ export default function AdminDesign() {
                     <p className="font-semibold">
                       Order #
                       {(currentPendingPage - 1) * ITEMS_PER_PAGE + index + 1}
-                    </p>{" "}
-                    {/* Display the readable order number */}
+                    </p>
                     <p className="font-semibold mt-1">
                       {asset.customerInfo?.fullName || "Unknown"}
-                    </p>{" "}
-                    {/* Add margin-top to create a small gap */}
+                    </p>
                     <p className="text-sm text-gray-500">
                       {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
                     </p>
@@ -181,34 +179,29 @@ export default function AdminDesign() {
                   </span>
                 </td>
                 <td className="p-2">
-                  <a
-                    href="#"
-                    onClick={() => setSelectedAsset(asset)} // Open modal with selected asset
-                    className="text-blue-500 hover:underline"
-                  >
-                    View File
-                  </a>
-                </td>
-                <td className="p-2 py-5 px-5 items-center relative flex justify-end">
                   <button
-                    className="px-4 py-2 text-green-600 rounded hover:bg-green-300 mr-2"
-                    onClick={() =>
-                      updateStatus(asset.userId, asset.id, "Approved")
-                    }
+                    onClick={() => setSelectedAsset(asset)}
+                    className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors text-sm font-medium flex items-center"
                   >
-                    Approve
+                    View Details
+                  </button>
+                </td>
+                <td className="py-6 px-5 items-center relative flex justify-end">
+                  <button
+                    className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 mr-3 transition-colors flex items-center shadow-sm text-sm font-medium"
+                    onClick={() => updateStatus(asset.userId, asset.id, "Approved")}
+                  >
+                    <Check className="w-4 h-4 mr-2" /> Approve
                   </button>
                   <button
-                    className="px-4 py-2 text-red-600 rounded hover:bg-red-300 mr-2"
-                    onClick={() =>
-                      updateStatus(asset.userId, asset.id, "Denied")
-                    }
+                    className="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 mr-3 transition-colors flex items-center shadow-sm text-sm font-medium"
+                    onClick={() => updateStatus(asset.userId, asset.id, "Denied")}
                   >
-                    Deny
+                    <XIcon className="w-4 h-4 mr-2" /> Deny
                   </button>
                 </td>
                 <td>
-                  <div className="relative menu-container">
+                  <div className="relative flex justify-start menu-container">
                     <button
                       className="p-2 rounded-full hover:bg-gray-200"
                       onClick={(e) => {
@@ -223,10 +216,10 @@ export default function AdminDesign() {
                     {openMenuId === asset.id && (
                       <div className="absolute -top-12 left-0 flex bg-white border rounded-lg shadow-lg z-50">
                         <button
-                          className="px-4 py-2 text-red-600 hover:bg-gray-100"
+                          className="px-4 py-2 text-red-600 hover:bg-gray-100 font-medium flex items-center"
                           onClick={() => deleteAsset(asset.userId, asset.id)}
                         >
-                          Delete
+                          <XIcon className="w-4 h-4 mr-2" /> Delete
                         </button>
                       </div>
                     )}
@@ -238,18 +231,18 @@ export default function AdminDesign() {
         </table>
         <div className="flex justify-between items-center p-4">
           <button
-            className="px-4 py-2 bg-gray-200 rounded"
+            className="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             disabled={currentPendingPage === 1}
             onClick={() => setCurrentPendingPage(currentPendingPage - 1)}
           >
             Previous
           </button>
-          <span>
-            Page {currentPendingPage} of {pendingPageCount}
+          <span className="font-medium">
+            Page {currentPendingPage} of {Math.max(1, pendingPageCount)}
           </span>
           <button
-            className="px-4 py-2 bg-gray-200 rounded"
-            disabled={currentPendingPage === pendingPageCount}
+            className="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            disabled={currentPendingPage === pendingPageCount || pendingPageCount === 0}
             onClick={() => setCurrentPendingPage(currentPendingPage + 1)}
           >
             Next
@@ -260,11 +253,11 @@ export default function AdminDesign() {
       <h2 className="text-4xl font-semibold mb-6">Design History</h2>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <label className="mr-2">Filter by status:</label>
+          <label className="mr-2 font-medium">Filter by status:</label>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border rounded"
+            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
           >
             <option value="All">All</option>
             <option value="Approved">Approved</option>
@@ -290,12 +283,10 @@ export default function AdminDesign() {
                     <p className="font-semibold">
                       Order #
                       {(currentHistoryPage - 1) * ITEMS_PER_PAGE + index + 1}
-                    </p>{" "}
-                    {/* Display the readable order number */}
+                    </p>
                     <p className="font-semibold mt-1">
                       {asset.customerInfo.fullName}
-                    </p>{" "}
-                    {/* Add margin-top to create a small gap */}
+                    </p>
                     <p className="text-sm text-gray-500">
                       {format(asset.timestamp.toDate(), "MMM dd, yyyy")}
                     </p>
@@ -315,13 +306,12 @@ export default function AdminDesign() {
                   </span>
                 </td>
                 <td className="p-2">
-                  <a
-                    href="#"
-                    onClick={() => setSelectedAsset(asset)} // Open modal with selected asset
-                    className="text-blue-500 hover:underline"
+                  <button
+                    onClick={() => setSelectedAsset(asset)}
+                    className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors text-sm font-medium flex items-center"
                   >
-                    View File
-                  </a>
+                    View Details
+                  </button>
                 </td>
                 <td>
                   <div className="relative menu-container">
@@ -339,10 +329,10 @@ export default function AdminDesign() {
                     {openMenuId === asset.id && (
                       <div className="absolute -top-12 left-0 flex bg-white border rounded-lg shadow-lg z-50">
                         <button
-                          className="px-4 py-2 text-red-600 hover:bg-gray-100"
+                          className="px-4 py-2 text-red-600 hover:bg-gray-100 font-medium flex items-center"
                           onClick={() => deleteAsset(asset.userId, asset.id)}
                         >
-                          Delete
+                          <XIcon className="w-4 h-4 mr-2" /> Delete
                         </button>
                       </div>
                     )}
@@ -354,18 +344,18 @@ export default function AdminDesign() {
         </table>
         <div className="flex justify-between items-center p-4">
           <button
-            className="px-4 py-2 bg-gray-200 rounded"
+            className="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             disabled={currentHistoryPage === 1}
             onClick={() => setCurrentHistoryPage(currentHistoryPage - 1)}
           >
             Previous
           </button>
-          <span>
-            Page {currentHistoryPage} of {historyPageCount}
+          <span className="font-medium">
+            Page {currentHistoryPage} of {Math.max(1, historyPageCount)}
           </span>
           <button
-            className="px-4 py-2 bg-gray-200 rounded"
-            disabled={currentHistoryPage === historyPageCount}
+            className="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            disabled={currentHistoryPage === historyPageCount || historyPageCount === 0}
             onClick={() => setCurrentHistoryPage(currentHistoryPage + 1)}
           >
             Next
@@ -374,88 +364,170 @@ export default function AdminDesign() {
       </div>
 
       {selectedAsset && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
-            <h2 className="text-2xl font-semibold mb-4">Asset Details</h2>
-            <div className="flex">
-              <img
-                src={selectedAsset.imageUrls[0]}
-                alt="Asset"
-                className="w-1/2 h-auto mr-4"
-              />
-              <div className="w-1/2">
-                <p>
-                  <strong>Order:</strong> #
-                  {(currentPendingPage - 1) * ITEMS_PER_PAGE +
-                    assets.indexOf(selectedAsset) +
-                    1}
-                </p>
-                <p>
-                  <strong>Name:</strong> {selectedAsset.customerInfo.fullName}
-                </p>
-                <p>
-                  <strong>Email:</strong> {selectedAsset.customerInfo.email}
-                </p>
-                <p>
-                  <strong>Phone:</strong> {selectedAsset.customerInfo.phone}
-                </p>
-                <p>
-                  <strong>Team Name:</strong>{" "}
-                  {selectedAsset.customerInfo.teamName}
-                </p>
-                <p>
-                  <strong>Date:</strong>{" "}
-                  {format(selectedAsset.timestamp.toDate(), "MMM dd, yyyy")}
-                </p>
-                <p>
-                  <strong>Status:</strong> {selectedAsset.status}
-                </p>
-                <p>
-                  <strong>Product Type:</strong> {selectedAsset.productType}
-                </p>
-                <p>
-                  <strong>Cut Type:</strong>{" "}
-                  {selectedAsset.designDetails.cutType}
-                </p>
-                <p>
-                  <strong>Pattern:</strong>{" "}
-                  {selectedAsset.designDetails.pattern}
-                </p>
-                <p>
-                  <strong>Primary Color:</strong>{" "}
-                  {selectedAsset.designDetails.primaryColor}
-                </p>
-                <p>
-                  <strong>Secondary Color:</strong>{" "}
-                  {selectedAsset.designDetails.secondaryColor}
-                </p>
-                <p>
-                  <strong>Quantity:</strong>{" "}
-                  {selectedAsset.designDetails.quantity}
-                </p>
-                <p>
-                  <strong>Sizes:</strong>{" "}
-                  {selectedAsset.designDetails.sizes.join(", ")}
-                </p>
-                <p>
-                  <strong>Special Instructions:</strong>{" "}
-                  {selectedAsset.designDetails.specialInstructions}
-                </p>
-                <p>
-                  <strong>Names:</strong>{" "}
-                  {selectedAsset.designDetails.names.join(", ")}
-                </p>
-              </div>
-            </div>
-            <button
-              className="mt-4 ml-205 px-6 py-2 bg-red-500 cursor-pointer text-white rounded hover:bg-red-600"
-              onClick={() => setSelectedAsset(null)}
-            >
-              Close
-            </button>
+  <div 
+    className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md bg-black/30"
+    onKeyDown={(e) => {
+      if (e.key === "Escape") {
+        setSelectedAsset(null);
+      }
+    }}
+    tabIndex={0}
+    ref={(node) => {
+      // Focus the div so it can receive keyboard events
+      if (node) node.focus();
+    }}
+  >
+    <div className="bg-white p-6 rounded-lg shadow-xl w-3/4 max-w-4xl max-h-[80vh] overflow-y-auto">
+      <div className="flex justify-between items-center border-b pb-4 mb-6">
+        <h2 className="text-2xl font-semibold">Asset Details</h2>
+        <button
+          className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100"
+          onClick={() => setSelectedAsset(null)}
+        >
+          <X className="h-6 w-6" />
+        </button>
+      </div>
+      
+      <div className="flex flex-col md:flex-row md:space-x-6">
+        <div className="md:w-1/2 mb-6 md:mb-0">
+          <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center h-[400px]">
+            <img
+              src={selectedAsset.imageUrls[0]}
+              alt="Asset"
+              className="max-h-full object-contain"
+              style={{ maxWidth: "100%", objectFit: "contain" }}
+            />
           </div>
         </div>
-      )}
+        
+        <div className="md:w-1/2 space-y-4">
+          <div className="mb-2">
+            <span className={`inline-block px-4 py-2 rounded-lg text-lg font-medium ${
+              selectedAsset.status === "Approved"
+                ? "bg-green-500 text-white"
+                : selectedAsset.status === "Denied"
+                ? "bg-red-500 text-white"
+                : "bg-yellow-500 text-white"
+            }`}>
+              {selectedAsset.status}
+            </span>
+          </div>
+          
+          <div className="border-b pb-2 mb-2">
+            <h3 className="font-bold text-2xl mb-3">Order Information</h3>
+            <p className="text-lg">
+              <span className="font-semibold">Order:</span> #
+              {(currentPendingPage - 1) * ITEMS_PER_PAGE +
+                assets.indexOf(selectedAsset) +
+                1}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Date:</span>{" "}
+              {format(selectedAsset.timestamp.toDate(), "MMM dd, yyyy")}
+            </p>
+          </div>
+          
+          <div className="border-b pb-2 mb-2">
+            <h3 className="font-bold text-2xl mb-3">Customer Information</h3>
+            <p className="text-lg">
+              <span className="font-semibold">Name:</span> {selectedAsset.customerInfo.fullName}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Email:</span> {selectedAsset.customerInfo.email}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Phone:</span> {selectedAsset.customerInfo.phone}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Team Name:</span>{" "}
+              {selectedAsset.customerInfo.teamName}
+            </p>
+          </div>
+          
+          <div>
+            <h3 className="font-bold text-2xl mb-3">Product Details</h3>
+            <p className="text-lg">
+              <span className="font-semibold">Product Type:</span> {selectedAsset.productType}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Cut Type:</span>{" "}
+              {selectedAsset.designDetails.cutType}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Pattern:</span>{" "}
+              {selectedAsset.designDetails.pattern}
+            </p>
+            <div className="flex items-center py-1">
+              <span className="font-semibold mr-2 text-lg">Primary Color:</span>
+              <div 
+                className="w-5 h-5 rounded-full mr-2" 
+                style={{ backgroundColor: selectedAsset.designDetails.primaryColor }}
+              ></div>
+              <span className="text-lg">{selectedAsset.designDetails.primaryColor}</span>
+            </div>
+            <div className="flex items-center py-1">
+              <span className="font-semibold mr-2 text-lg">Secondary Color:</span>
+              <div 
+                className="w-5 h-5 rounded-full mr-2" 
+                style={{ backgroundColor: selectedAsset.designDetails.secondaryColor }}
+              ></div>
+              <span className="text-lg">{selectedAsset.designDetails.secondaryColor}</span>
+            </div>
+            <p className="text-lg">
+              <span className="font-semibold">Quantity:</span>{" "}
+              {selectedAsset.designDetails.quantity}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Sizes:</span>{" "}
+              {selectedAsset.designDetails.sizes.join(", ")}
+            </p>
+            <p className="text-lg">
+              <span className="font-semibold">Names:</span>{" "}
+              {selectedAsset.designDetails.names.join(", ")}
+            </p>
+            <p className="mt-2">
+              <span className="font-semibold block mb-1 text-lg">Special Instructions:</span>
+              <span className="block p-3 bg-gray-50 rounded-lg text-lg border">
+                {selectedAsset.designDetails.specialInstructions || "None provided"}
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mt-6 pt-4 border-t flex justify-end space-x-4">
+        {selectedAsset.status === "Pending Approval" && (
+          <>
+            <button
+              className="px-6 py-3 bg-green-500 cursor-pointer text-white rounded-lg hover:bg-green-600 text-lg font-medium flex items-center transition-colors shadow-sm"
+              onClick={() => {
+                updateStatus(selectedAsset.userId, selectedAsset.id, "Approved");
+                setSelectedAsset(null);
+              }}
+            >
+              <Check className="w-5 h-5 mr-2" /> Approve
+            </button>
+            <button
+              className="px-6 py-3 bg-red-500 cursor-pointer text-white rounded-lg hover:bg-red-600 text-lg font-medium flex items-center transition-colors shadow-sm"
+              onClick={() => {
+                updateStatus(selectedAsset.userId, selectedAsset.id, "Denied");
+                setSelectedAsset(null);
+              }}
+            >
+              <XIcon className="w-5 h-5 mr-2" /> Deny
+            </button>
+          </>
+        )}
+        <button
+          className="px-6 py-3 bg-gray-200 cursor-pointer text-gray-800 rounded-lg hover:bg-gray-300 text-lg font-medium transition-colors"
+          onClick={() => setSelectedAsset(null)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

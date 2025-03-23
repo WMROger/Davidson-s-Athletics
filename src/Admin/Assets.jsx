@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { MoreHorizontal, Plus, ChevronDown, Edit, Trash, Calendar } from "lucide-react";
 import { db } from "../Database/firebase";
-import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import Select from 'react-select';
 
 const sizeOptions = [
@@ -16,17 +16,19 @@ export default function Assets() {
   const [assets, setAssets] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [showAddProductPopup, setShowAddProductPopup] = useState(false);
+  const [showEditProductPopup, setShowEditProductPopup] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [dateRange, setDateRange] = useState('Jan 1 - Jan 30, 2024');
   const [activeTab, setActiveTab] = useState('All');
   const [selectedProducts, setSelectedProducts] = useState([]);
 
+  // Form states
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [color, setColor] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState(""); // Store uploaded image URL
+  const [imageUrl, setImageUrl] = useState(""); 
   const [sizes, setSizes] = useState([]);
   const [stock, setStock] = useState("");
   const [loading, setLoading] = useState(false);
@@ -56,6 +58,7 @@ export default function Assets() {
   const deleteAsset = async (id) => {
     await deleteDoc(doc(db, "shirts", id));
     setAssets((prev) => prev.filter((asset) => asset.id !== id));
+    setSelectedProduct(null);
   };
 
   const addProduct = async (product) => {
@@ -66,6 +69,36 @@ export default function Assets() {
     } catch (error) {
       console.error("Error adding product:", error);
       alert("Failed to add product.");
+    }
+  };
+
+  const editProduct = async (updatedProduct) => {
+    try {
+      const productRef = doc(db, "shirts", updatedProduct.id);
+      await updateDoc(productRef, {
+        name: updatedProduct.name,
+        price: parseFloat(updatedProduct.price),
+        color: updatedProduct.color,
+        description: updatedProduct.description,
+        image: updatedProduct.image,
+        sizes: updatedProduct.sizes,
+        stock: parseInt(updatedProduct.stock),
+      });
+      
+      setAssets((prev) => 
+        prev.map((asset) => 
+          asset.id === updatedProduct.id ? updatedProduct : asset
+        )
+      );
+      
+      setShowEditProductPopup(false);
+      setSelectedProduct(updatedProduct);
+      
+      return true;
+    } catch (error) {
+      console.error("Error updating product:", error);
+      alert("Failed to update product.");
+      return false;
     }
   };
 
@@ -84,6 +117,10 @@ export default function Assets() {
   // Upload image to Firebase Storage
   const uploadImage = async () => {
     if (!image) {
+      // If editing and not changing the image, just return the existing URL
+      if (showEditProductPopup && imageUrl) {
+        return imageUrl;
+      }
       alert("Please select an image first.");
       return;
     }
@@ -115,7 +152,7 @@ export default function Assets() {
     }
   };
 
-  // Upload form data to Firestore
+  // Handle adding a new product
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !price || !color || !image || sizes.length === 0 || !stock || !description) {
@@ -144,6 +181,53 @@ export default function Assets() {
 
     await addProduct(newProduct);
 
+    // Reset form
+    resetForm();
+  };
+
+  // Handle editing an existing product
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!name || !price || !color || !sizes.length || !stock || !description) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    setLoading(true);
+    
+    // Upload a new image only if a new one was selected
+    let finalImageUrl = imageUrl;
+    if (image) {
+      finalImageUrl = await uploadImage();
+      if (!finalImageUrl) {
+        setLoading(false);
+        return;
+      }
+    }
+
+    const updatedProduct = {
+      ...selectedProduct,
+      name,
+      price: parseFloat(price),
+      color,
+      description,
+      image: finalImageUrl,
+      sizes,
+      stock: parseInt(stock),
+    };
+
+    const success = await editProduct(updatedProduct);
+    
+    if (success) {
+      // Reset form after successful edit
+      resetForm();
+    }
+    
+    setLoading(false);
+  };
+  
+  // Reset form fields
+  const resetForm = () => {
     setName("");
     setPrice("");
     setColor("");
@@ -153,6 +237,24 @@ export default function Assets() {
     setSizes([]);
     setStock("");
     setLoading(false);
+  };
+
+  // Populate form with selected product data for editing
+  const initializeEditForm = (product) => {
+    setName(product.name);
+    setPrice(product.price.toString());
+    setColor(product.color);
+    setDescription(product.description);
+    setImageUrl(product.image);
+    setSizes(product.sizes);
+    setStock(product.stock.toString());
+    setImage(null); // Reset file input
+  };
+
+  // Open edit form
+  const openEditForm = () => {
+    initializeEditForm(selectedProduct);
+    setShowEditProductPopup(true);
   };
 
   // Close menu when clicking outside
@@ -296,6 +398,7 @@ export default function Assets() {
         </div>
       </div>
 
+      {/* Add Product Popup */}
       {showAddProductPopup && (
         <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
@@ -392,8 +495,121 @@ export default function Assets() {
         </div>
       )}
 
-      {selectedProduct && (
+      {/* Edit Product Popup */}
+      {showEditProductPopup && (
         <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 className="text-xl font-semibold mb-6">Edit Product</h2>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="border-2 border-dashed rounded-lg p-8 mb-6 flex flex-col items-center justify-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="edit-upload-image"
+                />
+                <label htmlFor="edit-upload-image" className="cursor-pointer">
+                  {imageUrl ? (
+                    <img src={imageUrl} alt="Product" className="w-32 h-32 object-cover border rounded" />
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <Plus className="w-12 h-12 text-gray-400" />
+                      <span className="text-gray-500">Change Image</span>
+                    </div>
+                  )}
+                </label>
+              </div>
+
+              <input
+                type="text"
+                placeholder="Shirt Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full border rounded p-2"
+              />
+              
+              <div className="flex space-x-2">
+                <input
+                  type="number"
+                  placeholder="Price"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-1/2 border rounded p-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-1/2 border rounded p-2"
+                />
+              </div>
+
+              <textarea
+                placeholder="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full border rounded p-2"
+                rows={4}
+              />
+
+              <Select
+                isMulti
+                options={sizeOptions}
+                value={sizeOptions.filter(option => sizes.includes(option.value))}
+                onChange={(selectedOptions) => setSizes(selectedOptions.map(option => option.value))}
+                className="w-full"
+                placeholder="Select Sizes"
+              />
+
+              <input
+                type="number"
+                placeholder="Stock Quantity"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="w-full border rounded p-2"
+              />
+
+              <div className="flex space-x-2">
+                <button
+                  type="submit"
+                  className="flex-1 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+                  disabled={loading}
+                >
+                  {loading ? "Updating..." : "Update Product"}
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 border border-gray-300 px-4 py-2 rounded hover:bg-gray-50"
+                  onClick={() => {
+                    setShowEditProductPopup(false);
+                    resetForm();
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Product Details Popup */}
+      {selectedProduct && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setSelectedProduct(null);
+            }
+          }}
+          tabIndex={0}
+          ref={(node) => {
+            // Focus the div so it can receive keyboard events
+            if (node) node.focus();
+          }}
+        >
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
             <div className="flex mb-6">
               <div className="w-1/2 pr-6">
@@ -401,37 +617,39 @@ export default function Assets() {
                   src={selectedProduct.image} 
                   alt="Product" 
                   className="w-full h-auto rounded-lg border"
+                  style={{ objectFit: "contain" }}
                 />
               </div>
               <div className="w-1/2">
                 <h2 className="text-2xl font-semibold mb-4">Product Details</h2>
                 <div className="space-y-3">
-                  <p><span className="font-medium">Product Name:</span> {selectedProduct.name}</p>
-                  <p><span className="font-medium">Available Sizes:</span> {selectedProduct.sizes.join(", ")}</p>
-                  <p><span className="font-medium">Color:</span> {selectedProduct.color}</p>
-                  <p><span className="font-medium">Description:</span> {selectedProduct.description}</p>
-                  <p><span className="font-medium">Price:</span> ₱{selectedProduct.price}</p>
-                  <p><span className="font-medium">Stock:</span> {selectedProduct.stock}</p>
+                  <p className="text-lg"><span className="font-bold">Product Name:</span> {selectedProduct.name}</p>
+                  <p className="text-lg"><span className="font-bold">Available Sizes:</span> {selectedProduct.sizes.join(", ")}</p>
+                  <p className="text-lg"><span className="font-bold">Color:</span> {selectedProduct.color}</p>
+                  <p className="text-lg"><span className="font-bold">Description:</span> {selectedProduct.description}</p>
+                  <p className="text-lg"><span className="font-bold">Price:</span> ₱{selectedProduct.price}</p>
+                  <p className="text-lg"><span className="font-bold">Stock:</span> {selectedProduct.stock}</p>
                 </div>
               </div>
             </div>
             
             <div className="flex justify-end space-x-3">
               <button
-                className="px-4 py-2 bg-gray-800 text-white rounded flex items-center hover:bg-gray-700"
+                className="px-4 py-2 bg-gray-800 text-white rounded flex items-center hover:bg-gray-700 text-lg"
+                onClick={openEditForm}
               >
-                <Edit size={16} className="mr-2" />
+                <Edit size={18} className="mr-2" />
                 Edit Product
               </button>
               <button
-                className="px-4 py-2 bg-gray-800 text-white rounded flex items-center hover:bg-gray-700"
+                className="px-4 py-2 bg-gray-800 text-white rounded flex items-center hover:bg-gray-700 text-lg"
                 onClick={() => deleteAsset(selectedProduct.id)}
               >
-                <Trash size={16} className="mr-2" />
+                <Trash size={18} className="mr-2" />
                 Delete Product
               </button>
               <button
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-lg"
                 onClick={() => setSelectedProduct(null)}
               >
                 Close

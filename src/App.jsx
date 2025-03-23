@@ -22,6 +22,7 @@ import ProfileSidebar from "./Pages/Profile/ProfileSidebar";
 import Purchase from "./Pages/Profile/Purchase";
 import Checkout from "./Pages/ShopPages/CheckOut"; // Import the Checkout component
 import PaymentPage from "./Pages/ShopPages/PaymentPage";
+import SearchResults from "./Pages/ShopPages/Search"; // Import the Search Results component
 
 function App() {
   return (
@@ -120,6 +121,16 @@ function App() {
             </>
           }
         />
+        {/* Add route with product ID parameter */}
+        <Route
+          path="/ShopPages/CustomizeShirt/:id"
+          element={
+            <>
+              <Navbar />
+              <CustomizeShirt />
+            </>
+          }
+        />
         <Route
           path="/ShopPages/OrderConfirmation"
           element={
@@ -147,10 +158,30 @@ function App() {
             </>
           }
         />
+        {/* Add search results route */}
+        <Route
+          path="/ShopPages/search"
+          element={
+            <>
+              <Navbar />
+              <SearchResults />
+            </>
+          }
+        />
+        {/* Custom product detail route */}
+        <Route
+          path="/ShopPages/CustomProduct/:id"
+          element={
+            <>
+              <Navbar />
+              <CustomProduct />
+            </>
+          }
+        />
 
         {/* Profile Routes with Sidebar */}
         <Route
-          path="/profile/ProfilePage"
+          path="/Profile/ProfilePage"
           element={
             <>
               <Navbar />
@@ -159,7 +190,7 @@ function App() {
           }
         />
         <Route
-          path="/profile/Purchase"
+          path="/Profile/Purchase"
           element={
             <>
               <Navbar />
@@ -168,7 +199,7 @@ function App() {
           }
         />
 
-<       Route
+        <Route
           path="/ShopPages/PaymentPage"
           element={
             <>
@@ -178,8 +209,6 @@ function App() {
           }
         />
       </Routes>
-
-      
     </div>
   );
 }
