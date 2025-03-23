@@ -56,6 +56,11 @@ export default function Assets() {
   };
 
   const deleteAsset = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to delete this product?");
+    if (!confirmed) {
+      return;
+    }
+  
     try {
       await deleteDoc(doc(db, "shirts", id));
       setAssets((prev) => prev.filter((asset) => asset.id !== id));

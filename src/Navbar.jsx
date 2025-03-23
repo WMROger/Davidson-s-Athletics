@@ -82,8 +82,14 @@ const Navbar = () => {
           id: doc.id,
           ...doc.data(),
           type: 'shirt',
-          // Updated route structure as requested
-          route: `/ShopPages/CustomizeShirt/${doc.id}`
+          route: `/ShopPages/CustomizeShirt/${doc.id}`,
+          // Include necessary data for CustomizeShirt page
+          selectedImage: doc.data().image,
+          selectedColor: doc.data().color,
+          selectedName: doc.data().name,
+          selectedPrice: doc.data().price,
+          selectedSizes: doc.data().sizes,
+          availableStock: doc.data().stock
         }))
         .filter(item => 
           item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,27 +97,8 @@ const Navbar = () => {
           item.color?.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-      // Search in custom products collection (if exists)
-      const customQuery = query(collection(db, "customProducts"));
-      const customSnapshot = await getDocs(customQuery);
-      const customResults = customSnapshot.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          type: 'custom',
-          // Fixed route to match actual application routing structure
-          route: `/ShopPages/CustomProduct/${doc.id}`
-        }))
-        .filter(item => 
-          item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-
       // Combine results
-      const combinedResults = [...shirtsResults, ...customResults];
-      setSearchResults(combinedResults);
-      
-      // No longer auto-navigating even if there's exactly one result
+      setSearchResults(shirtsResults);
     } catch (error) {
       console.error("Error searching:", error);
     } finally {
@@ -149,13 +136,22 @@ const Navbar = () => {
   };
 
   // Handle search result click - now with direct navigation
-  const handleResultClick = (route) => {
+  const handleResultClick = (result) => {
     // Close the search UI
     setShowSearchResults(false);
     setSearchQuery("");
     
-    // Navigate to the specific route (product page, category, etc.)
-    navigate(route);
+    // Navigate to the specific route with state
+    navigate(result.route, {
+      state: {
+        selectedImage: result.selectedImage,
+        selectedColor: result.selectedColor,
+        selectedName: result.selectedName,
+        selectedPrice: result.selectedPrice,
+        selectedSizes: result.selectedSizes,
+        availableStock: result.availableStock
+      }
+    });
   };
 
   // Toggle mobile menu
@@ -256,7 +252,7 @@ const Navbar = () => {
                     {searchResults.map((result) => (
                       <div 
                         key={`${result.type}-${result.id}`}
-                        onClick={() => handleResultClick(result.route)}
+                        onClick={() => handleResultClick(result)}
                         className="flex items-center px-6 py-3 hover:bg-gray-100 cursor-pointer"
                       >
                         {result.image && (
@@ -381,7 +377,7 @@ const Navbar = () => {
                   {searchResults.slice(0, 3).map((result) => (
                     <div 
                       key={`mobile-${result.type}-${result.id}`}
-                      onClick={() => handleResultClick(result.route)}
+                      onClick={() => handleResultClick(result)}
                       className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b"
                     >
                       {result.image && (
