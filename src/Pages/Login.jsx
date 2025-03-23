@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 import { auth, googleProvider, facebookProvider } from "../Database/firebase";
 import { useFacebookSDK } from "../Database/useFacebookSDK";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
@@ -10,6 +10,8 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [isResetMode, setIsResetMode] = useState(false);
   const navigate = useNavigate();
   const db = getFirestore();
 
@@ -59,68 +61,144 @@ export default function Login() {
       navigate(docSnap.data().role === "admin" ? "/admin/dashboard" : "/home");
     }
   };
+  
+  // Handle password reset request
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    
+    if (!email) {
+      alert("Please enter your email address");
+      return;
+    }
+    
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetEmailSent(true);
+      console.log("Password reset email sent");
+    } catch (error) {
+      console.error("Error sending password reset email:", error.message);
+      alert("Failed to send password reset email: " + error.message);
+    }
+  };
 
   return (
     <div className="h-screen flex items-center justify-center bg-[url('/background.svg')] bg-cover bg-center">
-      <div className="bg-neutral-800 p-20 border-1 border-white rounded-2xl shadow-lg w-[450px] mt-22 pb-16">
-        <img src="/Logo.svg" alt="Logo" className="w-24 h-24 mx-auto" />
-        <h2 className="text-2xl font-bold text-center mb-6 mt-6 text-neutral-300">
-          Sign In
+      <div className="bg-[#222A2D] p-8 border border-[#676767] rounded-2xl shadow-xl w-full max-w-md mx-4 mt-30">
+        <img src="/Logo.svg" alt="Logo" className="w-28 h-28 mx-auto" />
+        <h2 className="text-3xl font-bold text-center mb-8 mt-4 text-white">
+          {isResetMode ? "Reset Password" : "Sign In"}
         </h2>
-        <form onSubmit={(e) => { e.preventDefault(); handleLogin("email"); }} className="space-y-4">
-          <div>
-            <label className="block text-neutral-400 text-sm font-medium">Email</label>
-            <input
-              type="email"
-              placeholder="user@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 text-white rounded-lg focus:ring focus:ring-blue-300"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-neutral-400 text-sm font-medium">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 text-white rounded-lg focus:ring focus:ring-blue-300"
-              required
-            />
-          </div>
-          <button type="submit" className="w-full bg-stone-300 text-black p-2 rounded-lg hover:bg-blue-700 transition">
-            Login
-          </button>
-
-          <div className="py-3 flex items-center text-xs text-gray-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6 dark:text-neutral-500 dark:before:border-neutral-600 dark:after:border-neutral-600">
-            or sign in with
-          </div>
-
-          {/* Social Sign-in Buttons */}
-          <div className="flex items-center justify-center space-x-4">
-            <div className="flex gap-4">
-              <div
-                className="bg-blue-600 cursor-pointer rounded-xl w-35 p-3 flex items-center justify-center h-12"
-                onClick={() => handleLogin("facebook")}
-              >
-                <img src="/fb.svg" alt="Facebook" className="w-8 h-8" />
+        
+        {isResetMode ? (
+          <div className="space-y-6">
+            {resetEmailSent ? (
+              <div className="bg-green-500/20 p-4 rounded-lg border border-green-500 mb-6">
+                <p className="text-green-400 text-lg">Password reset link sent to your email address.</p>
               </div>
-              <div
-                className="bg-white cursor-pointer rounded-xl w-35 p-3 flex items-center justify-center h-12"
-                onClick={() => handleLogin("google")}
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-6">
+                <div>
+                  <label className="block text-neutral-300 text-lg font-medium mb-2">Email</label>
+                  <input
+                    type="email"
+                    placeholder="user@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="block w-full p-3 border border-neutral-600 bg-neutral-700 text-white rounded-lg text-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                    required
+                  />
+                </div>
+                <p className="text-neutral-400 text-base">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+                <button 
+                  type="submit" 
+                  className="w-full bg-red-500 hover:bg-red-600 text-white p-4 rounded-lg text-lg font-bold transition-colors"
+                >
+                  Send Reset Link
+                </button>
+              </form>
+            )}
+            
+            <div className="text-center mt-6">
+              <button 
+                onClick={() => {
+                  setIsResetMode(false);
+                  setResetEmailSent(false);
+                }}
+                className="text-red-400 hover:text-red-300 text-lg font-medium underline transition-colors"
               >
-                <img src="/google.svg" alt="Google" className="w-6 h-6" />
-              </div>
+                Back to Sign In
+              </button>
             </div>
           </div>
+        ) : (
+          <form onSubmit={(e) => { e.preventDefault(); handleLogin("email"); }} className="space-y-6">
+            <div>
+              <label className="block text-neutral-300 text-lg font-medium mb-2">Email</label>
+              <input
+                type="email"
+                placeholder="user@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="block w-full p-3 border border-neutral-600 bg-neutral-700 text-white rounded-lg text-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-neutral-300 text-lg font-medium mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                placeholder="Enter your password"
+                onChange={(e) => setPassword(e.target.value)}
+                className="block w-full p-3 border border-neutral-600 bg-neutral-700 text-white rounded-lg text-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                required
+              />
+              <div className="flex justify-start underline mt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsResetMode(true)}
+                  className="text-red-400 hover:text-red-300 text-base transition-colors underline"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            </div>
+            <button 
+              type="submit" 
+              className="w-full bg-red-500 hover:bg-red-600 text-white p-4 rounded-lg text-lg font-bold transition-colors"
+            >
+              Sign In
+            </button>
 
-          <div className="flex items-center justify-center space-x-4">
-            <Link to="/register" className="text-sm text-red-400 underline items-center">
-              Create Account
-            </Link>
-          </div>
-        </form>
+            <div className="py-4 flex items-center text-neutral-400 text-base before:flex-1 before:border-t before:border-neutral-600 before:me-6 after:flex-1 after:border-t after:border-neutral-600 after:ms-6">
+              or sign in with
+            </div>
+
+            {/* Social Sign-in Buttons */}
+            <div className="flex items-center justify-center space-x-6">
+              <div
+                className="bg-blue-600 cursor-pointer rounded-xl p-3 flex items-center justify-center h-14 w-14 hover:bg-blue-700 transition-colors"
+                onClick={() => handleLogin("facebook")}
+              >
+                <img src="/fb.svg" alt="Facebook" className="w-10 h-10" />
+              </div>
+              <div
+                className="bg-white cursor-pointer rounded-xl p-3 flex items-center justify-center h-14 w-14 hover:bg-gray-200 transition-colors"
+                onClick={() => handleLogin("google")}
+              >
+                <img src="/google.svg" alt="Google" className="w-8 h-8" />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center mt-6">
+              <Link to="/register" className="text-lg text-red-400 hover:text-red-300 font-medium underline transition-colors">
+                Create Account
+              </Link>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
