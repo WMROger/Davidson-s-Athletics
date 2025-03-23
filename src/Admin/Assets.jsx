@@ -56,9 +56,15 @@ export default function Assets() {
   };
 
   const deleteAsset = async (id) => {
-    await deleteDoc(doc(db, "shirts", id));
-    setAssets((prev) => prev.filter((asset) => asset.id !== id));
-    setSelectedProduct(null);
+    try {
+      await deleteDoc(doc(db, "shirts", id));
+      setAssets((prev) => prev.filter((asset) => asset.id !== id));
+      setSelectedProduct(null);
+      alert("Product deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("Failed to delete product.");
+    }
   };
 
   const addProduct = async (product) => {
@@ -81,19 +87,19 @@ export default function Assets() {
         color: updatedProduct.color,
         description: updatedProduct.description,
         image: updatedProduct.image,
-        sizes: updatedProduct.sizes,
+        sizes: Array.isArray(updatedProduct.sizes) ? updatedProduct.sizes : [], // Ensure sizes is an array
         stock: parseInt(updatedProduct.stock),
       });
-      
-      setAssets((prev) => 
-        prev.map((asset) => 
+
+      setAssets((prev) =>
+        prev.map((asset) =>
           asset.id === updatedProduct.id ? updatedProduct : asset
         )
       );
-      
+
       setShowEditProductPopup(false);
-      setSelectedProduct(updatedProduct);
-      
+      resetForm(); // Reset form after successful edit
+
       return true;
     } catch (error) {
       console.error("Error updating product:", error);
@@ -212,7 +218,7 @@ export default function Assets() {
       color,
       description,
       image: finalImageUrl,
-      sizes,
+      sizes: sizes || [], // Ensure sizes is an array
       stock: parseInt(stock),
     };
 
@@ -246,15 +252,24 @@ export default function Assets() {
     setColor(product.color);
     setDescription(product.description);
     setImageUrl(product.image);
-    setSizes(product.sizes);
+    setSizes(product.sizes || []); // Ensure sizes is an array
     setStock(product.stock.toString());
     setImage(null); // Reset file input
   };
 
-  // Open edit form
-  const openEditForm = () => {
-    initializeEditForm(selectedProduct);
-    setShowEditProductPopup(true);
+  const openProductDetails = (product) => {
+    setSelectedProduct(product);
+    setShowEditProductPopup(false); // Ensure the edit product popup is not shown
+  };
+
+  const openEditForm = (product) => {
+    initializeEditForm(product);
+    setShowEditProductPopup(true); // Show the edit product popup
+  };
+
+  const closeModals = () => {
+    setShowEditProductPopup(false);
+    setSelectedProduct(null);
   };
 
   // Close menu when clicking outside
@@ -365,7 +380,7 @@ export default function Assets() {
                   <td className="p-2 flex items-center justify-end relative">
                     <button
                       className="px-4 py-2 text-blue-600 rounded hover:bg-blue-300 mr-2"
-                      onClick={() => setSelectedProduct(asset)}
+                      onClick={() => openProductDetails(asset)}
                     >
                       View
                     </button>
@@ -582,10 +597,7 @@ export default function Assets() {
                 <button
                   type="button"
                   className="flex-1 border border-gray-300 px-4 py-2 rounded hover:bg-gray-50"
-                  onClick={() => {
-                    setShowEditProductPopup(false);
-                    resetForm();
-                  }}
+                  onClick={closeModals}
                 >
                   Cancel
                 </button>
@@ -596,12 +608,12 @@ export default function Assets() {
       )}
 
       {/* Product Details Popup */}
-      {selectedProduct && (
+      {selectedProduct && !showEditProductPopup && (
         <div 
           className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md"
           onKeyDown={(e) => {
             if (e.key === "Escape") {
-              setSelectedProduct(null);
+              closeModals();
             }
           }}
           tabIndex={0}
@@ -636,21 +648,15 @@ export default function Assets() {
             <div className="flex justify-end space-x-3">
               <button
                 className="px-4 py-2 bg-gray-800 text-white rounded flex items-center hover:bg-gray-700 text-lg"
-                onClick={openEditForm}
+                onClick={() => openEditForm(selectedProduct)}
               >
                 <Edit size={18} className="mr-2" />
                 Edit Product
               </button>
-              <button
-                className="px-4 py-2 bg-gray-800 text-white rounded flex items-center hover:bg-gray-700 text-lg"
-                onClick={() => deleteAsset(selectedProduct.id)}
-              >
-                <Trash size={18} className="mr-2" />
-                Delete Product
-              </button>
+              
               <button
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-lg"
-                onClick={() => setSelectedProduct(null)}
+                onClick={closeModals}
               >
                 Close
               </button>

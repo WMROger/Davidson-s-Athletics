@@ -85,33 +85,34 @@ const OrderConfirmation = () => {
             />
           </div>
           <div className="md:w-1/2">
-            <h2 className="text-2xl font-bold mb-2">{selectedName}</h2>
-            <p className="text-gray-600 mb-6">Please check if the information you have filled up is correct.</p>
-            <div className="space-y-3 mb-8">
-              <div className="flex">
-                <span className="w-24 text-gray-600">Quantity:</span>
-                <span className="font-medium">{quantity}</span>
+            {/* Modified section with bigger text */}
+            <h2 className="text-3xl font-bold mb-4">{selectedName}</h2>
+            <p className="text-gray-600 mb-6 text-xl">Please check if the information you have filled up is correct.</p>
+            <div className="space-y-4 mb-8">
+              <div className="flex items-center">
+                <span className="w-32 text-gray-700 text-xl">Quantity:</span>
+                <span className="font-medium text-xl">{quantity}</span>
               </div>
-              <div className="flex">
-                <span className="w-24 text-gray-600">Color:</span>
-                <span className="font-medium">{selectedColor}</span>
+              <div className="flex items-center">
+                <span className="w-32 text-gray-700 text-xl">Color:</span>
+                <span className="font-medium text-xl">{selectedColor}</span>
               </div>
-              <div className="flex">
-                <span className="w-24 text-gray-600">Size:</span>
-                <span className="font-medium">{selectedSize}</span>
+              <div className="flex items-center">
+                <span className="w-32 text-gray-700 text-xl">Size:</span>
+                <span className="font-medium text-xl">{selectedSize}</span>
               </div>
-              <div className="flex pt-4 border-t">
-                <span className="w-24 text-gray-600">Total:</span>
-                <span className="font-bold">₱{price * quantity}.00</span>
+              <div className="flex items-center pt-6 border-t border-gray-300">
+                <span className="w-32 text-gray-700 text-xl">Total:</span>
+                <span className="font-bold text-2xl">₱{price * quantity}.00</span>
               </div>
             </div>
+            {/* Bigger button with enhanced styling */}
             <button
-              className="w-56 bg-black text-white py-3 px-6 rounded-md font-medium hover:bg-gray-800 transition"
+              className="w-full bg-black text-white py-3 px-5 rounded-md text-xl font-medium hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
               onClick={handleAddToCart}
             >
               Add to Cart
             </button>
-            
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import { db } from '../../Database/firebase'; // Ensure correct path
 import { collection, addDoc } from 'firebase/firestore';
+import TermsConditionsPopup from './T&C'; // Import the Terms popup component
 
 // Custom CSS for carousel buttons
 const customCarouselStyles = `
@@ -49,6 +50,8 @@ const Checkout = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  // Add state for the Terms and Conditions popup
+  const [isTermsPopupOpen, setIsTermsPopupOpen] = useState(false);
 
   useEffect(() => {
     const { fullName, email, phoneNumber, address, shippingMethod } = formData;
@@ -87,6 +90,17 @@ const Checkout = () => {
 
   const handleTermsChange = (e) => {
     setIsTermsChecked(e.target.checked);
+  };
+
+  // Function to open the Terms popup
+  const handleOpenTermsPopup = (e) => {
+    e.preventDefault(); // Prevent default link behavior
+    setIsTermsPopupOpen(true);
+  };
+
+  // Function to close the Terms popup
+  const handleCloseTermsPopup = () => {
+    setIsTermsPopupOpen(false);
   };
 
   const handleProceed = () => {
@@ -130,6 +144,14 @@ const Checkout = () => {
     <div className="min-h-screen bg-white mt-30">
       {/* Inject custom carousel styles */}
       <style>{customCarouselStyles}</style>
+      
+      {/* Terms and Conditions Popup - Added isChecked and onCheckChange props */}
+      <TermsConditionsPopup 
+        isOpen={isTermsPopupOpen} 
+        onClose={handleCloseTermsPopup}
+        isChecked={isTermsChecked}
+        onCheckChange={handleTermsChange}
+      />
       
       {/* Header */}
       <header className="border-b border-gray-200 py-4 px-6">
@@ -267,7 +289,9 @@ const Checkout = () => {
                     checked={isTermsChecked}
                     onChange={handleTermsChange}
                   />
-                  <span className="text-sm md:text-base">I have read the <a href="#" className="underline">Terms and Conditions</a>.</span>
+                  <span className="text-sm md:text-base">
+                    I have read the <a href="#" onClick={handleOpenTermsPopup} className="underline text-blue-600 hover:text-blue-800">Terms and Conditions</a>.
+                  </span>
                 </label>
               </div>
 

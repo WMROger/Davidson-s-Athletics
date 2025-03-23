@@ -4,6 +4,7 @@ import { db } from "../Database/firebase"; // Ensure correct path
 import { collection, getDocs } from "firebase/firestore";
 
 const sizes = ["S", "M", "L", "XL"];
+const ITEMS_PER_PAGE = 8; // Show 8 products per page (2 rows of 4)
 
 const Shop = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const Shop = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchShirts = async () => {
@@ -43,7 +45,6 @@ const Shop = () => {
     });
   };
 
-  
   const handleRequestDesign = () => {
     setShowDesignOptions(!showDesignOptions);
   };
@@ -74,6 +75,8 @@ const Shop = () => {
         ? prevSelectedSizes.filter((s) => s !== size)
         : [...prevSelectedSizes, size]
     );
+    // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const filteredProducts = products.filter(
@@ -81,6 +84,14 @@ const Shop = () => {
       selectedSizes.length === 0 ||
       selectedSizes.some((size) => product.sizes?.includes(size))
   );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const indexOfLastProduct = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstProduct = indexOfLastProduct - ITEMS_PER_PAGE;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="w-full">
@@ -149,7 +160,7 @@ const Shop = () => {
 
           <div className="grid grid-cols-4 gap-6 mt-6">
             {/* Upload a Design Section */}
-            <div className="container  flex justify-center items-center">
+            <div className="container flex justify-center items-center">
               <div className="border p-6 h-full bg-orange-100 rounded-lg shadow-lg text-center w-96">
                 <div
                   className="border-dashed bg-white border-2 p-15 rounded-lg cursor-pointer"
@@ -184,15 +195,16 @@ const Shop = () => {
               </div>
             </div>
 
-            {filteredProducts.map((product, index) => (
-              <div key={product.id} 
+            {currentProducts.map((product) => (
+              <div 
+                key={product.id} 
                 className="border p-4 shadow-lg rounded-lg transform transition-all duration-300 ease-in-out
-              hover:scale-105 hover:-translate-y-1 hover:shadow-xl">
-
+                hover:scale-105 hover:-translate-y-1 hover:shadow-xl"
+              >
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-48 object-cover rounded-lg cursor-pointer  transition-transform duration-500 ease-in-out
+                  className="w-full h-48 object-cover rounded-lg cursor-pointer transition-transform duration-500 ease-in-out
                   hover:scale-110"
                   onClick={() => handleImageClick(product)}
                 />
@@ -202,9 +214,60 @@ const Shop = () => {
                 <p className="text-gray-500">
                   Sizes: {product.sizes?.join(", ")}
                 </p>
-                
               </div>
             ))}
+          </div>
+
+          {/* Pagination */}
+          {filteredProducts.length > ITEMS_PER_PAGE && (
+            <div className="flex justify-center mt-8">
+              <nav className="flex items-center">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className={`mx-1 px-3 py-1 rounded ${
+                    currentPage === 1
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Previous
+                </button>
+                
+                <div className="flex mx-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                    <button
+                      key={number}
+                      onClick={() => paginate(number)}
+                      className={`mx-1 px-3 py-1 rounded ${
+                        currentPage === number
+                          ? "bg-black text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      {number}
+                    </button>
+                  ))}
+                </div>
+                
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className={`mx-1 px-3 py-1 rounded ${
+                    currentPage === totalPages
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Next
+                </button>
+              </nav>
+            </div>
+          )}
+
+          {/* Results counter */}
+          <div className="mt-4 text-gray-600 text-sm">
+            Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, filteredProducts.length)} of {filteredProducts.length} products
           </div>
         </div>
       </div>

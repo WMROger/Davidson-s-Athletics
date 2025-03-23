@@ -23,6 +23,11 @@ const RequestForm = () => {
     location.state?.imagePreviews || []
   );
   
+  // Add validation errors state
+  const [validationErrors, setValidationErrors] = useState({
+    phone: ""
+  });
+  
   // Available sizes for the products
   const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
   
@@ -56,7 +61,6 @@ const RequestForm = () => {
       sizes: Array(1).fill(""),
       // New property for size quantities when bundling
       sizeQuantities: AVAILABLE_SIZES.reduce((acc, size) => {
-        
         return acc;
       }, {})
     },
@@ -77,14 +81,96 @@ const RequestForm = () => {
       ...prev,
       [fieldId]: value ? true : false,
     }));
+    
+    // Validate phone when field loses focus
+    if (fieldId === "phone" && value) {
+      validatePhone(value);
+    }
+  };
+
+  // Format phone number as user types
+  const formatPhoneNumber = (value) => {
+    // Remove all non-digits
+    const digitsOnly = value.replace(/\D/g, '');
+    
+    // Format based on digit count (for an 11-digit number)
+    if (digitsOnly.length <= 4) {
+      return digitsOnly;
+    } else if (digitsOnly.length <= 7) {
+      return `${digitsOnly.slice(0, 4)}-${digitsOnly.slice(4)}`;
+    } else {
+      return `${digitsOnly.slice(0, 4)}-${digitsOnly.slice(4, 7)}-${digitsOnly.slice(7, 11)}`;
+    }
   };
 
   const handleInputChange = (e, field, section = "customerInfo") => {
-    const value = e.target.value;
+    let value = e.target.value;
+    
+    // Apply formatting only for phone fields
+    if (field === "phone") {
+      // Preserve cursor position
+      const cursorPosition = e.target.selectionStart;
+      const prevValue = formData.customerInfo.phone;
+      
+      // Format the phone number
+      const formattedValue = formatPhoneNumber(value);
+      
+      // Update value
+      value = formattedValue;
+      
+      // Set the state
+      setFormData((prev) => ({
+        ...prev,
+        [section]: { ...prev[section], [field]: value },
+      }));
+      
+      // Clear any error when typing
+      setValidationErrors(prev => ({
+        ...prev,
+        phone: ""
+      }));
+      
+      // After React updates the input value, restore cursor position properly
+      setTimeout(() => {
+        // Calculate new cursor position
+        let newPosition = cursorPosition;
+        const prevNonDigits = (prevValue.substring(0, cursorPosition).match(/\D/g) || []).length;
+        const newNonDigits = (value.substring(0, cursorPosition).match(/\D/g) || []).length;
+        newPosition += (newNonDigits - prevNonDigits);
+        
+        // Set the cursor position
+        e.target.setSelectionRange(newPosition, newPosition);
+      }, 0);
+      
+      return;
+    }
+    
+    // For non-phone fields, use original logic
     setFormData((prev) => ({
       ...prev,
       [section]: { ...prev[section], [field]: value },
     }));
+  };
+
+  // Validate phone number
+  const validatePhone = (phoneNumber) => {
+    // Remove any non-digit characters for validation
+    const digitsOnly = phoneNumber.replace(/\D/g, '');
+    
+    if (digitsOnly.length !== 11) {
+      setValidationErrors(prev => ({
+        ...prev,
+        phone: "Phone number must be 11 digits"
+      }));
+      return false;
+    }
+    
+    // Clear error if valid
+    setValidationErrors(prev => ({
+      ...prev,
+      phone: ""
+    }));
+    return true;
   };
 
   const handleFileChange = (event) => {
@@ -186,6 +272,16 @@ const RequestForm = () => {
   };
 
   const handleSubmit = async () => {
+    // Validate phone number before submission
+    const isPhoneValid = validatePhone(formData.customerInfo.phone);
+    
+    // If validation fails, return early and don't submit
+    if (!isPhoneValid) {
+      // Focus on the phone field to draw attention to the error
+      document.getElementById("phone").focus();
+      return;
+    }
+    
     try {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -349,7 +445,7 @@ const RequestForm = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              {/* Phone Field */}
+              {/* Phone Field - Modified with validation */}
               <div className="w-full sm:w-1/2 relative mb-4">
                 <input
                   id="phone"
@@ -358,19 +454,25 @@ const RequestForm = () => {
                   onChange={(e) => handleInputChange(e, "phone")}
                   onFocus={() => handleFocus("phone")}
                   onBlur={(e) => handleBlur("phone", e.target.value)}
-                  className="border p-2 rounded w-full z-10 relative bg-transparent"
+                  className={`border p-2 rounded w-full z-10 relative bg-transparent ${
+                    validationErrors.phone ? "border-red-500" : ""
+                  }`}
                   placeholder=" "
                 />
                 <label
                   htmlFor="phone"
                   className={`absolute transition-all duration-200 pointer-events-none ${
                     focusedFields["phone"] || formData.customerInfo.phone
-                      ? "text-xs text-gray-500 -top-2 left-2 bg-white px-1 z-20"
-                      : "text-gray-500 top-2 left-2 z-0"
+                      ? `text-xs ${validationErrors.phone ? "text-red-500" : "text-gray-500"} -top-2 left-2 bg-white px-1 z-20`
+                      : `${validationErrors.phone ? "text-red-500" : "text-gray-500"} top-2 left-2 z-0`
                   }`}
                 >
                   Phone Number
                 </label>
+                {validationErrors.phone && (
+                  <p className="text-red-500 text-xs mt-1">{validationErrors.phone}</p>
+                )}
+                <p className="text-gray-400 text-xs mt-1">Format: 09XX-XXX-XXXX (11 digits)</p>
               </div>
 
               {/* Team Name Field */}

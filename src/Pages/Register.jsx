@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../Database/firebase"; // Firebase setup
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
 export default function Register() {
@@ -20,6 +20,9 @@ export default function Register() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Send email verification
+      await sendEmailVerification(user);
+
       // Store user in Firestore
       await setDoc(doc(db, "users", user.uid), {
         firstName,
@@ -30,7 +33,7 @@ export default function Register() {
         createdAt: new Date(),
       });
 
-      alert("Registration successful!");
+      alert("Registration successful! Please check your email to verify your account.");
       navigate("/login"); // Redirect to login
     } catch (error) {
       console.error("Error registering:", error.message);
