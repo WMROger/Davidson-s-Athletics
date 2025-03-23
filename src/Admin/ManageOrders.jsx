@@ -13,6 +13,8 @@ const OrdersManagement = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [dropdownOrderId, setDropdownOrderId] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
 
   const typeDropdownRef = useRef(null);
   const statusDropdownRef = useRef(null);
@@ -23,7 +25,11 @@ const OrdersManagement = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       const querySnapshot = await getDocs(collection(db, "orders"));
-      const orders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const orders = querySnapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data(),
+        status: doc.data().status || 'Pending' // Set default status to Pending if not present
+      }));
       setAllOrders(orders);
     };
 
@@ -49,7 +55,8 @@ const OrdersManagement = () => {
       (dateFilter === '' || order.date === dateFilter) &&
       (searchQuery === '' || 
         order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.customer.toLowerCase().includes(searchQuery.toLowerCase()))
+        order.customer?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.fullName?.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }) : [];
 
@@ -150,6 +157,11 @@ const OrdersManagement = () => {
     return receiptFile ? 'text-green-500' : 'text-red-500';
   };
 
+  const handleProductClick = (products) => {
+    setSelectedProduct(products);
+    setShowProductModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto py-8 px-6">
@@ -217,7 +229,7 @@ const OrdersManagement = () => {
               </div>
             </div>
             
-            {/* Status Filter Dropdown */}
+            {/* Status Filter Dropdown - Updated with new status values */}
             <div className="relative" ref={statusDropdownRef}>
               <div className="inline-block">
                 <button 
@@ -247,42 +259,68 @@ const OrdersManagement = () => {
                       </li>
                       <li 
                         className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
-                        onClick={() => handleFilterChange(setStatusFilter, 'Paid')}
+                        onClick={() => handleFilterChange(setStatusFilter, 'Pending')}
                         role="menuitem"
                         tabIndex={0}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
-                            handleFilterChange(setStatusFilter, 'Paid');
+                            handleFilterChange(setStatusFilter, 'Pending');
                           }
                         }}
                       >
-                        Paid
+                        Pending
                       </li>
                       <li 
                         className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
-                        onClick={() => handleFilterChange(setStatusFilter, 'Cancelled')}
+                        onClick={() => handleFilterChange(setStatusFilter, 'To Ship')}
                         role="menuitem"
                         tabIndex={0}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
-                            handleFilterChange(setStatusFilter, 'Cancelled');
+                            handleFilterChange(setStatusFilter, 'To Ship');
                           }
                         }}
                       >
-                        Cancelled
+                        To Ship
                       </li>
                       <li 
                         className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
-                        onClick={() => handleFilterChange(setStatusFilter, 'Returned')}
+                        onClick={() => handleFilterChange(setStatusFilter, 'To Deliver')}
                         role="menuitem"
                         tabIndex={0}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
-                            handleFilterChange(setStatusFilter, 'Returned');
+                            handleFilterChange(setStatusFilter, 'To Deliver');
                           }
                         }}
                       >
-                        Returned
+                        To Deliver
+                      </li>
+                      <li 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
+                        onClick={() => handleFilterChange(setStatusFilter, 'To Receive')}
+                        role="menuitem"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleFilterChange(setStatusFilter, 'To Receive');
+                          }
+                        }}
+                      >
+                        To Receive
+                      </li>
+                      <li 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
+                        onClick={() => handleFilterChange(setStatusFilter, 'Completed')}
+                        role="menuitem"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleFilterChange(setStatusFilter, 'Completed');
+                          }
+                        }}
+                      >
+                        Completed
                       </li>
                     </ul>
                   </div>
@@ -380,6 +418,7 @@ const OrdersManagement = () => {
                   <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Customer</th>
                   <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Type</th>
                   <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Status</th>
+                  <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Payment Status</th>
                   <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Product</th>
                   <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Total</th>
                   <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Date</th>
@@ -408,7 +447,19 @@ const OrdersManagement = () => {
                           <span className="text-base">{order.fullName}</span>
                         </div>
                       </td>
-                      <td className="px-5 py-4 text-base">{order.shippingMethod}</td> {/* This line ensures the type is displayed */}
+                      <td className="px-5 py-4 text-base">{order.shippingMethod}</td>
+                      <td className="px-5 py-4">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-base ${
+                          order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 
+                          order.status === 'To Ship' ? 'bg-blue-100 text-blue-800' : 
+                          order.status === 'To Deliver' ? 'bg-indigo-100 text-indigo-800' : 
+                          order.status === 'To Receive' ? 'bg-purple-100 text-purple-800' : 
+                          order.status === 'Completed' ? 'bg-green-100 text-green-800' : 
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {order.status || 'Pending'}
+                        </span>
+                      </td>
                       <td className="px-5 py-4">
                         <div className={`flex items-center ${getStatusColor(order.receiptFile)}`}>
                           <StatusIcon receiptFile={order.receiptFile} />
@@ -417,17 +468,18 @@ const OrdersManagement = () => {
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex">
-                          {order.selectedItems && order.selectedItems.map((product, i) => (
-                            <div 
-                              key={i} 
-                              className={`w-8 h-8 border ${product.color === 'yellow' ? 'bg-yellow-400' : 'bg-black'} rounded ${i > 0 ? '-ml-2' : ''}`}
-                              aria-label={`Product color: ${product.color}`}
-                            />
-                          ))}
+                          {order.selectedItems && order.selectedItems.length > 0 && (
+                            <button 
+                              className="text-blue-600 hover:underline"
+                              onClick={() => handleProductClick(order.selectedItems)} // Pass the entire selectedItems array
+                            >
+                              View File
+                            </button>
+                          )}
                         </div>
                       </td>
                       <td className="px-5 py-4 text-base font-medium">₱{order.total}</td>
-                      <td className="px-5 py-4 text-base">{order.createdAt.toDate().toLocaleDateString()}</td>
+                      <td className="px-5 py-4 text-base">{order.createdAt?.toDate().toLocaleDateString()}</td>
                       <td className="px-5 py-4 relative">
                         <button 
                           className="text-gray-400 hover:text-gray-600"
@@ -438,6 +490,12 @@ const OrdersManagement = () => {
                         </button>
                         {openDropdown === order.id && (
                           <div className="fixed right-0 mt-2 w-52 bg-white border border-gray-200 rounded shadow-lg z-10">
+                            <button 
+                              className="block w-full text-left px-5 py-3 text-base text-gray-700 hover:bg-gray-100"
+                              onClick={() => handleStatusChange(order.id, 'Pending')}
+                            >
+                              Pending
+                            </button>
                             <button 
                               className="block w-full text-left px-5 py-3 text-base text-gray-700 hover:bg-gray-100"
                               onClick={() => handleStatusChange(order.id, 'To Ship')}
@@ -469,7 +527,7 @@ const OrdersManagement = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="9" className="px-5 py-8 text-center text-base text-gray-500">
+                    <td colSpan="10" className="px-5 py-8 text-center text-base text-gray-500">
                       No orders found matching your filters. Try adjusting your search criteria.
                     </td>
                   </tr>
@@ -526,6 +584,107 @@ const OrdersManagement = () => {
           </div>
         </div>
       </div>
+      {showProductModal && selectedProduct && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md bg-black/30"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setShowProductModal(false);
+            }
+          }}
+          tabIndex={0}
+          ref={(node) => {
+            // Focus the div so it can receive keyboard events
+            if (node) node.focus();
+          }}
+        >
+          <div className="bg-white p-6 rounded-lg shadow-xl w-3/4 max-w-4xl max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b pb-4 mb-6">
+              <h2 className="text-2xl font-semibold">File Details</h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100"
+                onClick={() => setShowProductModal(false)}
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="flex flex-col md:flex-row md:space-x-6">
+              <div className="md:w-1/2 mb-6 md:mb-0">
+                <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center h-[400px]">
+                  {selectedProduct.length > 1 ? (
+                    <div className="carousel">
+                      {selectedProduct.map((product, index) => (
+                        <div key={index} className="carousel-item">
+                          <img
+                            src={product.image}
+                            alt="Product"
+                            className="max-h-full object-contain"
+                            style={{ maxWidth: "100%", objectFit: "contain" }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <img
+                      src={selectedProduct[0].image}
+                      alt="Product"
+                      className="max-h-full object-contain"
+                      style={{ maxWidth: "100%", objectFit: "contain" }}
+                    />
+                  )}
+                </div>
+              </div>
+              
+              <div className="md:w-1/2 space-y-4">
+                <div className="mb-2">
+                  <span className={`inline-block px-4 py-2 rounded-lg text-lg font-medium ${
+                    selectedProduct[0].status === "Approved"
+                      ? "bg-green-500 text-white"
+                      : selectedProduct[0].status === "Denied"
+                      ? "bg-red-500 text-white"
+                      : "bg-yellow-500 text-white"
+                  }`}>
+                    {selectedProduct[0].status}
+                  </span>
+                </div>
+                
+                <div className="border-b pb-2 mb-2">
+                  <h3 className="font-bold text-2xl mb-3">File Information</h3>
+                  <p className="text-lg">
+                    <span className="font-semibold">File Name:</span> {selectedProduct[0].name}
+                  </p>
+                  <p className="text-lg">
+                    <span className="font-semibold">File Size:</span> {selectedProduct[0].size} MB
+                  </p>
+                  <p className="text-lg">
+                    <span className="font-semibold">Uploaded By:</span> {selectedProduct[0].uploadedBy}
+                  </p>
+                </div>
+                
+                <div className="border-b pb-2 mb-2">
+                  <h3 className="font-bold text-2xl mb-3">Description</h3>
+                  <p className="text-lg">{selectedProduct[0].description}</p>
+                </div>
+                
+                <div>
+                  <h3 className="font-bold text-2xl mb-3">Tags</h3>
+                  <p className="text-lg">{selectedProduct[0].tags ? selectedProduct[0].tags.join(", ") : "No tags available"}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 pt-4 border-t flex justify-end space-x-4">
+              <button
+                className="px-6 py-3 bg-gray-200 cursor-pointer text-gray-800 rounded-lg hover:bg-gray-300 text-lg font-medium transition-colors"
+                onClick={() => setShowProductModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
