@@ -140,9 +140,9 @@ const OrdersManagement = () => {
 
   const StatusIcon = ({ receiptFile }) => {
     if (receiptFile) {
-      return <Check className="w-4 h-4 text-green-500 mr-1" />;
+      return <Check className="w-5 h-5 text-green-500 mr-1" />;
     } else {
-      return <X className="w-4 h-4 text-red-500 mr-1" />;
+      return <X className="w-5 h-5 text-red-500 mr-1" />;
     }
   };
 
@@ -152,28 +152,28 @@ const OrdersManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto py-6 px-4">
-        <h1 className="text-6xl font-bold mb-6">Orders</h1>
+      <div className="container mx-auto py-8 px-6">
+        <h1 className="text-6xl font-bold mb-8">Orders</h1>
         
-        <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center justify-between mb-6 gap-3">
+          <div className="flex flex-wrap gap-3">
             {/* Type Filter Dropdown */}
             <div className="relative" ref={typeDropdownRef}>
               <div className="inline-block">
                 <button 
-                  className="px-4 py-2 bg-black text-white rounded-full flex items-center"
+                  className="px-5 py-3 bg-black text-white rounded-full flex items-center text-base"
                   onClick={() => toggleDropdown('type')}
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'type'}
                   aria-label="Filter by type"
                 >
-                  {typeFilter || 'Type'} <ChevronDown className="w-4 h-4 ml-1" />
+                  {typeFilter || 'Type'} <ChevronDown className="w-5 h-5 ml-2" />
                 </button>
                 {openDropdown === 'type' && (
-                  <div className="absolute mt-1 w-40 bg-white rounded-lg shadow-lg z-10">
-                    <ul className="py-1" role="menu">
+                  <div className="absolute mt-1 w-48 bg-white rounded-lg shadow-lg z-10">
+                    <ul className="py-2" role="menu">
                       <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                         onClick={() => handleFilterChange(setTypeFilter, '')}
                         role="menuitem"
                         tabIndex={0}
@@ -186,7 +186,7 @@ const OrdersManagement = () => {
                         All
                       </li>
                       <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                         onClick={() => handleFilterChange(setTypeFilter, 'Delivery')}
                         role="menuitem"
                         tabIndex={0}
@@ -199,7 +199,7 @@ const OrdersManagement = () => {
                         Delivery
                       </li>
                       <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                         onClick={() => handleFilterChange(setTypeFilter, 'Pickup')}
                         role="menuitem"
                         tabIndex={0}
@@ -221,19 +221,19 @@ const OrdersManagement = () => {
             <div className="relative" ref={statusDropdownRef}>
               <div className="inline-block">
                 <button 
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-full flex items-center"
+                  className="px-5 py-3 bg-white border border-gray-300 rounded-full flex items-center text-base"
                   onClick={() => toggleDropdown('status')}
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'status'}
                   aria-label="Filter by status"
                 >
-                  {statusFilter || 'Status'} <ChevronDown className="w-4 h-4 ml-1" />
+                  {statusFilter || 'Status'} <ChevronDown className="w-5 h-5 ml-2" />
                 </button>
                 {openDropdown === 'status' && (
-                  <div className="absolute mt-1 w-40 bg-white rounded-lg shadow-lg z-10">
-                    <ul className="py-1" role="menu">
+                  <div className="absolute mt-1 w-48 bg-white rounded-lg shadow-lg z-10">
+                    <ul className="py-2" role="menu">
                       <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                         onClick={() => handleFilterChange(setStatusFilter, '')}
                         role="menuitem"
                         tabIndex={0}
@@ -246,7 +246,7 @@ const OrdersManagement = () => {
                         All
                       </li>
                       <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                         onClick={() => handleFilterChange(setStatusFilter, 'Paid')}
                         role="menuitem"
                         tabIndex={0}
@@ -259,7 +259,7 @@ const OrdersManagement = () => {
                         Paid
                       </li>
                       <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                         onClick={() => handleFilterChange(setStatusFilter, 'Cancelled')}
                         role="menuitem"
                         tabIndex={0}
@@ -272,7 +272,7 @@ const OrdersManagement = () => {
                         Cancelled
                       </li>
                       <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                         onClick={() => handleFilterChange(setStatusFilter, 'Returned')}
                         role="menuitem"
                         tabIndex={0}
@@ -294,19 +294,19 @@ const OrdersManagement = () => {
             <div className="relative" ref={dateDropdownRef}>
               <div className="inline-block">
                 <button 
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-full flex items-center"
+                  className="px-5 py-3 bg-white border border-gray-300 rounded-full flex items-center text-base"
                   onClick={() => toggleDropdown('date')}
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'date'}
                   aria-label="Filter by date"
                 >
-                  {dateFilter || 'Date'} <ChevronDown className="w-4 h-4 ml-1" />
+                  {dateFilter || 'Date'} <ChevronDown className="w-5 h-5 ml-2" />
                 </button>
                 {openDropdown === 'date' && (
-                  <div className="absolute mt-1 w-40 bg-white rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-                    <ul className="py-1" role="menu">
+                  <div className="absolute mt-1 w-48 bg-white rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
+                    <ul className="py-2" role="menu">
                       <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                        className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                         onClick={() => handleFilterChange(setDateFilter, '')}
                         role="menuitem"
                         tabIndex={0}
@@ -321,7 +321,7 @@ const OrdersManagement = () => {
                       {uniqueDates.map((date, index) => (
                         <li 
                           key={index} 
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer" 
+                          className="px-5 py-3 hover:bg-gray-100 cursor-pointer text-base" 
                           onClick={() => handleFilterChange(setDateFilter, date)}
                           role="menuitem"
                           tabIndex={0}
@@ -348,15 +348,15 @@ const OrdersManagement = () => {
               placeholder="Search" 
               value={searchQuery}
               onChange={(e) => handleFilterChange(setSearchQuery, e.target.value)}
-              className="px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-full w-64"
+              className="px-5 py-3 pl-12 pr-5 border border-gray-300 rounded-full w-72 text-base"
               aria-label="Search orders"
             />
-            <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
           </div>
         </div>
         
         {/* Order Count Display */}
-        <div className="mb-4 text-sm text-gray-600">
+        <div className="mb-5 text-base text-gray-600">
           Showing {indexOfFirstOrder + 1}-{Math.min(indexOfLastOrder, filteredOrders.length)} of {filteredOrders.length} orders
           {(typeFilter || statusFilter || dateFilter || searchQuery) && (
             <span> (filtered from {allOrders.length} total orders)</span>
@@ -369,95 +369,95 @@ const OrdersManagement = () => {
             <table className="w-full whitespace-wrap">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="px-4 py-3 text-left">
+                  <th className="px-5 py-4 text-left">
                     <input 
                       type="checkbox" 
-                      className="rounded border-gray-300"
+                      className="rounded border-gray-300 w-5 h-5"
                       aria-label="Select all orders" 
                     />
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Order</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Customer</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Type</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Product</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Total</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Date</th>
-                  <th className="px-4 py-3"></th>
+                  <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Order</th>
+                  <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Customer</th>
+                  <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Type</th>
+                  <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Status</th>
+                  <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Product</th>
+                  <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Total</th>
+                  <th className="px-5 py-4 text-left text-lg font-medium text-gray-500">Date</th>
+                  <th className="px-5 py-4"></th>
                 </tr>
               </thead>
               <tbody>
                 {orders.length > 0 ? (
                   orders.map((order, index) => (
                     <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4">
                         <input 
                           type="checkbox" 
-                          className="rounded border-gray-300"
+                          className="rounded border-gray-300 w-5 h-5"
                           checked={selectedOrders.includes(order.id)}
                           onChange={() => toggleOrderSelection(order.id)}
                           aria-label={`Select order ${order.id}`}
                         />
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium">{order.id}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4 text-base font-medium">{order.id}</td>
+                      <td className="px-5 py-4">
                         <div className="flex items-center">
-                          <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden mr-2">
-                            <img src="../public/Icons/calendar.svg" alt="User" className="h-8 w-8 object-cover" />
+                          <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden mr-3">
+                            <img src="../public/Icons/calendar.svg" alt="User" className="h-10 w-10 object-cover" />
                           </div>
-                          <span className="text-sm">{order.fullName}</span>
+                          <span className="text-base">{order.fullName}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm">{order.shippingMethod}</td> {/* This line ensures the type is displayed */}
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4 text-base">{order.shippingMethod}</td> {/* This line ensures the type is displayed */}
+                      <td className="px-5 py-4">
                         <div className={`flex items-center ${getStatusColor(order.receiptFile)}`}>
                           <StatusIcon receiptFile={order.receiptFile} />
-                          <span className="text-sm">{order.receiptFile ? 'Paid' : 'Unpaid'}</span>
+                          <span className="text-base">{order.receiptFile ? 'Paid' : 'Unpaid'}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-4">
                         <div className="flex">
                           {order.selectedItems && order.selectedItems.map((product, i) => (
                             <div 
                               key={i} 
-                              className={`w-6 h-6 border ${product.color === 'yellow' ? 'bg-yellow-400' : 'bg-black'} rounded ${i > 0 ? '-ml-2' : ''}`}
+                              className={`w-8 h-8 border ${product.color === 'yellow' ? 'bg-yellow-400' : 'bg-black'} rounded ${i > 0 ? '-ml-2' : ''}`}
                               aria-label={`Product color: ${product.color}`}
                             />
                           ))}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium">₱{order.total}</td>
-                      <td className="px-4 py-3 text-sm">{order.createdAt.toDate().toLocaleDateString()}</td>
-                      <td className="px-4 py-3 relative">
+                      <td className="px-5 py-4 text-base font-medium">₱{order.total}</td>
+                      <td className="px-5 py-4 text-base">{order.createdAt.toDate().toLocaleDateString()}</td>
+                      <td className="px-5 py-4 relative">
                         <button 
                           className="text-gray-400 hover:text-gray-600"
                           aria-label={`More options for order ${order.id}`}
                           onClick={() => toggleDropdown(order.id)}
                         >
-                          <MoreHorizontal className="w-5 h-5" />
+                          <MoreHorizontal className="w-6 h-6" />
                         </button>
                         {openDropdown === order.id && (
-                          <div className="fixed right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-10">
+                          <div className="fixed right-0 mt-2 w-52 bg-white border border-gray-200 rounded shadow-lg z-10">
                             <button 
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              className="block w-full text-left px-5 py-3 text-base text-gray-700 hover:bg-gray-100"
                               onClick={() => handleStatusChange(order.id, 'To Ship')}
                             >
                               To Ship
                             </button>
                             <button 
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              className="block w-full text-left px-5 py-3 text-lg text-gray-700 hover:bg-gray-100"
                               onClick={() => handleStatusChange(order.id, 'To Deliver')}
                             >
                               To Deliver
                             </button>
                             <button 
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              className="block w-full text-left px-5 py-3 text-lg text-gray-700 hover:bg-gray-100"
                               onClick={() => handleStatusChange(order.id, 'To Receive')}
                             >
                               To Receive
                             </button>
                             <button 
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              className="block w-full text-left px-5 py-3 text-lg text-gray-700 hover:bg-gray-100"
                               onClick={() => handleStatusChange(order.id, 'Completed')}
                             >
                               Completed
@@ -469,7 +469,7 @@ const OrdersManagement = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="9" className="px-4 py-6 text-center text-gray-500">
+                    <td colSpan="9" className="px-5 py-8 text-center text-base text-gray-500">
                       No orders found matching your filters. Try adjusting your search criteria.
                     </td>
                   </tr>
@@ -480,29 +480,29 @@ const OrdersManagement = () => {
         </div>
         
         {/* Pagination */}
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-gray-600">
+        <div className="flex justify-between items-center mt-6">
+          <div className="text-base text-gray-600">
             Showing page {currentPage} of {totalPages || 1}
           </div>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-2">
             <button 
               onClick={prevPage}
               disabled={currentPage === 1}
-              className={`rounded-full px-3 py-2 flex items-center ${currentPage === 1 ? ' text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
+              className={`rounded-full px-4 py-3 flex items-center ${currentPage === 1 ? ' text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
               aria-label="Previous page"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
             
             {/* Page Number Links with Truncation */}
             {getPaginationLinks().map((page, index) => (
               page === '...' ? (
-                <span key={`ellipsis-${index}`} className="px-2 py-1 text-gray-500" aria-hidden="true">...</span>
+                <span key={`ellipsis-${index}`} className="px-3 py-2 text-gray-500 text-base" aria-hidden="true">...</span>
               ) : (
                 <button 
                   key={`page-${page}`}
                   onClick={() => goToPage(page)}
-                  className={`rounded-full w-8 h-8 flex items-center justify-center ${
+                  className={`rounded-full w-10 h-10 flex items-center justify-center text-base ${
                     currentPage === page 
                       ? 'bg-black text-white' 
                       : ' hover:bg-gray-300 text-gray-600'
@@ -518,10 +518,10 @@ const OrdersManagement = () => {
             <button
               onClick={nextPage}
               disabled={currentPage === totalPages || totalPages === 0}
-              className={`rounded-full px-3 py-2 flex items-center ${currentPage === totalPages || totalPages === 0 ? ' text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
+              className={`rounded-full px-4 py-3 flex items-center ${currentPage === totalPages || totalPages === 0 ? ' text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300 text-gray-600'}`}
               aria-label="Next page"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </div>

@@ -394,7 +394,7 @@ const Cart = () => {
                     {/* Remove Request Button */}
                     <button
                       onClick={() => removeRequest(request.id)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 cursor-pointer"
                     >
                       Remove Request
                     </button>

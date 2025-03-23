@@ -6,6 +6,30 @@ import 'react-multi-carousel/lib/styles.css';
 import { db } from '../../Database/firebase'; // Ensure correct path
 import { collection, addDoc } from 'firebase/firestore';
 
+// Custom CSS for carousel buttons
+const customCarouselStyles = `
+  .carousel-container {
+    position: relative;
+  }
+  
+  .carousel-container .react-multiple-carousel__arrow {
+    display: none;
+  }
+  
+  .carousel-container:hover .react-multiple-carousel__arrow {
+    display: block;
+  }
+  
+  .react-multiple-carousel__arrow {
+    min-width: 30px;
+    min-height: 30px;
+  }
+  
+  .react-multiple-carousel__arrow::before {
+    font-size: 14px;
+  }
+`;
+
 const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,13 +48,22 @@ const Checkout = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
     const { fullName, email, phoneNumber, address, shippingMethod } = formData;
+    const isPhoneValid = phoneNumber.trim().length === 11 && /^\d+$/.test(phoneNumber);
+    
+    if (phoneNumber.trim() !== '' && !isPhoneValid) {
+      setPhoneError("Phone number must be exactly 11 digits");
+    } else {
+      setPhoneError("");
+    }
+    
     setIsFormValid(
       fullName.trim() !== '' &&
       email.trim() !== '' &&
-      phoneNumber.trim() !== '' &&
+      isPhoneValid &&
       address.trim() !== '' &&
       shippingMethod.trim() !== '' &&
       isTermsChecked
@@ -39,7 +72,17 @@ const Checkout = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    
+    // For phone number, only allow digits and max 11 characters
+    if (name === 'phoneNumber') {
+      const digitsOnly = value.replace(/\D/g, '');
+      setFormData((prevData) => ({ 
+        ...prevData, 
+        [name]: digitsOnly.slice(0, 11)
+      }));
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   const handleTermsChange = (e) => {
@@ -85,6 +128,9 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-white mt-30">
+      {/* Inject custom carousel styles */}
+      <style>{customCarouselStyles}</style>
+      
       {/* Header */}
       <header className="border-b border-gray-200 py-4 px-6">
         <div className="container flex justify-end items-center">
@@ -158,6 +204,7 @@ const Checkout = () => {
                 <input
                   type="text"
                   name="fullName"
+                  placeholder='Enter Full Name'
                   value={formData.fullName}
                   onChange={handleInputChange}
                   className="w-full md:w-3/4 px-3 py-2 border border-gray-300 rounded-md"
@@ -172,6 +219,7 @@ const Checkout = () => {
                 <input
                   type="email"
                   name="email"
+                  placeholder='Enter Email Address'
                   value={formData.email}
                   onChange={handleInputChange}
                   className="w-full md:w-3/4 px-3 py-2 border border-gray-300 rounded-md"
@@ -188,9 +236,12 @@ const Checkout = () => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  className="w-full md:w-3/4 px-3 py-2 border border-gray-300 rounded-md"
+                  className={`w-full md:w-3/4 px-3 py-2 border ${phoneError ? 'border-red-500' : 'border-gray-300'} rounded-md`}
+                  placeholder="11-digit phone number"
+                  maxLength="11"
                   required
                 />
+                {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
               </div>
               
               <div className="mb-4">
@@ -200,6 +251,7 @@ const Checkout = () => {
                 <input
                   type="text"
                   name="address"
+                  placeholder='Enter Address'
                   value={formData.address}
                   onChange={handleInputChange}
                   className="w-full md:w-3/4 px-3 py-2 border border-gray-300 rounded-md"
@@ -229,29 +281,46 @@ const Checkout = () => {
           <div className="w-full md:w-1/2 p-4 md:p-6 mt-2">
             <h2 className="text-xl md:text-2xl font-semibold mb-4">Review your cart</h2>
             
-            <Carousel responsive={responsive}>
-              {selectedItems.map((item, index) => (
-                <div key={index} className="bg-gray-100 rounded-lg p-4 mb-6">
-                  <img 
-                    src={item.imageUrl || item.imageUrls?.[0] || '/placeholder.png'}
-                    alt={item.productName}
-                    className="w-full h-auto mb-4"
-                  />
-                  <div className="space-y-2 mb-6">
-                    <div className="flex justify-between text-sm md:text-base">
-                      <span>{item.productName}</span>
-                      <span>₱{((item.price || 380) * (item.quantity || 1)).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm md:text-base">
-                      <span>Quantity</span>
-                      <span>{item.quantity || 1}</span>
+            <div className="max-w-full overflow-hidden">
+              <Carousel 
+                responsive={responsive}
+                containerClass="carousel-container"
+                itemClass="px-2"
+                ssr={true}
+              >
+                {selectedItems.map((item, index) => (
+                  <div key={index} className="bg-gray-100 rounded-lg p-4 mb-4">
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                      {/* Slightly bigger image container */}
+                      <div className="w-full md:w-2/5 max-h-40 overflow-hidden flex items-center justify-center">
+                        <img 
+                          src={item.imageUrl || item.imageUrls?.[0] || '/placeholder.png'}
+                          alt={item.productName}
+                          className="object-contain h-40 max-w-full"
+                        />
+                      </div>
+                      <div className="w-full md:w-3/5 space-y-2">
+                        <p className="font-medium text-base">{item.productName}</p>
+                        <div className="flex justify-between text-sm">
+                          <span>Price:</span>
+                          <span>₱{(item.price || 380).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Quantity:</span>
+                          <span>{item.quantity || 1}</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-medium pt-2 border-t border-gray-300 mt-1">
+                          <span>Subtotal:</span>
+                          <span>₱{((item.price || 380) * (item.quantity || 1)).toFixed(2)}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </Carousel>
+                ))}
+              </Carousel>
+            </div>
             
-            <div className="space-y-2 mb-6">
+            <div className="space-y-2 mb-6 mt-6 p-4 bg-gray-50 rounded-lg">
               <div className="flex justify-between text-sm md:text-base">
                 <span>Subtotal</span>
                 <span>₱{subtotal.toFixed(2)}</span>
