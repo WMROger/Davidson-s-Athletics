@@ -346,7 +346,7 @@ const Shop = () => {
         </div>
       </div>
       {/* Footer */}
-      <div className="w-full py-20 px-10 bg-gray-800 mt-12">
+      <div className="w-full  pb-20 pt-10 px-10 bg-gray-800 mt-10">
         <div className="container mx-auto text-white">
           <div className="flex justify-between">
             <div>
@@ -355,8 +355,8 @@ const Shop = () => {
             </div>
             <div>
               <h3 className="text-lg font-bold">Contact Us</h3>
-              <p className="text-sm mt-2">Email: support@davidsonathletics.com</p>
-              <p className="text-sm">Phone: +1 234 567 890</p>
+              <p className="text-sm mt-2">Email: </p>
+              <p className="text-sm">Phone: </p>
             </div>
           </div>
         </div>

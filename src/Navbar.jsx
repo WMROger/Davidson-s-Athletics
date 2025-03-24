@@ -4,6 +4,7 @@ import { Menu, X, Search, ShoppingCart } from "lucide-react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "./Database/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import { Settings } from 'lucide-react';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,14 +83,15 @@ const Navbar = () => {
           id: doc.id,
           ...doc.data(),
           type: 'shirt',
-          route: `/ShopPages/CustomizeShirt/${doc.id}`,
-          // Include necessary data for CustomizeShirt page
-          selectedImage: doc.data().image,
-          selectedColor: doc.data().color,
-          selectedName: doc.data().name,
-          selectedPrice: doc.data().price,
-          selectedSizes: doc.data().sizes,
-          availableStock: doc.data().stock
+          // Store the full product data needed for CustomizeShirt
+          productData: {
+            selectedImage: doc.data().image,
+            selectedColor: doc.data().color,
+            selectedName: doc.data().name,
+            selectedPrice: doc.data().price,
+            selectedSizes: doc.data().sizes,
+            availableStock: doc.data().stock,
+          }
         }))
         .filter(item => 
           item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -97,8 +99,33 @@ const Navbar = () => {
           item.color?.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
+      // Search in custom products collection (if exists)
+      const customQuery = query(collection(db, "customProducts"));
+      const customSnapshot = await getDocs(customQuery);
+      const customResults = customSnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          type: 'custom',
+          // Store product data
+          productData: {
+            selectedImage: doc.data().image,
+            selectedColor: doc.data().color,
+            selectedName: doc.data().name,
+            selectedPrice: doc.data().price,
+            selectedSizes: doc.data().sizes,
+            availableStock: doc.data().stock,
+          }
+        }))
+        .filter(item => 
+          item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
       // Combine results
-      setSearchResults(shirtsResults);
+      const combinedResults = [...shirtsResults, ...customResults];
+      setSearchResults(combinedResults);
+      
     } catch (error) {
       console.error("Error searching:", error);
     } finally {
@@ -127,7 +154,7 @@ const Navbar = () => {
     }
   };
   
-  // Handle Enter key press in search box (no auto-navigation)
+  // Handle Enter key press in search box
   const handleEnterKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -135,23 +162,22 @@ const Navbar = () => {
     }
   };
 
-  // Handle search result click - now with direct navigation
-  const handleResultClick = (result) => {
+  // Handle search result click - now with direct navigation to CustomizeShirt
+  const handleResultClick = (product) => {
     // Close the search UI
     setShowSearchResults(false);
     setSearchQuery("");
     
-    // Navigate to the specific route with state
-    navigate(result.route, {
-      state: {
-        selectedImage: result.selectedImage,
-        selectedColor: result.selectedColor,
-        selectedName: result.selectedName,
-        selectedPrice: result.selectedPrice,
-        selectedSizes: result.selectedSizes,
-        availableStock: result.availableStock
-      }
-    });
+    // Navigate to the CustomizeShirt page with product data
+    if (product.type === 'shirt') {
+      navigate(`/ShopPages/CustomizeShirt`, {
+        state: product.productData
+      });
+    } else { // For custom products
+      navigate(`/ShopPages/CustomProduct/${product.id}`, {
+        state: product.productData
+      });
+    }
   };
 
   // Toggle mobile menu
@@ -303,13 +329,12 @@ const Navbar = () => {
 
               {/* Profile Picture with Dropdown */}
               <div className="relative">
-                <button onClick={toggleDropdown} className="focus:outline-none">
-                  <img
-                    src={user.photoURL || "/default-profile.png"}
-                    alt="Profile"
-                    className="h-10 w-10 rounded-full border-2 border-gray-400 cursor-pointer"
-                  />
-                </button>
+              <button onClick={toggleDropdown} className="focus:outline-none">
+              <div className="h-10 w-10 rounded-full 
+              cursor-pointer flex items-center justify-start ">
+                <Settings size={24} className=" hover:text-red-500 transition" />
+              </div>
+              </button>
 
                 {/* Profile Dropdown */}
                 {dropdownOpen && (
@@ -318,7 +343,7 @@ const Navbar = () => {
                       to="/Profile/ProfilePage"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
                     >
-                      Profile
+                      My Account
                     </Link>
 
                     <button

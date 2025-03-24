@@ -22,7 +22,7 @@ const PaymentPage = () => {
   
   // Auto-fill fields with data from checkout when component mounts
   useEffect(() => {
-    if (total && !amount) {
+    if (total) {
       setAmount(total.toFixed(2));
     }
     if (formData && formData.email && !email) {
@@ -31,7 +31,7 @@ const PaymentPage = () => {
     if (formData && formData.fullName && !name) {
       setName(formData.fullName);
     }
-  }, [total, formData, amount, email, name]);
+  }, [total, formData, email, name]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [step, setStep] = useState(1);
   const [paymentUrl, setPaymentUrl] = useState("");
@@ -61,10 +61,7 @@ const PaymentPage = () => {
     }
   };
 
-  const handleAmountChange = (e) => {
-    const value = e.target.value.replace(/[^\d.]/g, "");
-    setAmount(value);
-  };
+  // Removed handleAmountChange function since it's no longer needed
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -131,15 +128,12 @@ const PaymentPage = () => {
 
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setErrorMessage("Please enter a valid payment amount.");
+      setErrorMessage("Payment amount is invalid.");
       return;
     }
     
-    // Validate that amount matches the order total
-    if (Math.abs(parsedAmount - parseFloat(total.toFixed(2))) > 0.01) {
-      setErrorMessage(`Payment amount must match the order total of ₱${total.toFixed(2)}`);
-      return;
-    }
+    // Since amount is now read-only, we don't need to validate it matches the total
+    // The validation is kept for system integrity
 
     if (phoneNumber.length !== 10) {
       setErrorMessage("Please enter a valid 10-digit phone number.");
@@ -445,19 +439,20 @@ const PaymentPage = () => {
                         <input
                           type="text"
                           id="amount"
-                          className="w-full pl-10 pr-5 py-4 text-base rounded-lg border focus:ring-2 transition-colors font-medium"
+                          className="w-full pl-10 pr-5 py-4 text-base rounded-lg border focus:ring-2 transition-colors font-medium cursor-not-allowed"
                           style={{
                             backgroundColor: colors.inputBackground,
                             color: colors.lightText,
                             borderColor: colors.borderColor,
+                            opacity: 0.9
                           }}
                           placeholder={total ? total.toFixed(2) : "0.00"}
                           value={amount}
-                          onChange={handleAmountChange}
+                          readOnly
                           required
                         />
                         <div className="mt-2 text-sm" style={{ color: colors.secondaryText }}>
-                          Please enter the exact amount from the Order Summary
+                          Fixed amount based on your order total
                         </div>
                       </div>
                     </div>

@@ -6,13 +6,12 @@ const ProfileSidebar = ({ name }) => {
   const location = useLocation();
   
   return (
-    <div className="w-1/6 p-4 border-gray-200 my-10">
+    <div className="w-1/6 p-4 border-gray-200 my-7">
       {/* Profile icon and name */}
       <div className="flex items-center mb-6">
-        <div className="h-10 w-10 rounded-full bg-gray-300 overflow-hidden">
-          <img src="/api/placeholder/32/32" alt="Profile" />
-        </div>
-        <span className="ml-3 text-xl font-medium">{name}</span>
+          
+
+        <span className="ml-3 text-2xl font-medium">{name}</span>
       </div>
       
       {/* Navigation items */}

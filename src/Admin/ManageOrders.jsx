@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, MoreHorizontal, Check, X, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { db } from '../Database/firebase'; // Ensure correct path
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import Carousel from 'react-multi-carousel';
+import 'react-multi-carousel/lib/styles.css';
 
 const OrdersManagement = () => {
   const [selectedOrders, setSelectedOrders] = useState([]);
@@ -157,8 +159,13 @@ const OrdersManagement = () => {
     return receiptFile ? 'text-green-500' : 'text-red-500';
   };
 
-  const handleProductClick = (products) => {
-    setSelectedProduct(products);
+  const handleProductClick = (products, customerName) => {
+    const updatedProducts = products.map(product => ({
+      ...product,
+      uploadedBy: customerName // Set the uploadedBy field to the customer name
+    }));
+    console.log("Selected Products:", updatedProducts); // Log the selected products
+    setSelectedProduct(updatedProducts);
     setShowProductModal(true);
   };
 
@@ -471,7 +478,7 @@ const OrdersManagement = () => {
                           {order.selectedItems && order.selectedItems.length > 0 && (
                             <button 
                               className="text-blue-600 hover:underline"
-                              onClick={() => handleProductClick(order.selectedItems)} // Pass the entire selectedItems array
+                              onClick={() => handleProductClick(order.selectedItems, order.fullName)} // Pass the entire selectedItems array and customer name
                             >
                               View File
                             </button>
@@ -613,25 +620,77 @@ const OrdersManagement = () => {
               <div className="md:w-1/2 mb-6 md:mb-0">
                 <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center h-[400px]">
                   {selectedProduct.length > 1 ? (
-                    <div className="carousel">
+                    <Carousel
+                      additionalTransfrom={0}
+                      arrows
+                      autoPlaySpeed={3000}
+                      centerMode={false}
+                      className=""
+                      containerClass="container-with-dots"
+                      dotListClass=""
+                      draggable
+                      focusOnSelect={false}
+                      infinite
+                      itemClass=""
+                      keyBoardControl
+                      minimumTouchDrag={80}
+                      renderButtonGroupOutside={false}
+                      renderDotsOutside={false}
+                      responsive={{
+                        desktop: {
+                          breakpoint: {
+                            max: 3000,
+                            min: 1024
+                          },
+                          items: 1,
+                          partialVisibilityGutter: 40
+                        },
+                        mobile: {
+                          breakpoint: {
+                            max: 464,
+                            min: 0
+                          },
+                          items: 1,
+                          partialVisibilityGutter: 30
+                        },
+                        tablet: {
+                          breakpoint: {
+                            max: 1024,
+                            min: 464
+                          },
+                          items: 1,
+                          partialVisibilityGutter: 30
+                        }
+                      }}
+                      showDots={true}
+                      sliderClass=""
+                      slidesToSlide={1}
+                      swipeable
+                    >
                       {selectedProduct.map((product, index) => (
                         <div key={index} className="carousel-item">
                           <img
-                            src={product.image}
-                            alt="Product"
+                            src={product.imageUrl} // Use the correct property name for the image URL
+                            alt={product.productName} // Display the product name as alt text
                             className="max-h-full object-contain"
                             style={{ maxWidth: "100%", objectFit: "contain" }}
+                            onError={(e) => console.log("Image failed to load:", product.imageUrl)} // Log if image fails to load
                           />
+                          <p className="text-center mt-2">{product.productName}</p> {/* Display the product name */}
                         </div>
                       ))}
-                    </div>
+                    </Carousel>
                   ) : (
-                    <img
-                      src={selectedProduct[0].image}
-                      alt="Product"
-                      className="max-h-full object-contain"
-                      style={{ maxWidth: "100%", objectFit: "contain" }}
-                    />
+                    <div>
+                      <img
+                        src={selectedProduct[0].imageUrl} // Use the correct property name for the image URL
+                        alt={selectedProduct[0].productName} // Display the product name as alt text
+                        className="max-h-full object-contain"
+                        style={{ maxWidth: "100%", objectFit: "contain" }}
+                        onError={(e) => console.log("Image failed to load:", selectedProduct[0].imageUrl)} // Log if image fails to load
+                      />
+                      <p className="text-center mt-2">{selectedProduct[0].productName}</p> {/* Display the product name */}
+                    </div>
                   )}
                 </div>
               </div>
@@ -652,10 +711,10 @@ const OrdersManagement = () => {
                 <div className="border-b pb-2 mb-2">
                   <h3 className="font-bold text-2xl mb-3">File Information</h3>
                   <p className="text-lg">
-                    <span className="font-semibold">File Name:</span> {selectedProduct[0].name}
+                    <span className="font-semibold">File Name:</span> {selectedProduct[0].productName}
                   </p>
                   <p className="text-lg">
-                    <span className="font-semibold">File Size:</span> {selectedProduct[0].size} MB
+                    <span className="font-semibold">Shirt Size:</span> {selectedProduct[0].size}
                   </p>
                   <p className="text-lg">
                     <span className="font-semibold">Uploaded By:</span> {selectedProduct[0].uploadedBy}

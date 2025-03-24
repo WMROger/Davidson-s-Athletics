@@ -60,7 +60,7 @@ const ProfilePage = () => {
             {Object.keys(profile).filter(key => key !== 'role').map((key) => (
               <div key={key} className="flex items-center space-x-4">
                 <label className="w-32 font-semibold capitalize">{key}:</label>
-                {isEditing ? (
+                {isEditing && key !== 'email' ? (
                   <input
                     type="text"
                     name={key}
@@ -83,6 +83,22 @@ const ProfilePage = () => {
             >
               {isEditing ? "Save" : "Edit"}
             </button>
+          </div>
+        </div>
+      </div>
+      {/* Footer */}
+      <div className="w-full py-20 px-10 bg-gray-800 mt-12">
+        <div className="container mx-auto text-white">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-lg font-bold">Davidson Athletics</h3>
+              <p className="text-sm mt-2">© 2025 Davidson Athletics. All rights reserved.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">Contact Us</h3>
+              <p className="text-sm mt-2">Email: </p>
+              <p className="text-sm">Phone: </p>
+            </div>
           </div>
         </div>
       </div>

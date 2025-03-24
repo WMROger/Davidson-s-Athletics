@@ -249,8 +249,22 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Footer Section */}
-        <div className="w-full py-20 px-10 bg-gray-800"></div>
+       {/* Footer */}
+      <div className="w-full  pb-20 pt-10 px-10 bg-gray-800 mt-10">
+        <div className="container mx-auto text-white">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-lg font-bold">Davidson Athletics</h3>
+              <p className="text-sm mt-2">© 2025 Davidson Athletics. All rights reserved.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">Contact Us</h3>
+              <p className="text-sm mt-2">Email: support@davidsonathletics.com</p>
+              <p className="text-sm">Phone: +1 234 567 890</p>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
     </>
   );

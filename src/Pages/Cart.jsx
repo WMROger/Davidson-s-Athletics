@@ -426,8 +426,8 @@ const Cart = () => {
             </div>
             <div>
               <h3 className="text-lg font-bold">Contact Us</h3>
-              <p className="text-sm mt-2">Email: support@davidsonathletics.com</p>
-              <p className="text-sm">Phone: +1 234 567 890</p>
+              <p className="text-sm mt-2">Email: </p>
+              <p className="text-sm">Phone: </p>
             </div>
           </div>
         </div>
