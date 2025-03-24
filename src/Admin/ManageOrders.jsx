@@ -16,12 +16,9 @@ const OrdersManagement = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [dropdownOrderId, setDropdownOrderId] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState([
-    { imageUrl: 'https://davidsonathletics.scarlet2.io/assets/monkey.webp', productName: 'Product 1' },
-    { imageUrl: 'https://davidsonathletics.scarlet2.io/assets/BatCat.png', productName: 'Product 2' },
-    { imageUrl: 'https://davidsonathletics.scarlet2.io/assets/First Blender.png', productName: 'Product 3' }
-  ]);
-  const [showProductModal, setShowProductModal] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState([]);
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const typeDropdownRef = useRef(null);
   const statusDropdownRef = useRef(null);
@@ -605,16 +602,27 @@ const OrdersManagement = () => {
           <div className="bg-white p-6 rounded-lg shadow-xl w-3/4 max-w-4xl max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b pb-4 mb-6">
               <h2 className="text-2xl font-semibold">File Details</h2>
-              
+              <button
+                className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100"
+                onClick={() => setShowProductModal(false)}
+              >
+                <X className="h-6 w-6" />
+              </button>
             </div>
             <div className="flex flex-col md:flex-row md:space-x-6">
               <div className="md:w-1/2 mb-6 md:mb-0">
                 <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center h-[400px]">
-                  <Carousel showThumbs={false} showStatus={false} infiniteLoop useKeyboardArrows>
+                  <Carousel
+                    showThumbs={false}
+                    showStatus={false}
+                    infiniteLoop
+                    useKeyboardArrows
+                    selectedItem={currentSlide}
+                    onChange={(index) => setCurrentSlide(index)}
+                  >
                     {selectedProduct.map((product, index) => (
                       <div key={index}>
                         <img src={product.imageUrl} alt={product.productName} />
-                        <p className="legend">{product.productName}</p>
                       </div>
                     ))}
                   </Carousel>
@@ -624,18 +632,21 @@ const OrdersManagement = () => {
                 <div className="border-b pb-2 mb-2">
                   <h3 className="font-bold text-2xl mb-3">File Information</h3>
                   <p className="text-lg">
-                    <span className="font-semibold">File Name:</span> {selectedProduct[0].productName}
+                    <span className="font-semibold">File Name:</span> {selectedProduct[currentSlide].productName}
                   </p>
                   <p className="text-lg">
-                    <span className="font-semibold">Shirt Size:</span> {selectedProduct[0].size}
+                    <span className="font-semibold">Shirt Size:</span> {selectedProduct[currentSlide].size}
                   </p>
                   <p className="text-lg">
-                    <span className="font-semibold">Uploaded By:</span> {selectedProduct[0].uploadedBy}
+                    <span className="font-semibold">Quantity:</span> {selectedProduct[currentSlide].quantity}
+                  </p>
+                  <p className="text-lg">
+                    <span className="font-semibold">Uploaded By:</span> {selectedProduct[currentSlide].uploadedBy}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-bold text-2xl mb-3">Total Shirts Ordered</h3>
-                  <p className="text-lg">{selectedProduct.length}</p>
+                  <p className="text-lg">{selectedProduct.reduce((total, product) => total + product.quantity, 0)}</p>
                 </div>
               </div>
             </div>

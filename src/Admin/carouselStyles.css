@@ -1,11 +1,37 @@
 .carousel .control-next.control-arrow:before,
 .carousel .control-prev.control-arrow:before {
-  border-top-color: black;
-  border-right-color: black;
+  border-top-color: transparent;
+  border-right-color: transparent;
 }
 
 .carousel .control-next.control-arrow,
 .carousel .control-prev.control-arrow {
   background: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel .control-next.control-arrow {
+  right: 10px;
+}
+
+.carousel .control-prev.control-arrow {
+  left: 10px;
+}
+
+.carousel .control-next.control-arrow:before {
+  content: '>';
+}
+
+.carousel .control-prev.control-arrow:before {
+  content: '<';
 }
