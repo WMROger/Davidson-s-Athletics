@@ -417,7 +417,7 @@ const Cart = () => {
 
       
       {/* Footer */}
-      <div className="w-full py-20 px-10 bg-gray-800 mt-12">
+      <div className="w-full  pb-20 pt-10 px-10 bg-gray-800 mt-10">
         <div className="container mx-auto text-white">
           <div className="flex justify-between">
             <div>

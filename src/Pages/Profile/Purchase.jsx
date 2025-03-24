@@ -23,8 +23,8 @@ const Purchase = () => {
 
   return (
     <>
-      <div className="bg-black h-20 mt-30 w-full"></div>
-      <div className="flex min-h-screen">
+      <div className="bg-black h-30 mt-30 w-full"></div>
+      <div className="flex min-h-svh">
         <ProfileSidebar />
         <div className="flex-1 bg-white flex justify-center mr-50">
           <div className="w-full max-w-3xl">
@@ -105,22 +105,7 @@ const Purchase = () => {
       </div>
 
 
-      {/* Footer */}
-      <div className="w-full  pb-20 pt-10 px-10 bg-gray-800 mt-10">
-        <div className="container mx-auto text-white">
-          <div className="flex justify-between">
-            <div>
-              <h3 className="text-lg font-bold">Davidson Athletics</h3>
-              <p className="text-sm mt-2">© 2025 Davidson Athletics. All rights reserved.</p>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold">Contact Us</h3>
-              <p className="text-sm mt-2">Email: support@davidsonathletics.com</p>
-              <p className="text-sm">Phone: +1 234 567 890</p>
-            </div>
-          </div>
-        </div>
-      </div>
+    
     </>
   );
 };

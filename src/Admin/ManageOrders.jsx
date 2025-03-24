@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, MoreHorizontal, Check, X, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronDown, MoreHorizontal, Check, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { db } from '../Database/firebase'; // Ensure correct path
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import './carouselStyles.css'; // Import the custom CSS file
 
 const OrdersManagement = () => {
   const [selectedOrders, setSelectedOrders] = useState([]);
@@ -15,8 +16,12 @@ const OrdersManagement = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [dropdownOrderId, setDropdownOrderId] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showProductModal, setShowProductModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState([
+    { imageUrl: 'https://davidsonathletics.scarlet2.io/assets/monkey.webp', productName: 'Product 1' },
+    { imageUrl: 'https://davidsonathletics.scarlet2.io/assets/BatCat.png', productName: 'Product 2' },
+    { imageUrl: 'https://davidsonathletics.scarlet2.io/assets/First Blender.png', productName: 'Product 3' }
+  ]);
+  const [showProductModal, setShowProductModal] = useState(true);
 
   const typeDropdownRef = useRef(null);
   const statusDropdownRef = useRef(null);
@@ -162,9 +167,13 @@ const OrdersManagement = () => {
   const handleProductClick = (products, customerName) => {
     const updatedProducts = products.map(product => ({
       ...product,
-      uploadedBy: customerName // Set the uploadedBy field to the customer name
+      uploadedBy: customerName, // Set the uploadedBy field to the customer name
+      description: product.description || "No description available" // Ensure description is present
     }));
     console.log("Selected Products:", updatedProducts); // Log the selected products
+    updatedProducts.forEach((product, index) => {
+      console.log(`Product ${index + 1}:`, product);
+    });
     setSelectedProduct(updatedProducts);
     setShowProductModal(true);
   };
@@ -592,122 +601,26 @@ const OrdersManagement = () => {
         </div>
       </div>
       {showProductModal && selectedProduct && (
-        <div 
-          className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md bg-black/30"
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              setShowProductModal(false);
-            }
-          }}
-          tabIndex={0}
-          ref={(node) => {
-            // Focus the div so it can receive keyboard events
-            if (node) node.focus();
-          }}
-        >
+        <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md bg-black/30">
           <div className="bg-white p-6 rounded-lg shadow-xl w-3/4 max-w-4xl max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b pb-4 mb-6">
               <h2 className="text-2xl font-semibold">File Details</h2>
-              <button
-                className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100"
-                onClick={() => setShowProductModal(false)}
-              >
-                <X className="h-6 w-6" />
-              </button>
+              
             </div>
-            
             <div className="flex flex-col md:flex-row md:space-x-6">
               <div className="md:w-1/2 mb-6 md:mb-0">
                 <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center h-[400px]">
-                  {selectedProduct.length > 1 ? (
-                    <Carousel
-                      additionalTransfrom={0}
-                      arrows
-                      autoPlaySpeed={3000}
-                      centerMode={false}
-                      className=""
-                      containerClass="container-with-dots"
-                      dotListClass=""
-                      draggable
-                      focusOnSelect={false}
-                      infinite
-                      itemClass=""
-                      keyBoardControl
-                      minimumTouchDrag={80}
-                      renderButtonGroupOutside={false}
-                      renderDotsOutside={false}
-                      responsive={{
-                        desktop: {
-                          breakpoint: {
-                            max: 3000,
-                            min: 1024
-                          },
-                          items: 1,
-                          partialVisibilityGutter: 40
-                        },
-                        mobile: {
-                          breakpoint: {
-                            max: 464,
-                            min: 0
-                          },
-                          items: 1,
-                          partialVisibilityGutter: 30
-                        },
-                        tablet: {
-                          breakpoint: {
-                            max: 1024,
-                            min: 464
-                          },
-                          items: 1,
-                          partialVisibilityGutter: 30
-                        }
-                      }}
-                      showDots={true}
-                      sliderClass=""
-                      slidesToSlide={1}
-                      swipeable
-                    >
-                      {selectedProduct.map((product, index) => (
-                        <div key={index} className="carousel-item">
-                          <img
-                            src={product.imageUrl} // Use the correct property name for the image URL
-                            alt={product.productName} // Display the product name as alt text
-                            className="max-h-full object-contain"
-                            style={{ maxWidth: "100%", objectFit: "contain" }}
-                            onError={(e) => console.log("Image failed to load:", product.imageUrl)} // Log if image fails to load
-                          />
-                          <p className="text-center mt-2">{product.productName}</p> {/* Display the product name */}
-                        </div>
-                      ))}
-                    </Carousel>
-                  ) : (
-                    <div>
-                      <img
-                        src={selectedProduct[0].imageUrl} // Use the correct property name for the image URL
-                        alt={selectedProduct[0].productName} // Display the product name as alt text
-                        className="max-h-full object-contain"
-                        style={{ maxWidth: "100%", objectFit: "contain" }}
-                        onError={(e) => console.log("Image failed to load:", selectedProduct[0].imageUrl)} // Log if image fails to load
-                      />
-                      <p className="text-center mt-2">{selectedProduct[0].productName}</p> {/* Display the product name */}
-                    </div>
-                  )}
+                  <Carousel showThumbs={false} showStatus={false} infiniteLoop useKeyboardArrows>
+                    {selectedProduct.map((product, index) => (
+                      <div key={index}>
+                        <img src={product.imageUrl} alt={product.productName} />
+                        <p className="legend">{product.productName}</p>
+                      </div>
+                    ))}
+                  </Carousel>
                 </div>
               </div>
-              
               <div className="md:w-1/2 space-y-4">
-                <div className="mb-2">
-                  <span className={`inline-block px-4 py-2 rounded-lg text-lg font-medium ${
-                    selectedProduct[0].status === "Approved"
-                      ? "bg-green-500 text-white"
-                      : selectedProduct[0].status === "Denied"
-                      ? "bg-red-500 text-white"
-                      : "bg-yellow-500 text-white"
-                  }`}>
-                    {selectedProduct[0].status}
-                  </span>
-                </div>
-                
                 <div className="border-b pb-2 mb-2">
                   <h3 className="font-bold text-2xl mb-3">File Information</h3>
                   <p className="text-lg">
@@ -720,19 +633,12 @@ const OrdersManagement = () => {
                     <span className="font-semibold">Uploaded By:</span> {selectedProduct[0].uploadedBy}
                   </p>
                 </div>
-                
-                <div className="border-b pb-2 mb-2">
-                  <h3 className="font-bold text-2xl mb-3">Description</h3>
-                  <p className="text-lg">{selectedProduct[0].description}</p>
-                </div>
-                
                 <div>
-                  <h3 className="font-bold text-2xl mb-3">Tags</h3>
-                  <p className="text-lg">{selectedProduct[0].tags ? selectedProduct[0].tags.join(", ") : "No tags available"}</p>
+                  <h3 className="font-bold text-2xl mb-3">Total Shirts Ordered</h3>
+                  <p className="text-lg">{selectedProduct.length}</p>
                 </div>
               </div>
             </div>
-            
             <div className="mt-6 pt-4 border-t flex justify-end space-x-4">
               <button
                 className="px-6 py-3 bg-gray-200 cursor-pointer text-gray-800 rounded-lg hover:bg-gray-300 text-lg font-medium transition-colors"

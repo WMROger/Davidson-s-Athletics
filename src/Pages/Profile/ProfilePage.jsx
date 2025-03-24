@@ -45,8 +45,8 @@ const ProfilePage = () => {
 
   return (
     <>
-      <div className="bg-black h-20 w-full mt-30"></div>
-      <div className="flex min-h-screen">
+      <div className="bg-black h-30 w-full mt-30"></div>
+      <div className="flex ">
         {/* Sidebar */}
         <ProfileSidebar name={`${profile.firstName} ${profile.lastName}`} />
 
@@ -86,8 +86,10 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+      
+
       {/* Footer */}
-      <div className="w-full py-20 px-10 bg-gray-800 mt-12">
+      <div className="w-full pb-20 pt-10 px-20 bg-gray-800 mt-10">
         <div className="container mx-auto text-white">
           <div className="flex justify-between">
             <div>
@@ -96,8 +98,8 @@ const ProfilePage = () => {
             </div>
             <div>
               <h3 className="text-lg font-bold">Contact Us</h3>
-              <p className="text-sm mt-2">Email: </p>
-              <p className="text-sm">Phone: </p>
+              <p className="text-sm mt-2">Email: support@davidsonathletics.com</p>
+              <p className="text-sm">Phone: +1 234 567 890</p>
             </div>
           </div>
         </div>

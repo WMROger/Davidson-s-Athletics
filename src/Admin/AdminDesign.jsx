@@ -380,12 +380,12 @@ export default function AdminDesign() {
     <div className="bg-white p-6 rounded-lg shadow-xl w-3/4 max-w-4xl max-h-[80vh] overflow-y-auto">
       <div className="flex justify-between items-center border-b pb-4 mb-6">
         <h2 className="text-2xl font-semibold">Asset Details</h2>
-        <button
+        {/* <button
           className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100"
           onClick={() => setSelectedAsset(null)}
         >
           <X className="h-6 w-6" />
-        </button>
+        </button> */}
       </div>
       
       <div className="flex flex-col md:flex-row md:space-x-6">
