@@ -28,6 +28,13 @@ export default function Login() {
       }
 
       const user = userCredential.user;
+
+      // Check if email is verified
+      if (!user.emailVerified) {
+        alert("Please verify your email before logging in.");
+        return;
+      }
+
       console.log(`${authMethod} login successful:`, user);
 
       // Check if user exists in Firestore
